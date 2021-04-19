@@ -16,8 +16,11 @@ namespace DSM_Graph_Layer.HPGraphModel
 
         public override void AddPole(Pole p)
         {
-            if (!Poles.Any(x => x.Id == p.Id) && (p.VertexOwner!=null || p.GraphOwner!=null))
+            if (!Poles.Any(x => x.Id == p.Id) && (p.VertexOwner != null || p.GraphOwner != null))
+            {
+                p.EdgeOwners.Add(this);
                 Poles.Add(p);
+            }
         }
 
         public override void RemovePole(Pole p)
@@ -25,6 +28,7 @@ namespace DSM_Graph_Layer.HPGraphModel
             if (Poles.Any(x => x.Id == p.Id))
             {
                 RemoveLinksForPole(p);
+                p.EdgeOwners.Remove(this);
                 Poles.Remove(p);
             }               
 

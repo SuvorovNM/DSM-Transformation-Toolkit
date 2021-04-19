@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer
+namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 {
     public class IsomorphicSubgraphFinder
     {
@@ -102,7 +102,7 @@ namespace DSM_Graph_Layer
             else
             {
                 var possiblePairs = GetAllCandidatePairsV();
-                foreach(var pair in possiblePairs)
+                foreach (var pair in possiblePairs)
                 {
                     if (CheckFisibilityRulesV(pair))
                     {
@@ -116,13 +116,13 @@ namespace DSM_Graph_Layer
 
         public long[] RecurseW() // TODO: Output?
         {
-            if (wCoreTarget.All(x=>x != nullValue))
+            if (wCoreTarget.All(x => x != nullValue))
             {
                 var incidentEdges = GroupByIncidence();
-                foreach(var pair in incidentEdges)
+                foreach (var pair in incidentEdges)
                 {
                     var polCorr = RecurseP(pair); // TODO: добавить проверку на принадлежность соответствующим гиперребрам при сравнении
-                    if (!TryAppendToPoleMatching(polCorr)) 
+                    if (!TryAppendToPoleMatching(polCorr))
                     {
                         ClearPoleVectors();
                         break;
@@ -150,6 +150,7 @@ namespace DSM_Graph_Layer
         // Похоже придется вынести в отдельный класс
         public long[] RecurseP((Hyperedge sourceEdge, Hyperedge targetEdge) edgePair, List<long> polCorr = null) // TODO: Output?
         {
+            throw new NotImplementedException();
             if (polCorr == null)
             {
                 polCorr = new List<long>(edgePair.targetEdge.Poles.Count);
@@ -191,7 +192,7 @@ namespace DSM_Graph_Layer
             throw new NotImplementedException();
         }
 
-        public List<(Vertex,Vertex)> GetAllCandidatePairsV()
+        public List<(Vertex, Vertex)> GetAllCandidatePairsV()
         {
             throw new NotImplementedException();
         }

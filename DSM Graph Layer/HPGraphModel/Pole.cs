@@ -10,11 +10,13 @@ namespace DSM_Graph_Layer.HPGraphModel
         private PoleType Type { get; set; }
         public Vertex VertexOwner { get; set; }
         public HPGraph GraphOwner { get; set; }
+        public List<Hyperedge> EdgeOwners { get; set; }
 
         public Pole(PoleType type = PoleType.Both)
         {
             GraphEnumerator.SetNextId(this);
             Type = type;
+            EdgeOwners = new List<Hyperedge>();
         }
 
         public bool CanBeInput()
