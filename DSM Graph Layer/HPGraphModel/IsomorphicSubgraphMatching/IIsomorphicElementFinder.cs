@@ -12,8 +12,8 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         public Dictionary<T, long> ConnTarget { get; set; }
 
         //Dictionary<T, T> Recurse();
-        void UpdateVectors(T source, T target);
-        void RestoreVectors();
+        void UpdateVectors(long step, T source, T target);
+        void RestoreVectors(long step, T source, T target);
         List<(T, T)> GetAllCandidatePairs();
         bool CheckFisibiltyRules(T source, T target);
     }

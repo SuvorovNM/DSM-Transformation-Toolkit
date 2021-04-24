@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 {
-    public class IsomorphicVertexFinder //: IIsomorphicElementFinder<Vertex>
+    public class IsomorphicVertexFinder : IIsomorphicElementFinder<Vertex>
     {
         public IsomorphicVertexFinder(HPGraph source, HPGraph target)
         {
@@ -23,18 +23,18 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             CoreTarget = new Dictionary<Vertex, Vertex>();
             ConnTarget = new Dictionary<Vertex, long>();
-            foreach(var vertex in HPGraphTarget.Vertices)
+            foreach (var vertex in HPGraphTarget.Vertices)
             {
                 CoreTarget.Add(vertex, null);
                 ConnTarget.Add(vertex, 0);
             }
-            
+
             GeneratedAnswers = new List<(Dictionary<Vertex, Vertex>, Dictionary<Hyperedge, Hyperedge>, Dictionary<Pole, Pole>)>();
         }
         public Dictionary<Vertex, Vertex> CoreSource { get; set; }
         public Dictionary<Vertex, Vertex> CoreTarget { get; set; }
         public Dictionary<Vertex, long> ConnSource { get; set; }
-        public Dictionary<Vertex, long> ConnTarget { get; set; }        
+        public Dictionary<Vertex, long> ConnTarget { get; set; }
         private HPGraph HPGraphSource { get; }
         private HPGraph HPGraphTarget { get; }
         private List<(Dictionary<Vertex, Vertex>, Dictionary<Hyperedge, Hyperedge>, Dictionary<Pole, Pole>)> GeneratedAnswers;
@@ -46,16 +46,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             {
                 // Учитывать ли несколько вариаций изорфности ребер? - вероятно нет
                 var edgeFinder = new IsomorphicEdgeFinder(HPGraphSource, HPGraphTarget, CoreSource, CoreTarget);
-                (var edgeCorr, var polCorr) = edgeFinder.Recurse();
+                edgeFinder.Recurse();//(var edgeCorr, var polCorr) = 
+                var edgeCorr = edgeFinder.CoreTarget;
+                var polCorr = edgeFinder.PolCorr;
 
                 if (polCorr != null)
                 {
                     AppendUnlinkedMatches(polCorr);
                     GeneratedAnswers.Add((CoreTarget, edgeCorr, polCorr));
-                }
-                else
-                {
-                    RestoreVectors(step, source, target);
                 }
             }
             else
@@ -66,11 +64,12 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                     if (CheckFisibiltyRules(potentialSource, potentialTarget))
                     {
                         UpdateVectors(step, potentialSource, potentialTarget);
-                        Recurse(step+1, potentialSource, potentialTarget);
+                        Recurse(step + 1, potentialSource, potentialTarget);
                     }
                 }
-                RestoreVectors(step, source, target);
             }
+
+            RestoreVectors(step, source, target);
         }
 
         public void RestoreVectors(long step, Vertex source, Vertex target)
@@ -78,12 +77,12 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             CoreSource[source] = null;
             CoreTarget[target] = null;
 
-            foreach(var item in HPGraphSource.Vertices)
+            foreach (var item in HPGraphSource.Vertices)
             {
                 if (ConnSource[item] == step)
                     ConnSource[item] = 0;
             }
-            foreach(var item in HPGraphTarget.Vertices)
+            foreach (var item in HPGraphTarget.Vertices)
             {
                 if (ConnTarget[item] == step)
                     ConnTarget[item] = 0;
@@ -97,14 +96,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             // TODO: По возможности заменить на что-то более адекватное
             var connectedToSourceVertices = GetConnectedVertices(source);
-            foreach(var vertex in connectedToSourceVertices)
+            foreach (var vertex in connectedToSourceVertices)
             {
                 if (ConnSource[vertex] != 0)
                     ConnSource[vertex] = step;
             }
 
             var connectedToTargetVertices = GetConnectedVertices(target);
-            foreach(var vertex in connectedToTargetVertices)
+            foreach (var vertex in connectedToTargetVertices)
             {
                 if (ConnTarget[vertex] != 0)
                     ConnTarget[vertex] = step;
@@ -122,9 +121,9 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
 
             var resultPairList = new List<(Vertex, Vertex)>();
-            foreach(var source in candidateSourceVertices)
+            foreach (var source in candidateSourceVertices)
             {
-                foreach(var target in candidateTargetVertices)
+                foreach (var target in candidateTargetVertices)
                 {
                     resultPairList.Add((source, target));
                 }
@@ -136,19 +135,19 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         public bool CheckFisibiltyRules(Vertex source, Vertex target)
         {
             return CheckConsistencyRule(source, target) && CheckOneLookAhead(source, target) && CheckTwoLookAhead(source, target);
-        } 
-        
+        }
+
         private bool CheckConsistencyRule(Vertex source, Vertex target)
         {
-            var matchedConnectedToSource = GetConnectedVertices(source).Where(x=>CoreSource[x] != null);
+            var matchedConnectedToSource = GetConnectedVertices(source).Where(x => CoreSource[x] != null);
             var matchedConnectedToTarget = GetConnectedVertices(target).Where(x => CoreTarget[x] != null);
             var result = true;
 
-            foreach(var vertex in matchedConnectedToSource)
+            foreach (var vertex in matchedConnectedToSource)
             {
                 result &= matchedConnectedToTarget.Any(x => CoreTarget[x] == vertex);
             }
-            foreach(var vertex in matchedConnectedToTarget)
+            foreach (var vertex in matchedConnectedToTarget)
             {
                 result &= matchedConnectedToSource.Any(x => CoreSource[x] == vertex);
             }
