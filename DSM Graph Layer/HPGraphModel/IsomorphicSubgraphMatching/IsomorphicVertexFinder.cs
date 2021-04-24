@@ -98,14 +98,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var connectedToSourceVertices = GetConnectedVertices(source);
             foreach (var vertex in connectedToSourceVertices)
             {
-                if (ConnSource[vertex] != 0)
+                if (ConnSource[vertex] == 0)
                     ConnSource[vertex] = step;
             }
 
             var connectedToTargetVertices = GetConnectedVertices(target);
             foreach (var vertex in connectedToTargetVertices)
             {
-                if (ConnTarget[vertex] != 0)
+                if (ConnTarget[vertex] == 0)
                     ConnTarget[vertex] = step;
             }
         }

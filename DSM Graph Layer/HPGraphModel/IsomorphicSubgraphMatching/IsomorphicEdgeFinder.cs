@@ -52,8 +52,9 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 var incidentEdges = GroupByIncidence();
                 foreach ((var sourceGroup, var targetGroup) in incidentEdges)
                 {
-                    var poleFinder = new IsomorphicPoleFinder();
-                    var polCorr = poleFinder.Recurse();
+                    var poleFinder = new IsomorphicPoleFinder(sourceGroup, targetGroup, CoreSourceV, CoreTargetV, CoreSource, CoreTarget);
+                    poleFinder.Recurse();
+                    var polCorr = poleFinder.CoreTarget;
 
                     if (!TryAppendToPolesMatching(polCorr))
                     {
@@ -67,6 +68,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 var pairs = GetAllCandidatePairs();
                 foreach((var potentialSource, var potentialTarget) in pairs)
                 {
+                    // TODO: возможно, стоит добавить проверку
                     UpdateVectors(step, potentialSource, potentialTarget);
                     Recurse(step + 1, potentialSource, potentialTarget);
                 }
