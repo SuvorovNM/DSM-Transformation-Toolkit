@@ -47,11 +47,6 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             PolCorr = new Dictionary<Pole, Pole>();
             GeneratedAnswers = new List<(Dictionary<Hyperedge, Hyperedge> edges, Dictionary<Pole, Pole> poles)>();
         }
-
-        public Dictionary<Hyperedge, Hyperedge> CoreSource { get; set; }
-        public Dictionary<Hyperedge, Hyperedge> CoreTarget { get; set; }
-        public Dictionary<Hyperedge, long> ConnSource { get; set; } // Может и не нужно
-        public Dictionary<Hyperedge, long> ConnTarget { get; set; } // Может и не нужно
         /// <summary>
         /// Исходный граф
         /// </summary>
@@ -129,7 +124,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             return false;
         }
 
-        public void RestoreVectors(long step, Hyperedge source, Hyperedge target)
+        protected override void RestoreVectors(long step, Hyperedge source, Hyperedge target)
         {
             CoreSource[source] = (Hyperedge)null;
             CoreTarget[target] = (Hyperedge)null;
@@ -146,17 +141,17 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }*/
         }
 
-        public void UpdateVectors(long step, Hyperedge source, Hyperedge target)
+        protected override void UpdateVectors(long step, Hyperedge source, Hyperedge target)
         {
             CoreSource[source] = target;
             CoreTarget[target] = source;
         }
-        public bool CheckFisibiltyRules(Hyperedge source, Hyperedge target)
+        protected override bool CheckFisibiltyRules(Hyperedge source, Hyperedge target)
         {
             throw new NotImplementedException();
         }
 
-        public List<(Hyperedge, Hyperedge)> GetAllCandidatePairs()
+        protected override List<(Hyperedge, Hyperedge)> GetAllCandidatePairs()
         {
             var candidateSourceEdges = HPGraphSource.Edges.Where(x => CoreSource[x] == null);
             var candidateTargetEdges = HPGraphTarget.Edges.Where(x => CoreTarget[x] == null);

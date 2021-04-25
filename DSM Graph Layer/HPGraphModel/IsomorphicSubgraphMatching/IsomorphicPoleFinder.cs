@@ -51,11 +51,6 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 ConnTarget[pole] = 0;
             }
         }
-        
-        public Dictionary<Pole, Pole> CoreSource { get; set; }
-        public Dictionary<Pole, Pole> CoreTarget { get; set; }
-        public Dictionary<Pole, long> ConnSource { get; set; }
-        public Dictionary<Pole, long> ConnTarget { get; set; }
         /// <summary>
         /// Гиперребро исходного графа
         /// </summary>
@@ -111,7 +106,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             return false;
         }
 
-        public void RestoreVectors(long step, Pole source, Pole target)
+        protected override void RestoreVectors(long step, Pole source, Pole target)
         {
             CoreSource[source] = null;
             CoreTarget[target] = null;
@@ -128,7 +123,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
         }
 
-        public void UpdateVectors(long step, Pole source, Pole target)
+        protected override void UpdateVectors(long step, Pole source, Pole target)
         {
             CoreSource[source] = target;
             CoreTarget[target] = source;
@@ -153,7 +148,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
         }
 
-        public List<(Pole, Pole)> GetAllCandidatePairs()
+        protected override List<(Pole, Pole)> GetAllCandidatePairs()
         {
             var sourceCandidatePoles = HyperedgeSource.Poles.Where(x => CoreSource[x] == null && ConnSource[x] != 0);
             var targetCandidatePoles = HyperedgeTarget.Poles.Where(x => CoreTarget[x] == null && ConnTarget[x] != 0);
@@ -185,7 +180,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             return resultPairList;
         }
 
-        public bool CheckFisibiltyRules(Pole source, Pole target)
+        protected override bool CheckFisibiltyRules(Pole source, Pole target)
         {
             return CheckConsistencyRule(source, target) && CheckOneLookAhead(source, target) && CheckTwoLookAhead(source, target);
         }

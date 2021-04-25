@@ -38,10 +38,6 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             GeneratedAnswers = new List<(Dictionary<Vertex, Vertex>, Dictionary<Hyperedge, Hyperedge>, Dictionary<Pole, Pole>)>();
         }
-        public Dictionary<Vertex, Vertex> CoreSource { get; set; }
-        public Dictionary<Vertex, Vertex> CoreTarget { get; set; }
-        public Dictionary<Vertex, long> ConnSource { get; set; }
-        public Dictionary<Vertex, long> ConnTarget { get; set; }
         /// <summary>
         /// Исходный граф
         /// </summary>
@@ -100,7 +96,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             RestoreVectors(step, source, target);
         }
 
-        public void RestoreVectors(long step, Vertex source, Vertex target)
+        protected override void RestoreVectors(long step, Vertex source, Vertex target)
         {
             CoreSource[source] = null;
             CoreTarget[target] = null;
@@ -117,7 +113,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
         }
 
-        public void UpdateVectors(long step, Vertex source, Vertex target)
+        protected override void UpdateVectors(long step, Vertex source, Vertex target)
         {
             CoreSource[source] = target;
             CoreTarget[target] = source;
@@ -143,7 +139,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
         }
 
-        public List<(Vertex, Vertex)> GetAllCandidatePairs()
+        protected override List<(Vertex, Vertex)> GetAllCandidatePairs()
         {
             var candidateSourceVertices = HPGraphSource.Vertices.Where(x => CoreSource[x] == null && ConnSource[x] != 0);
             var candidateTargetVertices = HPGraphTarget.Vertices.Where(x => CoreTarget[x] == null && ConnTarget[x] != 0);
@@ -165,7 +161,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             return resultPairList;
         }
 
-        public bool CheckFisibiltyRules(Vertex source, Vertex target)
+        protected override bool CheckFisibiltyRules(Vertex source, Vertex target)
         {
             return CheckConsistencyRule(source, target) && CheckOneLookAhead(source, target) && CheckTwoLookAhead(source, target);
         }
