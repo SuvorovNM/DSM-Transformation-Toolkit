@@ -6,6 +6,9 @@ namespace DSM_Graph_Layer.HPGraphModel
 {
     public abstract class ElementWithId
     {
+        /// <summary>
+        /// Уникальный идентификатор объекта
+        /// </summary>
         public long Id { get; set; }
     }
 }

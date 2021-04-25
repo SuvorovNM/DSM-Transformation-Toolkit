@@ -5,13 +5,31 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel
 {
+    /// <summary>
+    /// Структура HP-графа: вершина или гиперребро
+    /// </summary>
     public abstract class Structure : ElementWithId
     {
+        /// <summary>
+        /// Граф, которому принадлежит структура
+        /// </summary>
         public HPGraph OwnerGraph { get; set; }
+        /// <summary>
+        /// Полюса структуры
+        /// </summary>
         public List<Pole> Poles { get; set;  }
+        /// <summary>
+        /// Семантический тип структуры
+        /// </summary>
         public string SemanticType { get; set; }
+        /// <summary>
+        /// Декомпозиции структуры
+        /// </summary>
         public List<HPGraph> Decompositions { get; set; }
 
+        /// <summary>
+        /// Инициализировать структуру и присвоить уникальный ID
+        /// </summary>
         public Structure()
         {
             GraphEnumerator.SetNextId(this);
@@ -19,9 +37,16 @@ namespace DSM_Graph_Layer.HPGraphModel
             Decompositions = new List<HPGraph>();
         }
 
+        /// <summary>
+        /// Добавить полюс к структуре
+        /// </summary>
+        /// <param name="p">Добавляемый полюс</param>
         public abstract void AddPole(Pole p);
 
-        // TODO: если получится, сделать другую передачу для удаления
+        /// <summary>
+        /// Удалить полюс из структуры
+        /// </summary>
+        /// <param name="p">Удаляемый полюс</param>
         public virtual void RemovePole(Pole p)
         {
             if (Poles.Any(x => x.Id == p.Id))
@@ -31,6 +56,10 @@ namespace DSM_Graph_Layer.HPGraphModel
                 OwnerGraph.RemoveStructure(this);
         }
 
+        /// <summary>
+        /// Добавить декомпозицию для структуры
+        /// </summary>
+        /// <param name="graph">Новый граф, которым декомпозируется структура</param>
         public void AddDecomposition(HPGraph graph)
         {
             if (!Decompositions.Any(x => x.Id == graph.Id))
@@ -40,6 +69,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Создать новую декомпозицию для структуры через отображение внутренних полюсов структуры на внешние полюса HP-графа
+        /// </summary>
+        /// <returns>Созданная декомпозиция</returns>
         public HPGraph AddDecomposition()
         {
             var hpGraph = new HPGraph(OwnerGraph, Poles);
@@ -48,6 +81,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             return hpGraph;
         }
 
+        /// <summary>
+        /// Удалить ссылку на декомпозицию структуры
+        /// </summary>
+        /// <param name="graph">Удаляемая декомпозиция</param>
         public void RemoveDecomposition(HPGraph graph)
         {
             if (Decompositions.Any(x => x.Id == graph.Id))

@@ -5,13 +5,20 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 {
+    /// <summary>
+    /// Класс для поиска изоморфизма на уровне вершин
+    /// </summary>
     public class IsomorphicVertexFinder : IIsomorphicElementFinder<Vertex>
     {
+        /// <summary>
+        /// Инициализация экземпляра класса
+        /// </summary>
+        /// <param name="source">Исходный граф</param>
+        /// <param name="target">Граф-паттерн</param>
         public IsomorphicVertexFinder(HPGraph source, HPGraph target)
         {
             HPGraphSource = source;
             HPGraphTarget = target;
-
 
             CoreSource = new Dictionary<Vertex, Vertex>();
             ConnSource = new Dictionary<Vertex, long>();
@@ -35,18 +42,35 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         public Dictionary<Vertex, Vertex> CoreTarget { get; set; }
         public Dictionary<Vertex, long> ConnSource { get; set; }
         public Dictionary<Vertex, long> ConnTarget { get; set; }
+        /// <summary>
+        /// Исходный граф
+        /// </summary>
         private HPGraph HPGraphSource { get; }
+        /// <summary>
+        /// Граф-паттерн
+        /// </summary>
         private HPGraph HPGraphTarget { get; }
+        /// <summary>
+        /// Список найденных изоморфных подграфов в виде словарей соответствий (см. CoreTarget)
+        /// </summary>
         public List<(Dictionary<Vertex, Vertex> vertices, Dictionary<Hyperedge, Hyperedge> edges, Dictionary<Pole, Pole> poles)> GeneratedAnswers { get; set; }
 
+        /// <summary>
+        /// Основная функция - рекурсивный поиск изоморфных подграфов.
+        /// Множественный изоморфизм на данный момент определен лишь для уровня вершин: на уровне гиперребер и полюсов определяется первый попавшийся изоморфизм и осуществляется выход из рекурсий
+        /// </summary>
+        /// <param name="step">Шаг</param>
+        /// <param name="source">Вершина исходного графа, добавленная на прошлом шаге</param>
+        /// <param name="target">Вершина графа-паттерна, добавленная на прошлом шаге</param>
         public void Recurse(long step = 1, Vertex source = null, Vertex target = null)
-        {
-            // TODO: Продумать множественный изоморфизм?
+        {            
             if (CoreTarget.Values.All(x => x != null) && ValidateVertexIsomorphism())
             {
-                // Учитывать ли несколько вариаций изорфности ребер? - вероятно нет
+                // Переход на уровень гиперребер
                 var edgeFinder = new IsomorphicEdgeFinder(HPGraphSource, HPGraphTarget, CoreSource, CoreTarget);
                 edgeFinder.Recurse();
+
+                // Если ответы нашлись, то получить матрицы соответствий, добавить несвязанные полюса к матрице соответствий полюсов и добавить ответ в список изоморфных подграфов
                 if (edgeFinder.GeneratedAnswers.Any())
                 {
                     var edgeCorr = edgeFinder.GeneratedAnswers[0].edges;
@@ -103,7 +127,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             if (ConnTarget[target] == 0)
                 ConnTarget[target] = step;
 
-            // TODO: По возможности заменить на что-то более адекватное
+            // TODO: По возможности найти более оптимальный подход к поиску связанных вершин
             var connectedToSourceVertices = GetConnectedVertices(source, HPGraphSource);
             foreach (var vertex in connectedToSourceVertices)
             {
@@ -163,7 +187,6 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             return result;
         }
-
         private bool CheckOneLookAhead(Vertex source, Vertex target)
         {
             var unmatchedConnectedToSource = GetConnectedVertices(source, HPGraphSource).Where(x => CoreSource[x] == null && ConnSource[x] != 0);
@@ -181,11 +204,11 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         }
 
         /// <summary>
-        /// Связать несвязные полюса (по внешним полюсам пройтись?)
+        /// Связать несвязные полюса (по внешним полюсам пройтись + полюса вершин, которые не были соотнесены)
         /// Учитывать ли множественный изоморфизм? - нет. Обоснование: трансформации могут исполниться над одними и теми же вершинами множество раз
         /// Сейчас сопоставляются лишь первые попавшиеся
         /// </summary>
-        /// <param name="polCorr"></param>
+        /// <param name="polCorr">Матрица соответствий полюсов</param>
         /// <returns></returns>
         private void AppendUnlinkedMatches(Dictionary<Pole, Pole> polCorr)
         {
@@ -209,12 +232,22 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
         }
 
+        /// <summary>
+        /// Получить вершины, связанные с выбранной вершиной
+        /// </summary>
+        /// <param name="vertex">Вершина, для которой определяются связанные вершины</param>
+        /// <param name="graph">Граф, в котором осуществляется поиск</param>
+        /// <returns>Связанные вершины</returns>
         private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex, HPGraph graph)
         {
             return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count()>0);
-            //return vertex.Poles.SelectMany(x => x.EdgeOwners).SelectMany(x => x.Poles.Select(x => x.VertexOwner)).Distinct();
         }
 
+
+        /// <summary>
+        /// Валидация для исключения дубликатов ответов, разница в которых лишь в разном порядке обхода вершин
+        /// </summary>
+        /// <returns>True, если валидация прошла успешно</returns>
         private bool ValidateVertexIsomorphism()
         {
             var createdVertexAnswers = GeneratedAnswers.Select(x => x.vertices);

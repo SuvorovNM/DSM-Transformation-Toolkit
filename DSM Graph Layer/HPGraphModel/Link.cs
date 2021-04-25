@@ -7,10 +7,28 @@ namespace DSM_Graph_Layer.HPGraphModel
 {
     public class Link : ElementWithId
     {
+        /// <summary>
+        /// Полюс-источник
+        /// </summary>
         public Pole SourcePole { get; set; }
+        /// <summary>
+        /// Полюс-приемник
+        /// </summary>
         public Pole TargetPole { get; set; }
+        /// <summary>
+        /// Тип связи
+        /// </summary>
         public LinkType Type { get; set; }
+        /// <summary>
+        /// Гиперребро, содержащее связь
+        /// </summary>
         public Hyperedge EdgeOwner { get; set; }
+        /// <summary>
+        /// Инициализировать связь
+        /// </summary>
+        /// <param name="sourcePole">Полюс-источник</param>
+        /// <param name="targetPole">Полюс-приемник</param>
+        /// <param name="type">Тип связи</param>
         public Link(Pole sourcePole, Pole targetPole, LinkType type = LinkType.Edge)
         {
             GraphEnumerator.SetNextId(this);

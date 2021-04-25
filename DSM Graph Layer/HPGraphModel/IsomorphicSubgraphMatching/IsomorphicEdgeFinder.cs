@@ -5,8 +5,18 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 {
+    /// <summary>
+    /// Класс для поиска изомоформизмов на уровне гиперребер
+    /// </summary>
     public class IsomorphicEdgeFinder : IIsomorphicElementFinder<Hyperedge>
     {
+        /// <summary>
+        /// Инициализировать экземпляр класса
+        /// </summary>
+        /// <param name="source">Исходный граф</param>
+        /// <param name="target">Граф-паттерн</param>
+        /// <param name="coreSourceV">Матрица соответствий для вершин исходного графа</param>
+        /// <param name="coreTargetV">Матрица соответствий для вершин графа-паттерна</param>
         public IsomorphicEdgeFinder(
             HPGraph source, 
             HPGraph target, 
@@ -42,30 +52,59 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         public Dictionary<Hyperedge, Hyperedge> CoreTarget { get; set; }
         public Dictionary<Hyperedge, long> ConnSource { get; set; } // Может и не нужно
         public Dictionary<Hyperedge, long> ConnTarget { get; set; } // Может и не нужно
+        /// <summary>
+        /// Исходный граф
+        /// </summary>
         private HPGraph HPGraphSource { get; }
+        /// <summary>
+        /// Граф-паттерн
+        /// </summary>
         private HPGraph HPGraphTarget { get; }
+        /// <summary>
+        /// Матрица соответствий для вершин исходного графа
+        /// </summary>
         private Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
+        /// <summary>
+        /// Матрица соответствий для вершин графа-паттерна
+        /// </summary>
         private Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
+        /// <summary>
+        /// Матрица соответствий для полюсов гиперребер
+        /// </summary>
         public Dictionary<Pole, Pole> PolCorr { get; set; }
+        /// <summary>
+        /// Список полученных изоморфизмов
+        /// </summary>
         public List<(Dictionary<Hyperedge, Hyperedge> edges, Dictionary<Pole, Pole> poles)> GeneratedAnswers { get; set; }
 
+        /// <summary>
+        /// Основная операция - рекурсивный поиск изоморфных гиперребер
+        /// </summary>
+        /// <param name="step">Шаг</param>
+        /// <param name="source">Гиперребро исходного графа, добавленное на предыдущем шаге</param>
+        /// <param name="target">Гиперребро графа-паттерна, добавленное на предыдущем шаге</param>
+        /// <returns></returns>
         public bool Recurse(long step = 1, Hyperedge source = null, Hyperedge target = null)
         {
             if (CoreTarget.Values.All(x => x != null))
             {
+                // Группировка гиперребер по принципу инцидентности
                 var incidentEdges = GroupByIncidence();
                 foreach ((var sourceGroup, var targetGroup) in incidentEdges)
                 {
+                    // Переход на уровень полюсов и поиск полного изоморфизма
                     var poleFinder = new IsomorphicPoleFinder(sourceGroup, targetGroup, CoreSourceV, CoreTargetV, CoreSource, CoreTarget);
                     poleFinder.Recurse();
                     var polCorr = poleFinder.CoreTarget;
 
+                    // Попытка добавить соответствия в матрицу PolCorr
                     if (!TryAppendToPolesMatching(polCorr))
                     {
                         PolCorr = new Dictionary<Pole, Pole>();
                         break;
                     }
                 }
+                // Следует также учитывать и случаи, когда гиперребра в графе отсутствуют
                 if (PolCorr.Any() || HPGraphTarget.Edges.Count == 0)
                 {
                     GeneratedAnswers.Add((new Dictionary<Hyperedge, Hyperedge>(CoreTarget), new Dictionary<Pole,Pole>(PolCorr)));
@@ -125,17 +164,19 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var resultList = new List<(Hyperedge, Hyperedge)>();
             foreach(var source in candidateSourceEdges)
             {
-                var sourceVertices = source.Poles.Select(x => x.VertexOwner).Distinct();
-                foreach(var target in candidateTargetEdges.Where(x=>x.Poles.Count==source.Poles.Count))
+                // Получить вершины гиперребер и провести проверку на соответствия, установленные при поиске изоморфизма на уровне вершин
+                // Вершины пар гиперребер должны быть полностью изоморфны
+                var sourceVertices = GetVerticesForHyperedge(source);
+                foreach (var target in candidateTargetEdges.Where(x => x.Poles.Count == source.Poles.Count))
                 {
-                    var targetVertices = target.Poles.Select(x => x.VertexOwner).Distinct();
+                    var targetVertices = GetVerticesForHyperedge(target);
 
                     var correctness = true;
-                    foreach(var vertice in targetVertices)
+                    foreach (var vertice in targetVertices)
                     {
                         correctness &= sourceVertices.Contains(CoreTargetV[vertice]) && CoreSourceV[CoreTargetV[vertice]] == vertice;
                     }
-                    foreach(var vertice in sourceVertices)
+                    foreach (var vertice in sourceVertices)
                     {
                         correctness &= targetVertices.Contains(CoreSourceV[vertice]) && CoreTargetV[CoreSourceV[vertice]] == vertice;
                     }
@@ -147,13 +188,26 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             return resultList;
         }
+        /// <summary>
+        /// Получить вершины, инцидентные гиперребру
+        /// </summary>
+        /// <param name="source">Гиперребро</param>
+        /// <returns>Коллекция вершин</returns>
+        private static IEnumerable<Vertex> GetVerticesForHyperedge(Hyperedge source)
+        {
+            return source.Poles.Select(x => x.VertexOwner).Distinct();
+        }
 
+        /// <summary>
+        /// Сгруппировать гиперребра по признаку инцидентности
+        /// </summary>
+        /// <returns>Список сгруппированных гиперребер</returns>
         private List<(Hyperedge, Hyperedge)> GroupByIncidence()
         {
             var groupList = new List<List<Hyperedge>>();
 
+            // Получить группы
             var possibleEdges = HPGraphTarget.Edges.Except(groupList.SelectMany(x => x.Select(y => y)));
-            // Target edges
             while (possibleEdges.Any())
             {
                 var group = new List<Hyperedge>();
@@ -166,7 +220,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                     var oldCount = group.Count;
                     foreach (var pole in group.SelectMany(x => x.Poles))
                     {
-                        group.Union(pole.EdgeOwners);
+                        group = group.Union(pole.EdgeOwners).ToList();
                     }
                     anyChanges = oldCount != group.Count;
                 } while (anyChanges);
@@ -174,31 +228,36 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 groupList.Add(group);
             }
 
+            // Преобразовать группы в гиперребра, объединив связи и полюса гиперребер из группы
             var incidenceList = new List<(Hyperedge, Hyperedge)>();
             foreach(var group in groupList)
             {
                 var hEdge = new Hyperedge();
-                var matchedHEdge = new Hyperedge();
+                var matchedHedge = new Hyperedge();
                 var poles = new List<Pole>();
                 var matchedPoles = new List<Pole>();
                 foreach(var item in group)
                 {
                     hEdge.Links.AddRange(item.Links);
-                    //hEdge.Poles.AddRange(item.Poles);
                     poles.AddRange(item.Poles);
 
-                    matchedHEdge.Links.AddRange(CoreTarget[item].Links);
-                    //matchedHEdge.Poles.AddRange(CoreTarget[item].Poles);
+                    matchedHedge.Links.AddRange(CoreTarget[item].Links);
                     matchedPoles.AddRange(CoreTarget[item].Poles);
                 }
                 hEdge.Poles.AddRange(poles.Distinct());
-                matchedHEdge.Poles.AddRange(matchedPoles.Distinct());
-                incidenceList.Add((matchedHEdge, hEdge));
+                matchedHedge.Poles.AddRange(matchedPoles.Distinct());
+                incidenceList.Add((matchedHedge, hEdge));
             }
 
             return incidenceList;
         }
 
+        /// <summary>
+        /// Осуществить попытку добавления полюсов в матрицу соответствий.
+        /// Если на месте PolCorr[i] уже есть полюс, отличающийся от полюса на месте PolCorr[i], метод завершается с результатом false.
+        /// </summary>
+        /// <param name="polesMatching">Добавляемая матрица соответствий</param>
+        /// <returns>Результат попытки добавления - True, если добавление прошло успешно</returns>
         private bool TryAppendToPolesMatching(Dictionary<Pole, Pole> polesMatching)
         {
             foreach ((var key, var val) in polesMatching)

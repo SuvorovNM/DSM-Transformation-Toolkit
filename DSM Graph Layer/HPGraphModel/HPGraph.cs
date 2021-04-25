@@ -7,11 +7,26 @@ namespace DSM_Graph_Layer.HPGraphModel
 {
     public class HPGraph : ElementWithId
     {
+        /// <summary>
+        /// Родительский граф - используется при декомпозиции
+        /// </summary>
         public HPGraph ParentGraph { get; set; }
+        /// <summary>
+        /// Внешние полюса графа
+        /// </summary>
         public List<Pole> ExternalPoles { get; }
+        /// <summary>
+        /// Гиперребра графа
+        /// </summary>
         public List<Hyperedge> Edges { get; }
+        /// <summary>
+        /// Вершины графа
+        /// </summary>
         public List<Vertex> Vertices { get; }
 
+        /// <summary>
+        /// Создать новый гиперграф с полюсами
+        /// </summary>
         public HPGraph()
         {
             GraphEnumerator.SetNextId(this);
@@ -21,6 +36,11 @@ namespace DSM_Graph_Layer.HPGraphModel
             Vertices = new List<Vertex>();
         }
 
+        /// <summary>
+        /// Создать новый гиперграф с полюсами, являющийся декомпозицией выбранного графа
+        /// </summary>
+        /// <param name="parentGraph">Родительский граф</param>
+        /// <param name="externalPoles">Внешние полюса создаваемого гиперграфа с полюсами</param>
         public HPGraph(HPGraph parentGraph, List<Pole> externalPoles = null)
         {
             GraphEnumerator.SetNextId(this);
@@ -40,6 +60,10 @@ namespace DSM_Graph_Layer.HPGraphModel
 
         }
 
+        /// <summary>
+        /// Добавить внешний полюс к графу
+        /// </summary>
+        /// <param name="p">Добавляемый полюс</param>
         public void AddExternalPole(Pole p)
         {
             if (!ExternalPoles.Any(x => x.Id == p.Id))
@@ -50,6 +74,10 @@ namespace DSM_Graph_Layer.HPGraphModel
 
         }
 
+        /// <summary>
+        /// Удалить внешний полюс из графа, а также все его вхождения в гиперребра
+        /// </summary>
+        /// <param name="p">Удаляемый полюс</param>
         public void RemoveExternalPole(Pole p)
         {
             if (p.VertexOwner.OwnerGraph != this)
@@ -70,6 +98,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Добавить вершину в граф (для вершины должны быть определены полюса)
+        /// </summary>
+        /// <param name="v">Добавляемая вершина</param>
         public void AddVertex(Vertex v)
         {
             if (!Vertices.Any(x => x.Id == v.Id))
@@ -79,7 +111,11 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
-        public void AddHyperEdge(Hyperedge e) // TODO: сделать проверку на дуги/полюса
+        /// <summary>
+        /// Добавить гиперребро в граф (для гиперребра должны быть определены полюса и связи)
+        /// </summary>
+        /// <param name="e">Добавляемое гиперребро</param>
+        public void AddHyperEdge(Hyperedge e)
         {
             if (!Edges.Any(x => x.Id == e.Id) && e.Links.Any() && e.Poles.Any() && !e.Poles.Any(x => x.GraphOwner != this && x.GraphOwner != null))
             {
@@ -88,6 +124,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить структуру (вершину или гиперребро) из графа
+        /// </summary>
+        /// <param name="str">Удаляемая структура</param>
         public void RemoveStructure(Structure str)
         {
             if (str is Vertex)
@@ -98,6 +138,10 @@ namespace DSM_Graph_Layer.HPGraphModel
                 throw new Exception("Попытка удаления нераспознанной структуры из графа!");
         }
 
+        /// <summary>
+        /// Удалить вершину из графа
+        /// </summary>
+        /// <param name="v">Удаляемая вершина</param>
         private void RemoveVertex(Vertex v)
         {
             if (Vertices.Any(x => x.Id == v.Id))
@@ -110,6 +154,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить гиперребро из графа
+        /// </summary>
+        /// <param name="e">Удаляемое гиперребро</param>
         private void RemoveHyperEdge(Hyperedge e)
         {
             if (Edges.Any(x => x.Id == e.Id))
@@ -122,6 +170,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить внутренний полюс гиперграфа
+        /// </summary>
+        /// <param name="p">Удаляемый полюс</param>
         public void RemoveInternalPole(Pole p)
         {
             // TODO: уточнить проверку
@@ -140,6 +192,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить все связи, источником или приемником которых является полюс
+        /// </summary>
+        /// <param name="p">Выбранный полюс</param>
         public void RemoveAllLinksForPole(Pole p)
         {
             var links = Edges.SelectMany(x => x.Links).Where(x => x.SourcePole == p || x.TargetPole == p).ToList();
@@ -150,11 +206,18 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
-        public bool IsSubgraph(HPGraph g)
+        public bool IsSubgraph(HPGraph g) // TODO: определить необходимость метода
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Осуществление трансформации.
+        /// Для трансформации в левой и правой части могут быть определены неполные вершины, которые не будут изменяться.
+        /// У таких вершин должны быть одинаковые ID и кол-во полюсов
+        /// </summary>
+        /// <param name="leftPart">Левая часть правила</param>
+        /// <param name="rightPart">Правая часть правила</param>
         public void Transform(HPGraph leftPart, HPGraph rightPart)
         {
             var subgraphFinder = new IsomorphicVertexFinder(this, leftPart);
@@ -179,6 +242,11 @@ namespace DSM_Graph_Layer.HPGraphModel
             finally { }
         }
 
+        /// <summary>
+        /// Найти изоморфный подграф в текущем графе
+        /// </summary>
+        /// <param name="g">Паттерн, по которому осуществляется поиск</param>
+        /// <returns>Список подграфов, изоморфных паттерну</returns>
         public List<HPGraph> FindIsomorphicSubgraphs(HPGraph g)
         {
             var subgraphFinder = new IsomorphicVertexFinder(this, g);
@@ -200,6 +268,12 @@ namespace DSM_Graph_Layer.HPGraphModel
             return hpGraphList;
         }
 
+        /// <summary>
+        /// Удалить подграф из текущего графа.
+        /// Неполные вершины не удаляются
+        /// </summary>
+        /// <param name="subgraph">Удаляемый подграф</param>
+        /// <param name="matching">Словарь соответствия вершин, полученный при поиске изоморфных подграфов</param>
         private void DeleteSubgraph(HPGraph subgraph, Dictionary<Vertex,Vertex> matching)
         {
             foreach (var edge in subgraph.Edges)
@@ -220,6 +294,12 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Добавить подграф в текущий граф.
+        /// Неполные вершины не добавляются
+        /// </summary>
+        /// <param name="subgraph">Добавляемый подграф</param>
+        /// <param name="matching">Соответствие ID полюса в графе-паттерне и изоморфного ему полюса в текущем графе (используется для неполных вершин)</param>
         private void AddSubgraph(HPGraph subgraph, Dictionary<long, Pole> matching)
         {
             foreach (var pole in subgraph.ExternalPoles)
@@ -254,6 +334,14 @@ namespace DSM_Graph_Layer.HPGraphModel
                 AddHyperEdge(edge);
             }
         }
+
+        /// <summary>
+        /// Инициализация нового подграфа для его добавления в граф.
+        /// Операция необходима, так как при нахождении нескольких подграфов, изоморфных паттерну, будет осуществлена попытка добавления элементов подграфов с одинаковыми ID.
+        /// Инициализация присваивает новые ID и обходит данное ограничение
+        /// </summary>
+        /// <param name="subgraph">Граф из правой части правила</param>
+        /// <returns>Новый подграф, готовый для добавления</returns>
         private HPGraph InitializeSubgraph(HPGraph subgraph)
         {
             var newGraph = new HPGraph();

@@ -5,8 +5,14 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel
 {
+    /// <summary>
+    /// Вершина HP-графа
+    /// </summary>
     public class Vertex : Structure
     {
+        /// <summary>
+        /// Инициализировать вершину - по умолчанию создается с единственным полюсом
+        /// </summary>
         public Vertex() : base()
         {
             var vertexPole = new Pole();
@@ -14,6 +20,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             Poles.Add(vertexPole);
         }
 
+        /// <summary>
+        /// Добавить полюс к вершине
+        /// </summary>
+        /// <param name="p">Добавляемый полюс</param>
         public override void AddPole(Pole p)
         {
             if (!Poles.Any(x => x.Id == p.Id))
@@ -23,6 +33,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить полюс из вершины
+        /// </summary>
+        /// <param name="p">Удаляемый полюс</param>
         public override void RemovePole(Pole p)
         {
             var graph = p.VertexOwner.OwnerGraph;
@@ -38,12 +52,23 @@ namespace DSM_Graph_Layer.HPGraphModel
         }
     }
 
+    /// <summary>
+    /// Подкласс вершины, необходимый для произведения трансформаций (содержит определение неполных вершин)
+    /// </summary>
     public class VertexForTransformation : Vertex
     {
+        /// <summary>
+        /// Инициализация вершины для трансформации
+        /// </summary>
+        /// <param name="isIncomplete">Является ли вершина неполной (True, если да)</param>
         public VertexForTransformation(bool isIncomplete = false) :base()
         {
             IsIncomplete = isIncomplete;
         }
+        /// <summary>
+        /// Сделать дубликат вершины для трансформации
+        /// </summary>
+        /// <param name="vertex">Исходная вершина</param>
         public VertexForTransformation(VertexForTransformation vertex)
         {
             IsIncomplete = vertex.IsIncomplete;
@@ -59,6 +84,9 @@ namespace DSM_Graph_Layer.HPGraphModel
             vertex.Decompositions = vertex.Decompositions;
         }
 
+        /// <summary>
+        /// Является ли вершина неполной
+        /// </summary>
         public bool IsIncomplete { get; set; }
     }
 }

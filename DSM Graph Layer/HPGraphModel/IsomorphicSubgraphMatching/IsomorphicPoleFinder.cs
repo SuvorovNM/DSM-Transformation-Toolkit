@@ -5,8 +5,20 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 {
+    /// <summary>
+    /// Класс для поиска изоморфизма на уровне полюсов
+    /// </summary>
     public class IsomorphicPoleFinder : IIsomorphicElementFinder<Pole>
     {
+        /// <summary>
+        /// Инициализировать экземпляр класса
+        /// </summary>
+        /// <param name="hyperEdgeSource">Гиперребро исходного графа</param>
+        /// <param name="hyperEdgeTarget">Гиперребро графа-паттерна</param>
+        /// <param name="coreSourceV">Матрица соответствий для вершин исходного графа</param>
+        /// <param name="coreTargetV">Матрица соответствий для вершин графа-паттерна</param>
+        /// <param name="coreSourceW">Матрица соответствий для гиперребер исходного графа</param>
+        /// <param name="coreTargetW">Матрица соответствий для гиперребер графа-паттерна</param>
         public IsomorphicPoleFinder(
             Hyperedge hyperEdgeSource,
             Hyperedge hyperEdgeTarget,
@@ -44,13 +56,38 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         public Dictionary<Pole, Pole> CoreTarget { get; set; }
         public Dictionary<Pole, long> ConnSource { get; set; }
         public Dictionary<Pole, long> ConnTarget { get; set; }
+        /// <summary>
+        /// Гиперребро исходного графа
+        /// </summary>
         private Hyperedge HyperedgeSource { get; set; }
+        /// <summary>
+        /// Гиперребро графа-паттерна
+        /// </summary>
         private Hyperedge HyperedgeTarget { get; set; }
+        /// <summary>
+        /// Матрица соответствий для вершин исходного графа
+        /// </summary>
         private Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
+        /// <summary>
+        /// Матрица соответствий для вершин графа-паттерна
+        /// </summary>
         private Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
+        /// <summary>
+        /// Матрица соответствий для гиперребер исходного графа
+        /// </summary>
         private Dictionary<Hyperedge, Hyperedge> CoreSourceW { get; set; }
+        /// <summary>
+        /// Матрица соответствий для гиперребер графа-паттерна
+        /// </summary>
         private Dictionary<Hyperedge, Hyperedge> CoreTargetW { get; set; }
 
+        /// <summary>
+        /// Основная операция - рекурсивный поиск изоморфных полюсов гиперребер
+        /// </summary>
+        /// <param name="step">Шаг</param>
+        /// <param name="source">Полюс исходного гиперребра, добавленный на предыдущем шаге</param>
+        /// <param name="target">Полюс гиперребра графа-паттерна, добавленный на предыдущем шаге</param>
+        /// <returns></returns>
         public bool Recurse(long step = 1, Pole source = null, Pole target = null)
         {
             if (CoreTarget.Values.All(x => x != null))
@@ -129,6 +166,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             var resultPairList = new List<(Pole, Pole)>();
 
+            // Пары полюсов - те полюса, которые принадлежат паре изоморфных вершин и содержат аналогичные гиперребра
             foreach (var sourcePole in sourceCandidatePoles)
             {
                 // TODO: Можно потом добавить еще проверку на количество связей, если потребуется
@@ -186,7 +224,12 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             return unmatchedConnectedToSourceNotConnectedToGraph.Count() >= unmatchedConnectedToTargetNotConnectedToGraph.Count();
         }
 
-
+        /// <summary>
+        /// Получить полюса, связанные с выбранным
+        /// </summary>
+        /// <param name="p">Выбранный полюс</param>
+        /// <param name="w">Гиперребро, в котором производится поиск</param>
+        /// <returns>Коллекция связанных полюсов</returns>
         private IEnumerable<Pole> GetConnectedPoles(Pole p, Hyperedge w)
         {
             var connectedPolesList = new List<Pole>();

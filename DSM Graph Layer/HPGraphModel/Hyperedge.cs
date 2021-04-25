@@ -6,14 +6,24 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel
 {
+    /// <summary>
+    /// Гиперребро HP-графа
+    /// </summary>
     public class Hyperedge : Structure
     {
+        /// <summary>
+        /// Связи гиперребра
+        /// </summary>
         public List<Link> Links { get; set; }
         public Hyperedge() : base()
         {
             Links = new List<Link>();
         }
 
+        /// <summary>
+        /// Добавить полюс к гиперребру и добавить ссылку на гиперребро у полюса
+        /// </summary>
+        /// <param name="p">Добавляемый полюс</param>
         public override void AddPole(Pole p)
         {
             if (!Poles.Any(x => x.Id == p.Id) && (p.VertexOwner != null || p.GraphOwner != null))
@@ -23,6 +33,11 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить полюс из гиперребра и удалить ссылку на гиперребро у полюса.
+        /// Если в гиперребре больше не осталось полюсов, то гиперребро удаляется.
+        /// </summary>
+        /// <param name="p">Удаляемый полюс</param>
         public override void RemovePole(Pole p)
         {
             if (Poles.Any(x => x.Id == p.Id))
@@ -36,6 +51,13 @@ namespace DSM_Graph_Layer.HPGraphModel
                 OwnerGraph.RemoveStructure(this);
         }
 
+        /// <summary>
+        /// Добавить связь в гиперребро
+        /// </summary>
+        /// <param name="source">Полюс-источник</param>
+        /// <param name="target">Полюс-приемник</param>
+        /// <param name="type">Тип связи</param>
+        /// <returns>Добавленная связь</returns>
         public Link AddLink(Pole source, Pole target, LinkType type = LinkType.Edge)
         {
             if (Poles.Contains(source) && Poles.Contains(target))
@@ -51,6 +73,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Добавить связь в гиперребро
+        /// </summary>
+        /// <param name="link">Добавляемая связь</param>
         public void AddLink(Link link)
         {
             if (!Links.Any(x => x.Id == link.Id) && Poles.Contains(link.SourcePole) && Poles.Contains(link.TargetPole))
@@ -60,6 +86,10 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
+        /// <summary>
+        /// Удалить связь из гиперребра
+        /// </summary>
+        /// <param name="link">Удаляемая связь</param>
         public void RemoveLink(Link link)
         {
             if (Links.Any(x => x.Id == link.Id))
@@ -69,6 +99,10 @@ namespace DSM_Graph_Layer.HPGraphModel
                 OwnerGraph.RemoveStructure(this);
         }
 
+        /// <summary>
+        /// Удалить связи, в которых участвует выбранный полюс
+        /// </summary>
+        /// <param name="p">Выбранный полюс</param>
         private void RemoveLinksForPole(Pole p)
         {
             var links = Links.Where(x => x.SourcePole == p || x.TargetPole == p).ToList();
