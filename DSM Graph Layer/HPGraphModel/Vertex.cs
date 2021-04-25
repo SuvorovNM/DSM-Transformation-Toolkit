@@ -40,13 +40,25 @@ namespace DSM_Graph_Layer.HPGraphModel
 
     public class VertexForTransformation : Vertex
     {
-        public VertexForTransformation(bool isIncomplete = false, Vertex correspondingV = null) : base()
+        public VertexForTransformation(bool isIncomplete = false) :base()
         {
             IsIncomplete = isIncomplete;
-            CorrespondingVertex = correspondingV;
+        }
+        public VertexForTransformation(VertexForTransformation vertex)
+        {
+            IsIncomplete = vertex.IsIncomplete;
+            Id = vertex.Id;
+            Poles = new List<Pole>();
+            foreach (var pole in vertex.Poles)
+            {
+                var p = new Pole(pole);
+                p.VertexOwner = this;
+                Poles.Add(p);
+            }
+            SemanticType = vertex.SemanticType;
+            vertex.Decompositions = vertex.Decompositions;
         }
 
         public bool IsIncomplete { get; set; }
-        public Vertex CorrespondingVertex { get; set; }
     }
 }

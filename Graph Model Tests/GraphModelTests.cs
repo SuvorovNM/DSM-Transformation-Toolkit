@@ -21,6 +21,7 @@ namespace Graph_Model_Tests
             SourceGraph.AddVertex(vertex1);
             var hEdge = CreateHyperEdge(vertex1.Poles.First());
             SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddExternalPole(new Pole());
 
             var newHPGraph = CreateRandomGraph();
             vertex.AddDecomposition(newHPGraph);
@@ -442,7 +443,232 @@ namespace Graph_Model_Tests
             Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == polesCount) == 2);
         }
 
-        private static (Vertex, Vertex, Hyperedge, Hyperedge) CreateVerticesAndIncidentHyperedges()
+        [Test]
+        public void SingleSubgraphTransformationWithIncidentHyperedgesTest()
+        {
+            var startVertexCount = SourceGraph.Vertices.Count;
+            var startHyperedgeCount = SourceGraph.Edges.Count;
+
+            (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hedge1);
+            SourceGraph.AddHyperEdge(hedge2);
+
+            (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
+            var patternGraph = new HPGraph();
+            patternGraph.AddVertex(newVertex);
+            patternGraph.AddVertex(newVertex1);
+            patternGraph.AddHyperEdge(newHedge1);
+            patternGraph.AddHyperEdge(newHedge2);
+
+            var replacementGraph = new HPGraph();
+            var (vertex1, vertex2, hedge) = CreateVerticesAndHedge();
+            replacementGraph.AddVertex(vertex1);
+            replacementGraph.AddVertex(vertex2);
+            replacementGraph.AddHyperEdge(hedge);
+
+            SourceGraph.Transform(patternGraph, replacementGraph);
+
+            Assert.IsTrue(SourceGraph.Vertices.Count == startVertexCount + 2);
+            Assert.IsTrue(SourceGraph.Edges.Count == startHyperedgeCount + 1);
+            Assert.IsTrue(SourceGraph.Vertices.Any(x=>x.Poles.Count == vertex1.Poles.Count));
+            Assert.IsTrue(SourceGraph.Vertices.Any(x => x.Poles.Count == vertex2.Poles.Count));
+            Assert.IsTrue(SourceGraph.Edges.Any(x => x.Poles.Count == hedge.Poles.Count));
+            Assert.IsTrue(SourceGraph.Edges.Any(x => x.Links.Count == hedge.Links.Count));
+        }
+
+        [Test]
+        public void MultipleSubgraphTransformationWithIncidentHyperedgesTest()
+        {
+            var startVertexCount = SourceGraph.Vertices.Count;
+            var startHyperedgeCount = SourceGraph.Edges.Count;
+
+            (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hedge1);
+            SourceGraph.AddHyperEdge(hedge2);
+
+            (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(secondlyAddedVertex1);
+            SourceGraph.AddVertex(secondlyAddedVertex);
+            SourceGraph.AddHyperEdge(secondlyHedge1);
+            SourceGraph.AddHyperEdge(secondlyHedge2);
+
+            (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
+            var patternGraph = new HPGraph();
+            patternGraph.AddVertex(newVertex);
+            patternGraph.AddVertex(newVertex1);
+            patternGraph.AddHyperEdge(newHedge1);
+            patternGraph.AddHyperEdge(newHedge2);
+
+            var replacementGraph = new HPGraph();
+            var (vertex1, vertex2, hedge) = CreateVerticesAndHedge();
+            replacementGraph.AddVertex(vertex1);
+            replacementGraph.AddVertex(vertex2);
+            replacementGraph.AddHyperEdge(hedge);
+
+            SourceGraph.Transform(patternGraph, replacementGraph);
+
+            Assert.IsTrue(SourceGraph.Vertices.Count == startVertexCount + 4);
+            Assert.IsTrue(SourceGraph.Edges.Count == startHyperedgeCount + 2);
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == vertex1.Poles.Count)>=2);
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == vertex2.Poles.Count)>=2);
+            Assert.IsTrue(SourceGraph.Edges.Count(x => x.Poles.Count == hedge.Poles.Count)>=2);
+            Assert.IsTrue(SourceGraph.Edges.Count(x => x.Links.Count == hedge.Links.Count)>=2);
+        }
+
+        [Test]
+        public void MultipleSubgraphTransformationWithIncidentHyperedgesAndIncompleteVerticesTest()
+        {
+            var startVertexCount = SourceGraph.Vertices.Count;
+            var startHyperedgeCount = SourceGraph.Edges.Count;
+
+            (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hedge1);
+            SourceGraph.AddHyperEdge(hedge2);
+
+            (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(secondlyAddedVertex1);
+            SourceGraph.AddVertex(secondlyAddedVertex);
+            SourceGraph.AddHyperEdge(secondlyHedge1);
+            SourceGraph.AddHyperEdge(secondlyHedge2);
+
+            (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
+            newVertex.IsIncomplete = true;
+            newVertex.Poles.RemoveAll(x => !x.EdgeOwners.Any());
+
+            var patternGraph = new HPGraph();
+            patternGraph.AddVertex(newVertex);
+            patternGraph.AddVertex(newVertex1);
+            patternGraph.AddHyperEdge(newHedge1);
+            patternGraph.AddHyperEdge(newHedge2);
+
+            var replacementGraph = new HPGraph();
+            var newIncomplete = new VertexForTransformation(newVertex);
+            var (vertex1, vertex2, hedge) = CreateSubgraphWithIncompleteVertex(newIncomplete);
+            replacementGraph.AddVertex(newIncomplete);
+            replacementGraph.AddVertex(vertex1);
+            replacementGraph.AddVertex(vertex2);
+            replacementGraph.AddHyperEdge(hedge);
+
+            SourceGraph.Transform(patternGraph, replacementGraph);
+
+            Assert.IsTrue(SourceGraph.Vertices.Count == startVertexCount + 6);
+            Assert.IsTrue(SourceGraph.Edges.Count == startHyperedgeCount + 2);
+            Assert.IsTrue(SourceGraph.Vertices.Contains(addedVertex));
+            Assert.IsTrue(SourceGraph.Vertices.Contains(secondlyAddedVertex));
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == vertex1.Poles.Count) >= 2);
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == vertex2.Poles.Count) >= 2);
+            Assert.IsTrue(SourceGraph.Edges.Count(x => x.Poles.Count == hedge.Poles.Count) >= 2);
+            Assert.IsTrue(SourceGraph.Edges.Count(x => x.Links.Count == hedge.Links.Count) >= 2);
+        }
+
+        [Test]
+        public void MultipleSubgraphTransformationWithIncidentHyperedgesAndIncompleteVerticesWithEdgesNotExistingInPatternTest()
+        {
+            var startVertexCount = SourceGraph.Vertices.Count;
+            var startHyperedgeCount = SourceGraph.Edges.Count;
+
+            (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddHyperEdge(hedge1);
+            SourceGraph.AddHyperEdge(hedge2);
+            var nonExistingInPatternHyperedge = new Hyperedge();
+            nonExistingInPatternHyperedge.AddPole(addedVertex.Poles.First());
+            nonExistingInPatternHyperedge.AddPole(SourceGraph.ExternalPoles.First());
+            nonExistingInPatternHyperedge.AddLink(addedVertex.Poles.First(), SourceGraph.ExternalPoles.First());
+            SourceGraph.AddHyperEdge(nonExistingInPatternHyperedge);
+
+            (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(secondlyAddedVertex);
+            SourceGraph.AddVertex(secondlyAddedVertex1);
+            SourceGraph.AddHyperEdge(secondlyHedge1);
+            SourceGraph.AddHyperEdge(secondlyHedge2);
+            var nonExistingInPatternHyperedge1 = new Hyperedge();
+            nonExistingInPatternHyperedge1.AddPole(secondlyAddedVertex.Poles.Last());
+            nonExistingInPatternHyperedge1.AddPole(SourceGraph.Vertices.First().Poles.First());
+            nonExistingInPatternHyperedge1.AddLink(secondlyAddedVertex.Poles.Last(), SourceGraph.Vertices.First().Poles.First());
+            SourceGraph.AddHyperEdge(nonExistingInPatternHyperedge1);
+
+            (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
+            newVertex.IsIncomplete = true;
+            newVertex.Poles.RemoveAll(x => !x.EdgeOwners.Any());
+
+            var patternGraph = new HPGraph();
+            patternGraph.AddVertex(newVertex);
+            patternGraph.AddVertex(newVertex1);
+            patternGraph.AddHyperEdge(newHedge1);
+            patternGraph.AddHyperEdge(newHedge2);
+
+            var replacementGraph = new HPGraph();
+            var newIncomplete = new VertexForTransformation(newVertex);
+            var (vertex1, vertex2, hedge) = CreateSubgraphWithIncompleteVertex(newIncomplete);
+            replacementGraph.AddVertex(newIncomplete);
+            replacementGraph.AddVertex(vertex1);
+            replacementGraph.AddVertex(vertex2);
+            replacementGraph.AddHyperEdge(hedge);
+
+            SourceGraph.Transform(patternGraph, replacementGraph);
+
+            Assert.IsTrue(SourceGraph.Vertices.Count == startVertexCount + 6);
+            Assert.IsTrue(SourceGraph.Edges.Count == startHyperedgeCount + 4);
+            Assert.IsTrue(SourceGraph.Vertices.Contains(addedVertex));
+            Assert.IsTrue(SourceGraph.Vertices.Contains(secondlyAddedVertex));
+            Assert.IsTrue(SourceGraph.Edges.Contains(nonExistingInPatternHyperedge));
+            Assert.IsTrue(SourceGraph.Edges.Contains(nonExistingInPatternHyperedge1));
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == vertex1.Poles.Count) >= 2);
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == vertex2.Poles.Count) >= 2);
+            Assert.IsTrue(SourceGraph.Edges.Count(x => x.Poles.Count == hedge.Poles.Count) >= 2);
+            Assert.IsTrue(SourceGraph.Edges.Count(x => x.Links.Count == hedge.Links.Count) >= 2);
+        }
+
+        private static (Vertex,Vertex,Hyperedge) CreateSubgraphWithIncompleteVertex(VertexForTransformation incompleteVertex)
+        {
+            var addedVertex = CreateVertex(51);
+            var addedVertex1 = CreateVertex(52);
+            var hEdge = new Hyperedge();
+
+            foreach (var pole in addedVertex.Poles)
+            {
+                hEdge.AddPole(pole);
+            }
+            foreach (var pole in addedVertex1.Poles)
+            {
+                hEdge.AddPole(pole);
+            }
+            foreach (var pole in incompleteVertex.Poles)
+            {
+                hEdge.AddPole(pole);
+            }
+
+            var firstPole = hEdge.Poles[0];
+            var secondPole = hEdge.Poles[1];
+
+            foreach (var pole in hEdge.Poles.Skip(2))
+            {
+                if (firstPole != pole)
+                {
+                    hEdge.AddLink(pole, firstPole);
+                    hEdge.AddLink(secondPole, pole);
+                }
+            }
+            foreach(var pole in incompleteVertex.Poles)
+            {
+                foreach(var pole1 in hEdge.Poles.SkipLast(incompleteVertex.Poles.Count))
+                {
+                    hEdge.AddLink(pole, pole1);
+                }
+            }
+
+            return (addedVertex, addedVertex1, hEdge);
+        }
+
+        private static (VertexForTransformation, VertexForTransformation, Hyperedge, Hyperedge) CreateVerticesAndIncidentHyperedges()
         {
             var addedVertex = CreateVertex(5);
             var addedVertex1 = CreateVertex(10);
@@ -520,9 +746,9 @@ namespace Graph_Model_Tests
             return (addedVertex, addedVertex1, hEdge);
         }
 
-        private static Vertex CreateVertex(int polesCount)
+        private static VertexForTransformation CreateVertex(int polesCount)
         {
-            var vertex = new Vertex();
+            var vertex = new VertexForTransformation();
             var polesList = new List<Pole> { vertex.Poles.FirstOrDefault() };
             for (int i = 0; i < polesCount; i++)
             {

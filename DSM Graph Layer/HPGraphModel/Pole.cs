@@ -18,6 +18,12 @@ namespace DSM_Graph_Layer.HPGraphModel
             Type = type;
             EdgeOwners = new List<Hyperedge>();
         }
+        public Pole(Pole p)
+        {
+            Id = p.Id;
+            Type = p.Type;
+            EdgeOwners = new List<Hyperedge>();
+        }
 
         public bool CanBeInput()
         {

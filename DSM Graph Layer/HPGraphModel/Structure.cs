@@ -8,9 +8,9 @@ namespace DSM_Graph_Layer.HPGraphModel
     public abstract class Structure : ElementWithId
     {
         public HPGraph OwnerGraph { get; set; }
-        public List<Pole> Poles { get; }
+        public List<Pole> Poles { get; set;  }
         public string SemanticType { get; set; }
-        public List<HPGraph> Decompositions { get; }
+        public List<HPGraph> Decompositions { get; set; }
 
         public Structure()
         {

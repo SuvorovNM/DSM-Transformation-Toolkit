@@ -136,7 +136,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                                             .Where(x => CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner && sourcePole.EdgeOwners.Count >= x.EdgeOwners.Count))
                 {
                     var checkCorrectness = true;
-                    foreach (var edge in targetPole.EdgeOwners)
+                    foreach (var edge in targetPole.EdgeOwners.Intersect(CoreTargetW.Keys))
                         checkCorrectness &= sourcePole.EdgeOwners.Contains(CoreTargetW[edge]);
 
                     if (checkCorrectness)

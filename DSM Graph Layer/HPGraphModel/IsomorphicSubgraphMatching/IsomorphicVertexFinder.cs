@@ -104,14 +104,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 ConnTarget[target] = step;
 
             // TODO: По возможности заменить на что-то более адекватное
-            var connectedToSourceVertices = GetConnectedVertices(source);
+            var connectedToSourceVertices = GetConnectedVertices(source, HPGraphSource);
             foreach (var vertex in connectedToSourceVertices)
             {
                 if (ConnSource[vertex] == 0)
                     ConnSource[vertex] = step;
             }
 
-            var connectedToTargetVertices = GetConnectedVertices(target);
+            var connectedToTargetVertices = GetConnectedVertices(target, HPGraphTarget);
             foreach (var vertex in connectedToTargetVertices)
             {
                 if (ConnTarget[vertex] == 0)
@@ -148,8 +148,8 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
         private bool CheckConsistencyRule(Vertex source, Vertex target)
         {
-            var matchedConnectedToSource = GetConnectedVertices(source).Where(x => CoreSource[x] != null);
-            var matchedConnectedToTarget = GetConnectedVertices(target).Where(x => CoreTarget[x] != null);
+            var matchedConnectedToSource = GetConnectedVertices(source, HPGraphSource).Where(x => CoreSource[x] != null);
+            var matchedConnectedToTarget = GetConnectedVertices(target, HPGraphTarget).Where(x => CoreTarget[x] != null);
             var result = true;
 
             foreach (var vertex in matchedConnectedToSource)
@@ -166,16 +166,16 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
         private bool CheckOneLookAhead(Vertex source, Vertex target)
         {
-            var unmatchedConnectedToSource = GetConnectedVertices(source).Where(x => CoreSource[x] == null && ConnSource[x] != 0);
-            var unmatchedConnectedToTarget = GetConnectedVertices(target).Where(x => CoreTarget[x] == null && ConnTarget[x] != 0);
+            var unmatchedConnectedToSource = GetConnectedVertices(source, HPGraphSource).Where(x => CoreSource[x] == null && ConnSource[x] != 0);
+            var unmatchedConnectedToTarget = GetConnectedVertices(target, HPGraphTarget).Where(x => CoreTarget[x] == null && ConnTarget[x] != 0);
 
             return unmatchedConnectedToSource.Count() >= unmatchedConnectedToTarget.Count();
         }
 
         private bool CheckTwoLookAhead(Vertex source, Vertex target)
         {
-            var unmatchedConnectedToSourceNotConnectedToGraph = GetConnectedVertices(source).Where(x => CoreSource[x] == null && ConnSource[x] == 0);
-            var unmatchedConnectedToTargetNotConnectedToGraph = GetConnectedVertices(target).Where(x => CoreTarget[x] == null && ConnTarget[x] == 0);
+            var unmatchedConnectedToSourceNotConnectedToGraph = GetConnectedVertices(source, HPGraphSource).Where(x => CoreSource[x] == null && ConnSource[x] == 0);
+            var unmatchedConnectedToTargetNotConnectedToGraph = GetConnectedVertices(target, HPGraphTarget).Where(x => CoreTarget[x] == null && ConnTarget[x] == 0);
 
             return unmatchedConnectedToSourceNotConnectedToGraph.Count() >= unmatchedConnectedToTargetNotConnectedToGraph.Count();
         }
@@ -209,9 +209,10 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
         }
 
-        private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex)
+        private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex, HPGraph graph)
         {
-            return vertex.Poles.SelectMany(x => x.EdgeOwners).SelectMany(x => x.Poles.Select(x => x.VertexOwner)).Distinct();
+            return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count()>0);
+            //return vertex.Poles.SelectMany(x => x.EdgeOwners).SelectMany(x => x.Poles.Select(x => x.VertexOwner)).Distinct();
         }
 
         private bool ValidateVertexIsomorphism()

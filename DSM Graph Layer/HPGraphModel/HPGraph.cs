@@ -172,7 +172,8 @@ namespace DSM_Graph_Layer.HPGraphModel
 
                     DeleteSubgraph(hpGraph, vertices);
                     var insertedGraph = InitializeSubgraph(rightPart);
-                    AddSubgraph(insertedGraph, poles);
+                    var dict = poles.ToDictionary(x => x.Key.Id, x => x.Value);
+                    AddSubgraph(insertedGraph, dict);
                 }
             }
             finally { }
@@ -219,7 +220,7 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
         }
 
-        private void AddSubgraph(HPGraph subgraph, Dictionary<Pole, Pole> matching)
+        private void AddSubgraph(HPGraph subgraph, Dictionary<long, Pole> matching)
         {
             foreach (var pole in subgraph.ExternalPoles)
             {
@@ -227,25 +228,25 @@ namespace DSM_Graph_Layer.HPGraphModel
             }
 
             var verticesForInsertion = subgraph.Vertices.Where(x => x as VertexForTransformation == null || !(x as VertexForTransformation).IsIncomplete);
-            foreach (var vertex in subgraph.Vertices)
+            foreach (var vertex in verticesForInsertion)
             {
                 AddVertex(vertex);
             }
 
-            foreach(var edge in subgraph.Edges)
+            foreach(var edge in subgraph.Edges.ToList())
             {
-                foreach(var pole in edge.Poles)
+                foreach(var pole in edge.Poles.ToList())
                 {
                     if (pole.VertexOwner as VertexForTransformation != null && (pole.VertexOwner as VertexForTransformation).IsIncomplete)
                     {
-                        edge.AddPole(matching[pole]);
+                        edge.AddPole(matching[pole.Id]);
                         foreach(var link in edge.Links.Where(x=>x.SourcePole == pole).ToList())
                         {
-                            link.SourcePole = matching[pole];
+                            link.SourcePole = matching[pole.Id];
                         }
                         foreach(var link in edge.Links.Where(x=>x.TargetPole == pole).ToList())
                         {
-                            link.TargetPole = matching[pole];
+                            link.TargetPole = matching[pole.Id];
                         }
                     }
                 }
@@ -296,7 +297,7 @@ namespace DSM_Graph_Layer.HPGraphModel
                 {
                     newHedge.AddLink(poleMatching[link.SourcePole], poleMatching[link.TargetPole], link.Type);
                 }
-                newGraph.AddHyperEdge(hedge);
+                newGraph.AddHyperEdge(newHedge);
             }
 
             return newGraph;
