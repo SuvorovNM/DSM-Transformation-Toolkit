@@ -266,6 +266,260 @@ namespace Graph_Model_Tests
             Assert.AreEqual(hpGraph.ExternalPoles.Count, decomposingEdge.Poles.Count);
         }
 
+        [Test]
+        public void SingleSubgraphSearchTest()
+        {
+            (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hEdge);
+
+            (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
+            var newHPGraph = new HPGraph();
+            newHPGraph.AddVertex(newVertex);
+            newHPGraph.AddVertex(newVertex1);
+            newHPGraph.AddHyperEdge(newHedge);
+
+            var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
+
+            Assert.IsTrue(results.Count == 1);
+            Assert.IsTrue(results.Any(x => x.Vertices.Contains(addedVertex) && x.Vertices.Contains(addedVertex1) && x.Edges.Contains(hEdge)));
+        }
+
+        [Test]
+        public void MultipleSubgraphSearchTest()
+        {
+            (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hEdge);
+
+            (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyAddedHedge) = CreateVerticesAndHedge();
+            SourceGraph.AddVertex(secondlyAddedVertex);
+            SourceGraph.AddVertex(secondlyAddedVertex1);
+            SourceGraph.AddHyperEdge(secondlyAddedHedge);
+
+            (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
+            var newHPGraph = new HPGraph();
+            newHPGraph.AddVertex(newVertex);
+            newHPGraph.AddVertex(newVertex1);
+            newHPGraph.AddHyperEdge(newHedge);
+
+            var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
+
+            Assert.IsTrue(results.Count == 2);
+            Assert.IsTrue(results.Any(x => x.Vertices.Contains(addedVertex) && x.Vertices.Contains(addedVertex1) && x.Edges.Contains(hEdge)));
+            Assert.IsTrue(results.Any(x => x.Vertices.Contains(secondlyAddedVertex) && x.Vertices.Contains(secondlyAddedVertex1) && x.Edges.Contains(secondlyAddedHedge)));
+        }
+
+        [Test]
+        public void SingleSubgraphSearchWithIncidentHyperedgesTest()
+        {
+            (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hedge1);
+            SourceGraph.AddHyperEdge(hedge2);
+
+            (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
+            var newHPGraph = new HPGraph();
+            newHPGraph.AddVertex(newVertex);
+            newHPGraph.AddVertex(newVertex1);
+            newHPGraph.AddHyperEdge(newHedge1);
+            newHPGraph.AddHyperEdge(newHedge2);
+
+            var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
+
+            Assert.IsTrue(results.Count == 1);
+            Assert.IsTrue(results.Any(x => x.Vertices.Contains(addedVertex) && x.Vertices.Contains(addedVertex1) && x.Edges.Contains(hedge1) && x.Edges.Contains(hedge2)));
+        }
+
+        [Test]
+        public void MultipleSubgraphSearchWithIncidentHyperedgesTest()
+        {
+            (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hedge1);
+            SourceGraph.AddHyperEdge(hedge2);
+
+            (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
+            SourceGraph.AddVertex(secondlyAddedVertex1);
+            SourceGraph.AddVertex(secondlyAddedVertex);
+            SourceGraph.AddHyperEdge(secondlyHedge1);
+            SourceGraph.AddHyperEdge(secondlyHedge2);
+
+            (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
+            var newHPGraph = new HPGraph();
+            newHPGraph.AddVertex(newVertex);
+            newHPGraph.AddVertex(newVertex1);
+            newHPGraph.AddHyperEdge(newHedge1);
+            newHPGraph.AddHyperEdge(newHedge2);
+
+            var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
+
+            Assert.IsTrue(results.Count == 2);
+            Assert.IsTrue(results.Any(x => x.Vertices.Contains(addedVertex) && x.Vertices.Contains(addedVertex1) && x.Edges.Contains(hedge1) && x.Edges.Contains(hedge2)));
+            Assert.IsTrue(results.Any(x => x.Vertices.Contains(secondlyAddedVertex) && x.Vertices.Contains(secondlyAddedVertex1) && x.Edges.Contains(secondlyHedge1) && x.Edges.Contains(secondlyHedge2)));
+        }
+
+        [Test]
+        public void SingleIncompleteVertexSubgraphSearch()
+        {
+            var newHPGraph = new HPGraph();
+            var vertex = new Vertex();
+            newHPGraph.AddVertex(vertex);
+
+            var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
+
+            Assert.IsTrue(results.Count == SourceGraph.Vertices.Count);
+        }
+
+        [Test]
+        public void SingleSubgraphTransformationTest()
+        {
+            var startVertexCount = SourceGraph.Vertices.Count;
+            var startHyperedgeCount = SourceGraph.Edges.Count;
+            var polesCount = 100;
+
+            (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hEdge);
+
+            (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
+            var patternGraph = new HPGraph();
+            patternGraph.AddVertex(newVertex);
+            patternGraph.AddVertex(newVertex1);
+            patternGraph.AddHyperEdge(newHedge);
+
+            var vertex = new Vertex();
+            for (int i = 1; i < polesCount; i++)
+                vertex.AddPole(new Pole());
+            var replacementGraph = new HPGraph();
+            replacementGraph.AddVertex(vertex);
+
+            SourceGraph.Transform(patternGraph, replacementGraph);
+
+            Assert.IsTrue(SourceGraph.Vertices.Count == startVertexCount + 1);
+            Assert.IsTrue(SourceGraph.Edges.Count == startHyperedgeCount);
+            Assert.IsTrue(SourceGraph.Vertices.Any(x=>x.Poles.Count == polesCount));
+        }
+
+        [Test]
+        public void MultipleSubgraphTransformationTest()
+        {
+            var startVertexCount = SourceGraph.Vertices.Count;
+            var startHyperedgeCount = SourceGraph.Edges.Count;
+            var polesCount = 100;
+
+            (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
+            SourceGraph.AddVertex(addedVertex1);
+            SourceGraph.AddVertex(addedVertex);
+            SourceGraph.AddHyperEdge(hEdge);
+
+            (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyAddedHedge) = CreateVerticesAndHedge();
+            SourceGraph.AddVertex(secondlyAddedVertex);
+            SourceGraph.AddVertex(secondlyAddedVertex1);
+            SourceGraph.AddHyperEdge(secondlyAddedHedge);
+
+            (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
+            var patternGraph = new HPGraph();
+            patternGraph.AddVertex(newVertex);
+            patternGraph.AddVertex(newVertex1);
+            patternGraph.AddHyperEdge(newHedge);
+
+            var vertex = new Vertex();
+            for (int i = 1; i < polesCount; i++)
+                vertex.AddPole(new Pole());
+            var replacementGraph = new HPGraph();
+            replacementGraph.AddVertex(vertex);
+
+            SourceGraph.Transform(patternGraph, replacementGraph);
+
+            Assert.IsTrue(SourceGraph.Vertices.Count == startVertexCount + 2);
+            Assert.IsTrue(SourceGraph.Edges.Count == startHyperedgeCount);
+            Assert.IsTrue(SourceGraph.Vertices.Count(x => x.Poles.Count == polesCount) == 2);
+        }
+
+        private static (Vertex, Vertex, Hyperedge, Hyperedge) CreateVerticesAndIncidentHyperedges()
+        {
+            var addedVertex = CreateVertex(5);
+            var addedVertex1 = CreateVertex(10);
+            var hedge1 = new Hyperedge();
+            var hedge2 = new Hyperedge();
+            foreach (var pole in addedVertex.Poles.Skip(2))
+            {
+                hedge1.AddPole(pole);
+            }
+            foreach (var pole in addedVertex.Poles.SkipLast(2))
+            {
+                hedge2.AddPole(pole);
+            }
+
+            foreach (var pole in addedVertex1.Poles.Skip(3))
+            {
+                hedge1.AddPole(pole);
+            }
+            foreach (var pole in addedVertex1.Poles.SkipLast(3))
+            {
+                hedge2.AddPole(pole);
+            }
+
+            var firstPole = hedge1.Poles[0];
+            var secondPole = hedge1.Poles[1];
+            foreach (var pole in hedge1.Poles.Skip(2))
+            {
+                if (firstPole != pole)
+                {
+                    hedge1.AddLink(pole, firstPole);
+                    hedge1.AddLink(secondPole, pole);
+                }
+            }
+
+            firstPole = hedge2.Poles[1];
+            secondPole = hedge2.Poles[2];
+            foreach (var pole in hedge2.Poles.SkipLast(1))
+            {
+                if (firstPole != pole)
+                {
+                    hedge2.AddLink(pole, firstPole);
+                    hedge2.AddLink(secondPole, pole);
+                }
+            }
+
+            return (addedVertex, addedVertex1, hedge1, hedge2);
+        }
+
+        private static (Vertex, Vertex, Hyperedge) CreateVerticesAndHedge()
+        {
+            var addedVertex = CreateVertex(10);
+            var addedVertex1 = CreateVertex(15);
+            var hEdge = new Hyperedge();
+            foreach(var pole in addedVertex.Poles)
+            {
+                hEdge.AddPole(pole);
+            }
+            foreach(var pole in addedVertex1.Poles)
+            {
+                hEdge.AddPole(pole);
+            }
+
+            var firstPole = hEdge.Poles[0];
+            var secondPole = hEdge.Poles[1];
+
+            foreach (var pole in hEdge.Poles.Skip(2))
+            {
+                if (firstPole != pole)
+                {
+                    hEdge.AddLink(pole, firstPole);
+                    hEdge.AddLink(secondPole, pole);
+                }
+            }
+
+            return (addedVertex, addedVertex1, hEdge);
+        }
+
         private static Vertex CreateVertex(int polesCount)
         {
             var vertex = new Vertex();
@@ -294,7 +548,7 @@ namespace Graph_Model_Tests
             return hEdge;
         }
 
-        // TODO: Добавить внешние полюса!
+        // TODO: Убрать рандомную генерацию
         private HPGraph CreateRandomGraph()
         {
             var rnd = new Random();

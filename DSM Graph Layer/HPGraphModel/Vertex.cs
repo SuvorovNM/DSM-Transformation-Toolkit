@@ -37,4 +37,16 @@ namespace DSM_Graph_Layer.HPGraphModel
                 OwnerGraph.RemoveStructure(this);
         }
     }
+
+    public class VertexForTransformation : Vertex
+    {
+        public VertexForTransformation(bool isIncomplete = false, Vertex correspondingV = null) : base()
+        {
+            IsIncomplete = isIncomplete;
+            CorrespondingVertex = correspondingV;
+        }
+
+        public bool IsIncomplete { get; set; }
+        public Vertex CorrespondingVertex { get; set; }
+    }
 }

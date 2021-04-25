@@ -7,7 +7,7 @@ namespace DSM_Graph_Layer.HPGraphModel
 {
     public class Pole : ElementWithId, ICloneable
     {
-        private PoleType Type { get; set; }
+        public PoleType Type { get; set; }
         public Vertex VertexOwner { get; set; }
         public HPGraph GraphOwner { get; set; }
         public List<Hyperedge> EdgeOwners { get; set; }

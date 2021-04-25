@@ -37,23 +37,26 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         public Dictionary<Vertex, long> ConnTarget { get; set; }
         private HPGraph HPGraphSource { get; }
         private HPGraph HPGraphTarget { get; }
-        private List<(Dictionary<Vertex, Vertex>, Dictionary<Hyperedge, Hyperedge>, Dictionary<Pole, Pole>)> GeneratedAnswers;
+        public List<(Dictionary<Vertex, Vertex> vertices, Dictionary<Hyperedge, Hyperedge> edges, Dictionary<Pole, Pole> poles)> GeneratedAnswers { get; set; }
 
         public void Recurse(long step = 1, Vertex source = null, Vertex target = null)
         {
             // TODO: Продумать множественный изоморфизм?
-            if (CoreTarget.Values.All(x => x != null))
+            if (CoreTarget.Values.All(x => x != null) && ValidateVertexIsomorphism())
             {
                 // Учитывать ли несколько вариаций изорфности ребер? - вероятно нет
                 var edgeFinder = new IsomorphicEdgeFinder(HPGraphSource, HPGraphTarget, CoreSource, CoreTarget);
-                edgeFinder.Recurse();//(var edgeCorr, var polCorr) = 
-                var edgeCorr = edgeFinder.CoreTarget;
-                var polCorr = edgeFinder.PolCorr;
-
-                if (polCorr != null)
+                edgeFinder.Recurse();
+                if (edgeFinder.GeneratedAnswers.Any())
                 {
-                    AppendUnlinkedMatches(polCorr);
-                    GeneratedAnswers.Add((CoreTarget, edgeCorr, polCorr));
+                    var edgeCorr = edgeFinder.GeneratedAnswers[0].edges;
+                    var polCorr = edgeFinder.GeneratedAnswers[0].poles;
+
+                    if (polCorr != null)
+                    {
+                        AppendUnlinkedMatches(polCorr);
+                        GeneratedAnswers.Add((new Dictionary<Vertex, Vertex>(CoreTarget), edgeCorr, polCorr));
+                    }
                 }
             }
             else
@@ -68,7 +71,8 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                     }
                 }
             }
-
+            if (source == null || target == null)
+                return;
             RestoreVectors(step, source, target);
         }
 
@@ -79,12 +83,12 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             foreach (var item in HPGraphSource.Vertices)
             {
-                if (ConnSource[item] == step)
+                if (ConnSource[item] == step - 1)
                     ConnSource[item] = 0;
             }
             foreach (var item in HPGraphTarget.Vertices)
             {
-                if (ConnTarget[item] == step)
+                if (ConnTarget[item] == step - 1)
                     ConnTarget[item] = 0;
             }
         }
@@ -93,6 +97,11 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         {
             CoreSource[source] = target;
             CoreTarget[target] = source;
+
+            if (ConnSource[source] == 0)
+                ConnSource[source] = step;
+            if (ConnTarget[target] == 0)
+                ConnTarget[target] = step;
 
             // TODO: По возможности заменить на что-то более адекватное
             var connectedToSourceVertices = GetConnectedVertices(source);
@@ -123,7 +132,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var resultPairList = new List<(Vertex, Vertex)>();
             foreach (var source in candidateSourceVertices)
             {
-                foreach (var target in candidateTargetVertices)
+                foreach (var target in candidateTargetVertices.Where(x=>source.Poles.Count >= x.Poles.Count))
                 {
                     resultPairList.Add((source, target));
                 }
@@ -168,7 +177,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var unmatchedConnectedToSourceNotConnectedToGraph = GetConnectedVertices(source).Where(x => CoreSource[x] == null && ConnSource[x] == 0);
             var unmatchedConnectedToTargetNotConnectedToGraph = GetConnectedVertices(target).Where(x => CoreTarget[x] == null && ConnTarget[x] == 0);
 
-            return unmatchedConnectedToSourceNotConnectedToGraph.Count() > unmatchedConnectedToTargetNotConnectedToGraph.Count();
+            return unmatchedConnectedToSourceNotConnectedToGraph.Count() >= unmatchedConnectedToTargetNotConnectedToGraph.Count();
         }
 
         /// <summary>
@@ -180,18 +189,41 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <returns></returns>
         private void AppendUnlinkedMatches(Dictionary<Pole, Pole> polCorr)
         {
-            var sourceExternalPoles = HPGraphSource.ExternalPoles.Except(polCorr.Keys).ToList();
-            var targetExternalPoles = HPGraphTarget.ExternalPoles.Except(polCorr.Values).ToList();
+            var sourceExternalPoles = HPGraphSource.ExternalPoles.Except(polCorr.Values).ToList();
+            var targetExternalPoles = HPGraphTarget.ExternalPoles.Except(polCorr.Keys).ToList();
 
             for (int i = 0; i < targetExternalPoles.Count(); i++)
             {
                 polCorr.Add(sourceExternalPoles[i], targetExternalPoles[i]);
+            }
+
+            foreach(var targetV in HPGraphTarget.Vertices)
+            {
+                var targetInternalPoles = targetV.Poles.Except(polCorr.Keys).ToList();
+                var sourceInternalPoles = CoreTarget[targetV].Poles.Except(polCorr.Values).ToList();
+
+                for (int i = 0; i < targetInternalPoles.Count(); i++)
+                {
+                    polCorr.Add(sourceInternalPoles[i], targetInternalPoles[i]);
+                }
             }
         }
 
         private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex)
         {
             return vertex.Poles.SelectMany(x => x.EdgeOwners).SelectMany(x => x.Poles.Select(x => x.VertexOwner)).Distinct();
+        }
+
+        private bool ValidateVertexIsomorphism()
+        {
+            var createdVertexAnswers = GeneratedAnswers.Select(x => x.vertices);
+
+            foreach(var dict in createdVertexAnswers)
+            {
+                if (dict.All(x => CoreTarget[x.Key] == x.Value))
+                    return false;
+            }
+            return true;
         }
     }
 }

@@ -33,6 +33,9 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 CoreTarget.Add(edge, null);
                 ConnTarget.Add(edge, 0);
             }
+
+            PolCorr = new Dictionary<Pole, Pole>();
+            GeneratedAnswers = new List<(Dictionary<Hyperedge, Hyperedge> edges, Dictionary<Pole, Pole> poles)>();
         }
 
         public Dictionary<Hyperedge, Hyperedge> CoreSource { get; set; }
@@ -44,8 +47,9 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         private Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
         private Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
         public Dictionary<Pole, Pole> PolCorr { get; set; }
+        public List<(Dictionary<Hyperedge, Hyperedge> edges, Dictionary<Pole, Pole> poles)> GeneratedAnswers { get; set; }
 
-        public void Recurse(long step = 1, Hyperedge source = null, Hyperedge target = null)
+        public bool Recurse(long step = 1, Hyperedge source = null, Hyperedge target = null)
         {
             if (CoreTarget.Values.All(x => x != null))
             {
@@ -62,6 +66,11 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                         break;
                     }
                 }
+                if (PolCorr.Any() || HPGraphTarget.Edges.Count == 0)
+                {
+                    GeneratedAnswers.Add((new Dictionary<Hyperedge, Hyperedge>(CoreTarget), new Dictionary<Pole,Pole>(PolCorr)));
+                    return true;
+                }
             }
             else
             {
@@ -70,17 +79,21 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 {
                     // TODO: возможно, стоит добавить проверку
                     UpdateVectors(step, potentialSource, potentialTarget);
-                    Recurse(step + 1, potentialSource, potentialTarget);
+                    if (Recurse(step + 1, potentialSource, potentialTarget))
+                        return true;
                 }
             }
 
+            if (source == null || target == null)
+                return false;
             RestoreVectors(step, source, target);
+            return false;
         }
 
         public void RestoreVectors(long step, Hyperedge source, Hyperedge target)
         {
-            CoreSource[source] = null;
-            CoreTarget[target] = null;
+            CoreSource[source] = (Hyperedge)null;
+            CoreTarget[target] = (Hyperedge)null;
 
             /*foreach (var item in HPGraphSource.Edges)
             {
@@ -166,15 +179,21 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             {
                 var hEdge = new Hyperedge();
                 var matchedHEdge = new Hyperedge();
+                var poles = new List<Pole>();
+                var matchedPoles = new List<Pole>();
                 foreach(var item in group)
                 {
                     hEdge.Links.AddRange(item.Links);
-                    hEdge.Poles.Union(item.Poles);
+                    //hEdge.Poles.AddRange(item.Poles);
+                    poles.AddRange(item.Poles);
 
                     matchedHEdge.Links.AddRange(CoreTarget[item].Links);
-                    matchedHEdge.Poles.Union(CoreTarget[item].Poles);
+                    //matchedHEdge.Poles.AddRange(CoreTarget[item].Poles);
+                    matchedPoles.AddRange(CoreTarget[item].Poles);
                 }
-                incidenceList.Add((hEdge, matchedHEdge));
+                hEdge.Poles.AddRange(poles.Distinct());
+                matchedHEdge.Poles.AddRange(matchedPoles.Distinct());
+                incidenceList.Add((matchedHEdge, hEdge));
             }
 
             return incidenceList;
@@ -184,10 +203,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         {
             foreach ((var key, var val) in polesMatching)
             {
-                if (PolCorr[key] == null)
-                    PolCorr[key] = val;
-                else
+                if (PolCorr.ContainsKey(key) && PolCorr[key] != val)
+                {
                     return false;
+                }
+                else
+                {
+                    PolCorr[key] = val;
+                }
             }
             return true;
         }

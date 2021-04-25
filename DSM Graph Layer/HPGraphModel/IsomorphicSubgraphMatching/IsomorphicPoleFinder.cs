@@ -51,11 +51,11 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         private Dictionary<Hyperedge, Hyperedge> CoreSourceW { get; set; }
         private Dictionary<Hyperedge, Hyperedge> CoreTargetW { get; set; }
 
-        public void Recurse(long step = 1, Pole source = null, Pole target = null)
+        public bool Recurse(long step = 1, Pole source = null, Pole target = null)
         {
             if (CoreTarget.Values.All(x => x != null))
             {
-                return;
+                return true;
             }
 
             var pairs = GetAllCandidatePairs();
@@ -64,10 +64,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 if (CheckFisibiltyRules(potentialSource, potentialTarget))
                 {
                     UpdateVectors(step, potentialSource, potentialTarget);
-                    Recurse(step + 1, potentialSource, potentialTarget);
+                    if (Recurse(step + 1, potentialSource, potentialTarget))
+                        return true;
                 }
             }
+            if (source == null || target == null)
+                return false;
             RestoreVectors(step, source, target);
+            return false;
         }
 
         public void RestoreVectors(long step, Pole source, Pole target)
@@ -77,12 +81,12 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             foreach (var item in HyperedgeSource.Poles)
             {
-                if (ConnSource[item] == step)
+                if (ConnSource[item] == step - 1)
                     ConnSource[item] = 0;
             }
             foreach (var item in HyperedgeTarget.Poles)
             {
-                if (ConnTarget[item] == step)
+                if (ConnTarget[item] == step - 1)
                     ConnTarget[item] = 0;
             }
         }
@@ -92,17 +96,22 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             CoreSource[source] = target;
             CoreTarget[target] = source;
 
+            if (ConnSource[source] == 0)
+                ConnSource[source] = step;
+            if (ConnTarget[target] == 0)
+                ConnTarget[target] = step;
+
             var connectedToSourcePoles = GetConnectedPoles(source, HyperedgeSource);
             foreach (var pole in connectedToSourcePoles)
             {
-                if (ConnSource[pole] != 0)
+                if (ConnSource[pole] == 0)
                     ConnSource[pole] = step;
             }
 
             var connectedToTargetPoles = GetConnectedPoles(target, HyperedgeTarget);
             foreach (var pole in connectedToTargetPoles)
             {
-                if (ConnTarget[pole] != 0)
+                if (ConnTarget[pole] == 0)
                     ConnTarget[pole] = step;
             }
         }
@@ -124,7 +133,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             {
                 // TODO: Можно потом добавить еще проверку на количество связей, если потребуется
                 foreach (var targetPole in targetCandidatePoles
-                                            .Where(x => CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner && sourcePole.EdgeOwners.Count == x.EdgeOwners.Count))
+                                            .Where(x => CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner && sourcePole.EdgeOwners.Count >= x.EdgeOwners.Count))
                 {
                     var checkCorrectness = true;
                     foreach (var edge in targetPole.EdgeOwners)
@@ -174,7 +183,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var unmatchedConnectedToSourceNotConnectedToGraph = GetConnectedPoles(source, HyperedgeSource).Where(x => CoreSource[x] == null && ConnSource[x] == 0);
             var unmatchedConnectedToTargetNotConnectedToGraph = GetConnectedPoles(target, HyperedgeTarget).Where(x => CoreTarget[x] == null && ConnTarget[x] == 0);
 
-            return unmatchedConnectedToSourceNotConnectedToGraph.Count() > unmatchedConnectedToTargetNotConnectedToGraph.Count();
+            return unmatchedConnectedToSourceNotConnectedToGraph.Count() >= unmatchedConnectedToTargetNotConnectedToGraph.Count();
         }
 
 
