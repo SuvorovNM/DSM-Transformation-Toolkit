@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
+namespace DSM_Graph_Layer.HPGraphModel.Interfaces
 {
     /// <summary>
     /// Интерфейс для поиска изоморфного элемента

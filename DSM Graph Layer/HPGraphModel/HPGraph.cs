@@ -274,7 +274,7 @@ namespace DSM_Graph_Layer.HPGraphModel
         /// </summary>
         /// <param name="subgraph">Удаляемый подграф</param>
         /// <param name="matching">Словарь соответствия вершин, полученный при поиске изоморфных подграфов</param>
-        private void DeleteSubgraph(HPGraph subgraph, Dictionary<Vertex,Vertex> matching)
+        private void DeleteSubgraph(HPGraph subgraph, Dictionary<Vertex, Vertex> matching)
         {
             foreach (var edge in subgraph.Edges)
             {
@@ -313,18 +313,18 @@ namespace DSM_Graph_Layer.HPGraphModel
                 AddVertex(vertex);
             }
 
-            foreach(var edge in subgraph.Edges.ToList())
+            foreach (var edge in subgraph.Edges.ToList())
             {
-                foreach(var pole in edge.Poles.ToList())
+                foreach (var pole in edge.Poles.ToList())
                 {
                     if (pole.VertexOwner as VertexForTransformation != null && (pole.VertexOwner as VertexForTransformation).IsIncomplete)
                     {
                         edge.AddPole(matching[pole.Id]);
-                        foreach(var link in edge.Links.Where(x=>x.SourcePole == pole).ToList())
+                        foreach (var link in edge.Links.Where(x => x.SourcePole == pole).ToList())
                         {
                             link.SourcePole = matching[pole.Id];
                         }
-                        foreach(var link in edge.Links.Where(x=>x.TargetPole == pole).ToList())
+                        foreach (var link in edge.Links.Where(x => x.TargetPole == pole).ToList())
                         {
                             link.TargetPole = matching[pole.Id];
                         }
@@ -346,18 +346,18 @@ namespace DSM_Graph_Layer.HPGraphModel
         {
             var newGraph = new HPGraph();
             var poleMatching = new Dictionary<Pole, Pole>();
-            foreach(var extPole in subgraph.ExternalPoles)
+            foreach (var extPole in subgraph.ExternalPoles)
             {
                 var newExtPole = new Pole(extPole.Type);
                 newGraph.AddExternalPole(newExtPole);
                 poleMatching.TryAdd(extPole, newExtPole);
             }
-            foreach(var vertex in subgraph.Vertices.Where(x=> (x as VertexForTransformation == null) || !(x as VertexForTransformation).IsIncomplete))
+            foreach (var vertex in subgraph.Vertices.Where(x => (x as VertexForTransformation == null) || !(x as VertexForTransformation).IsIncomplete))
             {
                 var newVertex = new VertexForTransformation(false);
                 poleMatching.TryAdd(vertex.Poles.First(), newVertex.Poles.First());
 
-                foreach(var pole in vertex.Poles.Skip(1))
+                foreach (var pole in vertex.Poles.Skip(1))
                 {
                     var newIntPole = new Pole(pole.Type);
                     newVertex.AddPole(newIntPole);
@@ -365,23 +365,23 @@ namespace DSM_Graph_Layer.HPGraphModel
                 }
                 newGraph.AddVertex(newVertex);
             }
-            foreach(var vertex in subgraph.Vertices.Where(x => (x as VertexForTransformation != null) && (x as VertexForTransformation).IsIncomplete))
+            foreach (var vertex in subgraph.Vertices.Where(x => (x as VertexForTransformation != null) && (x as VertexForTransformation).IsIncomplete))
             {
                 newGraph.AddVertex(vertex);
-                foreach(var pole in vertex.Poles)
+                foreach (var pole in vertex.Poles)
                 {
                     poleMatching.TryAdd(pole, pole);
                 }
             }
-            foreach(var hedge in subgraph.Edges)
+            foreach (var hedge in subgraph.Edges)
             {
                 var newHedge = new Hyperedge();
 
-                foreach(var pole in hedge.Poles)
+                foreach (var pole in hedge.Poles)
                 {
                     newHedge.AddPole(poleMatching[pole]);
                 }
-                foreach(var link in hedge.Links)
+                foreach (var link in hedge.Links)
                 {
                     newHedge.AddLink(poleMatching[link.SourcePole], poleMatching[link.TargetPole], link.Type);
                 }

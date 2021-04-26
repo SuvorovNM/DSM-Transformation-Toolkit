@@ -89,7 +89,7 @@ namespace DSM_Graph_Layer.HPGraphModel
         /// Клонировать полюс
         /// </summary>
         /// <returns>Копия полюса</returns>
-        public object Clone()
+        public virtual object Clone()
         {
             var pole = new Pole(this.Type);
             pole.VertexOwner = this.VertexOwner;

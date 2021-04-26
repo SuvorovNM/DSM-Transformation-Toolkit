@@ -28,6 +28,14 @@ namespace Graph_Model_Tests
         }
 
         [Test]
+        public void CreateNewRoleTest()
+        {
+            var testRole = new Role("Ассоциация");
+
+            Assert.IsTrue(testRole.OppositeRole != null && testRole.OppositeRole.Name == testRole.Name && testRole.OppositeRole.OppositeRole == testRole);
+        }
+
+        [Test]
         public void AddNewVertexWithPolesTest()
         {
             var polesCount = 6;
