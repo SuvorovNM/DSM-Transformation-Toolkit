@@ -5,20 +5,29 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
-    class HyperedgeRelation : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<HyperedgeRelation>
+    public class HyperedgeRelation : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<HyperedgeRelation>
     {
         public HyperedgeRelation(Role role, string label = "") : base()
         {
             RelationRole = role;
             Label = label;
             Attributes = new List<ElementAttribute>();
+            Instances = new List<HyperedgeRelation>();
         }
 
+        public HyperedgeRelation OppositeRelation { get; set; }
         public Role RelationRole { get; set; }
         public string Label { get; set; }
         public List<ElementAttribute> Attributes { get; set; }
-        public HyperedgeRelation BaseElement { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public List<HyperedgeRelation> Instances { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public HyperedgeRelation BaseElement { get; set; }
+        public List<HyperedgeRelation> Instances { get; set; }
+        public HyperedgeVertex HyperEdge
+        {
+            get
+            {
+                return VertexOwner as HyperedgeVertex;
+            }
+        }
 
         public void SetLabel(string label)
         {
@@ -36,19 +45,38 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             return relation;
         }
 
-        public void SetBaseElement(HyperedgeRelation baseElement)
+        public void SetOppositeRelation(HyperedgeRelation relation)
         {
-            throw new NotImplementedException();
+            OppositeRelation = relation;
+            relation.OppositeRelation = this;
         }
 
-        public HyperedgeRelation Instantiate()
+        public void SetBaseElement(HyperedgeRelation baseElement)
         {
-            throw new NotImplementedException();
+            BaseElement = baseElement;
+            baseElement.Instances.Add(baseElement);
+        }
+
+        public HyperedgeRelation Instantiate(string label)
+        {
+            var newRelation = new HyperedgeRelation(RelationRole, label);
+            newRelation.SetBaseElement(this);
+
+            foreach (var attribute in Attributes)
+            {
+                newRelation.Attributes.Add(new ElementAttribute(attribute.DataValue, ""));
+            }
+            newRelation.Type = Type;
+            return newRelation;
         }
 
         public void DeleteInstance(HyperedgeRelation instance)
         {
-            throw new NotImplementedException();
+            if (Instances.Contains(instance))
+            {
+                instance.BaseElement = null;
+                Instances.Remove(instance);
+            }
         }
     }
 }

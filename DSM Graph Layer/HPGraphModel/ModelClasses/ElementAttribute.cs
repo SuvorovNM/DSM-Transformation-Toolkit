@@ -8,5 +8,11 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     {
         public string DataType { get; set; }
         public string DataValue { get; set; }
+
+        public ElementAttribute(string key, string val)
+        {
+            DataType = key;
+            DataValue = val;
+        }
     }
 }

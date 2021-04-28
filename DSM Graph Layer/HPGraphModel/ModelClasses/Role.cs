@@ -11,10 +11,14 @@ namespace DSM_Graph_Layer.HPGraphModel
             Name = name;
             OppositeRole = this;
         }
-        public Role(Role r)
+        public Role(Role r, string name = "")
         {
-            Name = r.Name;
+            if (name == "")
+                Name = r.Name;
+            else
+                Name = name;
             OppositeRole = r;
+            r.OppositeRole = this;
         }
 
         public string Name { get; set; }

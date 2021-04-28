@@ -9,7 +9,7 @@ namespace DSM_Graph_Layer.HPGraphModel.Interfaces
         public T BaseElement { get; set; }
         public List<T> Instances { get; set; }
         public void SetBaseElement(T baseElement);
-        public T Instantiate();
+        public T Instantiate(string label);
         public void DeleteInstance(T instance);
     }
 }

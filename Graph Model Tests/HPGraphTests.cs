@@ -8,7 +8,7 @@ using System;
 
 namespace Graph_Model_Tests
 {
-    public class GraphModelTests
+    public class HPGraphTests
     {
         HPGraph SourceGraph;
         [SetUp]

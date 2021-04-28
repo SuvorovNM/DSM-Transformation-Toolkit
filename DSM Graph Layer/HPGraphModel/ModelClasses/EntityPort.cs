@@ -1,16 +1,18 @@
 ﻿using DSM_Graph_Layer.HPGraphModel.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
-    class EntityPort : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<EntityPort>
+    public class EntityPort : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<EntityPort>
     {
         public EntityPort(string label = "", IEnumerable<Role> roles = null) : base()
         {
             Label = label;
             Attributes = new List<ElementAttribute>();
+            Instances = new List<EntityPort>();
             if (roles != null)
                 AcceptedRoles = new List<Role>(roles);
             else
@@ -20,8 +22,16 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         public List<Role> AcceptedRoles { get; set; }
         public string Label { get; set; }
         public List<ElementAttribute> Attributes { get; set; }
-        public EntityPort BaseElement { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public List<EntityPort> Instances { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public EntityPort BaseElement { get; set; }
+        public List<EntityPort> Instances { get; set; }
+        public List<HyperedgeRelation> Relations
+        {
+            get
+            {
+                // TODO: возможно получится сделать запрос проще
+                return EdgeOwners.SelectMany(x => x.Links.Where(y => y.SourcePole == this).Select(y => y.TargetPole as HyperedgeRelation)).Union(EdgeOwners.SelectMany(x => x.Links.Where(y => y.TargetPole == this).Select(y => y.SourcePole as HyperedgeRelation))).ToList();
+            }
+        }
 
         public void SetLabel(string label)
         {
@@ -39,19 +49,34 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             return port;
         }
 
-        public void SetBaseElement(EntityPort baseElement)
+        public void SetBaseElement(EntityPort baseElement) // Заменить на protected/private
         {
-            throw new NotImplementedException();
+            // TODO: Продумать над проверками и необходимостью переопределения свойств
+            BaseElement = baseElement;
+            baseElement.Instances.Add(this);
         }
 
-        public EntityPort Instantiate()
+        public EntityPort Instantiate(string label)
         {
-            throw new NotImplementedException();
+            var newPort = new EntityPort(label, this.AcceptedRoles);
+            newPort.SetBaseElement(this);
+
+            foreach(var attribute in Attributes)
+            {
+                newPort.Attributes.Add(new ElementAttribute(attribute.DataValue, ""));
+            }
+            newPort.Type = this.Type;
+
+            return newPort;
         }
 
         public void DeleteInstance(EntityPort instance)
         {
-            throw new NotImplementedException();
+            if (Instances.Contains(instance))
+            {
+                instance.BaseElement = null;
+                Instances.Remove(instance);
+            }
         }
     }
 }

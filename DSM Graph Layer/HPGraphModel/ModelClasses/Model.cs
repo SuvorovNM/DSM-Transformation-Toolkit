@@ -6,28 +6,26 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
-    class Model : HPGraph, ILabeledElement, IAttributedElement
+    public class Model : HPGraph, ILabeledElement, IAttributedElement, IMetamodelingElement<Model>
     {
-        public Model(string label = "", Model metamodel = null)
+        public Model(string label = "")
         {
             Label = label;
-            Metamodel = metamodel;
             Roles = new List<Role>();            
             Attributes = new List<ElementAttribute>();
-            ModelInstances = new List<Model>();
+            Instances = new List<Model>();
         }
         public Model(Model parentGraph, string label = "", List<Pole> externalPoles = null) : base(parentGraph, externalPoles)
         {
             Roles = parentGraph.Roles;
             Label = label;
-            ModelInstances = new List<Model>();
+            Attributes = new List<ElementAttribute>();
+            Instances = new List<Model>();
         }
 
         public List<Role> Roles { get; }
         public string Label { get; set; }
         public List<ElementAttribute> Attributes { get; set; }
-        public Model Metamodel { get; set; }
-        public List<Model> ModelInstances { get; set; }
         public List<EntityVertex> Entities 
         { 
             get
@@ -43,11 +41,14 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             }
         }
 
+        public Model BaseElement { get; set; }
+        public List<Model> Instances { get; set; }
+
         /// <summary>
         /// Добавить новую пару ролей к графу
         /// </summary>
         /// <param name="r">Добавляемая роль</param>
-        public void AddNewRoleToGraph(Role r) // TODO: возможно не стоит сразу добавлять Opposite
+        public void AddNewRolePairToGraph(Role r) // TODO: возможно не стоит сразу добавлять Opposite
         {
             if (!Roles.Contains(r))
                 Roles.Add(r);
@@ -73,22 +74,148 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Label = label;
         }
 
-        public void AddNewEntityVertex(EntityVertex entity)
+        public void AddNewEntityVertex(EntityVertex entity) // TODO: Разобраться с инициализацией элементов в моделях, основанных на метамоделях
         {
-            throw new NotImplementedException();
+            AddVertex(entity);
+            /*foreach(var instance in Instances)
+            {
+                var entInstance = entity.Instantiate(entity.Label);
+                instance.AddNewEntityVertex(entInstance);
+            }*/
         }
         public void RemoveEntityVertex(EntityVertex entity)
         {
-            throw new NotImplementedException();
+            if (Entities.Contains(entity))
+            {
+                foreach(var port in entity.Ports)
+                {
+                    entity.RemovePortFromEntity(port);
+                }
+                entity.BaseElement?.DeleteInstance(entity);
+
+                foreach(var instance in Instances)
+                {
+                    var entities = entity.Instances.Where(x => x.OwnerGraph == instance);
+                    foreach(var entityInst in entities)
+                    {
+                        instance.RemoveEntityVertex(entityInst);
+                    }
+                }
+                RemoveStructure(entity);
+            }            
         }
 
-        public void AddNewHyperedgeVertex(HyperedgeVertex hyperedge)
+        public void AddNewHyperedgeVertex(HyperedgeVertex hyperedge) // TODO: Определить момент добавления/изменения гиперребра
         {
-            throw new NotImplementedException();
+            AddVertex(hyperedge);
+            /*foreach(var instance in Instances)
+            {
+                var hedgeInstance = hyperedge.Instantiate(hyperedge.Label);
+                instance.AddNewHyperedgeVertex(hedgeInstance);
+            }*/
         }
         public void RemoveHyperedgeVertex(HyperedgeVertex hyperedge)
         {
-            throw new NotImplementedException();
+            if (Hyperedges.Contains(hyperedge))
+            {
+                foreach(var rel in hyperedge.Relations)
+                {
+                    hyperedge.RemoveRelationFromHyperedge(rel);
+                }
+                hyperedge.BaseElement?.DeleteInstance(hyperedge);
+
+                foreach(var instance in Instances)
+                {
+                    var hyperedges = hyperedge.Instances.Where(x => x.OwnerGraph == instance);
+                    foreach(var hyperedgeInst in hyperedges)
+                    {
+                        instance.RemoveHyperedgeVertex(hyperedgeInst);
+                    }
+                }
+                RemoveStructure(hyperedge);
+            }
+        }
+        public HyperedgeVertex AddNewRelation((EntityPort port, Role role) relFirst, (EntityPort port, Role role) relSecond)
+        {
+            var hyperedge = (HyperedgeVertex) null;            
+            if (BaseElement == null)
+            {
+                hyperedge = new HyperedgeVertex();
+                AddNewHyperedgeVertex(hyperedge);                
+            }
+            else
+            {
+                var appropriateHyperedges = BaseElement.Hyperedges
+                    .Where(x => x.Relations.Select(y => y.RelationRole).Contains(relFirst.role) && x.Relations.Select(y => y.RelationRole).Contains(relSecond.role));
+
+                if (appropriateHyperedges.Any())
+                {
+                    hyperedge = appropriateHyperedges.First().Instantiate("");
+                    AddNewHyperedgeVertex(hyperedge);
+                }
+            }
+
+            if (hyperedge != null)
+            {
+                var rel1 = new HyperedgeRelation(relFirst.role);
+                var rel2 = new HyperedgeRelation(relSecond.role);
+                rel1.SetOppositeRelation(rel2);
+
+                hyperedge.AddRelationPairToHyperedge(rel1);
+
+                var relationPortsLinks = hyperedge.CorrespondingHyperedge == null ? new RelationsPortsHyperedge() : hyperedge.CorrespondingHyperedge;
+                relationPortsLinks.AddConnection(rel1, relFirst.port);
+                relationPortsLinks.AddConnection(rel2, relSecond.port);
+
+                AddHyperEdge(relationPortsLinks);
+            }
+            return hyperedge;
+        }
+
+        public void AddLinkBetweenPortAndRelation(EntityPort p, HyperedgeRelation rel)
+        {
+            var relationPortsLinks = rel.HyperEdge.CorrespondingHyperedge == null ? new RelationsPortsHyperedge() : rel.HyperEdge.CorrespondingHyperedge;
+            relationPortsLinks.AddConnection(rel, p);
+            AddHyperEdge(relationPortsLinks);
+        }
+
+        public void SetBaseElement(Model baseElement)
+        {
+            BaseElement = baseElement;
+            baseElement.Instances.Add(this);
+        }
+
+        public Model Instantiate(string label)
+        {
+            var newModel = new Model(label);
+            newModel.SetBaseElement(this);
+
+            foreach (var attribute in Attributes)
+            {
+                newModel.Attributes.Add(new ElementAttribute(attribute.DataValue, ""));
+            }
+            newModel.Roles.AddRange(Roles); // Возможно, это и не нужно
+            newModel.ParentGraph = ParentGraph; // Возможно, это и не нужно
+
+            return newModel;
+        }
+
+        public void DeleteInstance(Model instance)
+        {
+            if (Instances.Contains(instance))
+            {
+                instance.BaseElement = null;
+                Instances.Remove(instance);
+
+                foreach (var ent in instance.Entities.ToList())
+                {
+                    ent.BaseElement.DeleteInstance(ent);
+                }
+                foreach (var hyperedge in instance.Hyperedges.ToList())
+                {
+                    hyperedge.BaseElement.DeleteInstance(hyperedge);
+                }
+            }
         }
     }
 }
