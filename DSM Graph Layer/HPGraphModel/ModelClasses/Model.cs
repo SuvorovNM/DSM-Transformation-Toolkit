@@ -135,48 +135,85 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 RemoveStructure(hyperedge);
             }
         }
-        public HyperedgeVertex AddNewRelation((EntityPort port, Role role) relFirst, (EntityPort port, Role role) relSecond)
+
+        public HyperedgeVertex AddHyperedgeWithRelation(EntityVertex source, EntityVertex target, Role role)
         {
-            var hyperedge = (HyperedgeVertex) null;            
+            var sourcePort = source.Ports.Where(x => x.AcceptedRoles.Contains(role)).First();
+            var targetPort = target.Ports.Where(x => x.AcceptedRoles.Contains(role.OppositeRole)).First();
+
+            return AddHyperedgeWithRelation(sourcePort, targetPort, role);
+        }
+
+        public HyperedgeVertex AddHyperedgeWithRelation(EntityPort source, EntityPort target, Role role)
+        {
+            var hyperedge = (HyperedgeVertex) null;
+            var rel1 = (HyperedgeRelation) null;
+            var rel2 = (HyperedgeRelation) null;
             if (BaseElement == null)
             {
                 hyperedge = new HyperedgeVertex();
-                AddNewHyperedgeVertex(hyperedge);                
+                AddNewHyperedgeVertex(hyperedge);
+
+                rel1 = new HyperedgeRelation(role);
+                rel2 = new HyperedgeRelation(role.OppositeRole);
+                hyperedge.AddRelationPairToHyperedge(rel1, rel2);
             }
             else
             {
                 var appropriateHyperedges = BaseElement.Hyperedges
-                    .Where(x => x.Relations.Select(y => y.RelationRole).Contains(relFirst.role) && x.Relations.Select(y => y.RelationRole).Contains(relSecond.role));
+                    .Where(x => x.Relations.Select(y => y.RelationRole).Contains(role) && x.Relations.Select(y => y.RelationRole).Contains(role.OppositeRole))
+                    .Where(x=>x.Relations.Select(y=>y.CorrespondingPort).Contains(source.BaseElement) && x.Relations.Select(y => y.CorrespondingPort).Contains(target.BaseElement));
 
                 if (appropriateHyperedges.Any())
                 {
                     hyperedge = appropriateHyperedges.First().Instantiate("");
                     AddNewHyperedgeVertex(hyperedge);
+
+                    rel1 = hyperedge.Relations.Where(x => x.RelationRole == role).First();
+                    rel2 = hyperedge.Relations.Where(x => x.RelationRole == role.OppositeRole).First();
                 }
             }
-
-            if (hyperedge != null)
+            if (hyperedge != null && rel1 != null && rel2 != null)
             {
-                var rel1 = new HyperedgeRelation(relFirst.role);
-                var rel2 = new HyperedgeRelation(relSecond.role);
-                rel1.SetOppositeRelation(rel2);
-
-                hyperedge.AddRelationPairToHyperedge(rel1);
-
                 var relationPortsLinks = hyperedge.CorrespondingHyperedge == null ? new RelationsPortsHyperedge() : hyperedge.CorrespondingHyperedge;
-                relationPortsLinks.AddConnection(rel1, relFirst.port);
-                relationPortsLinks.AddConnection(rel2, relSecond.port);
+                relationPortsLinks.AddConnection(rel1, source);
+                relationPortsLinks.AddConnection(rel2, target);
 
                 AddHyperEdge(relationPortsLinks);
             }
             return hyperedge;
         }
 
-        public void AddLinkBetweenPortAndRelation(EntityPort p, HyperedgeRelation rel)
+        private void AddLinkBetweenPortAndRelation(EntityPort p, HyperedgeRelation rel)
         {
-            var relationPortsLinks = rel.HyperEdge.CorrespondingHyperedge == null ? new RelationsPortsHyperedge() : rel.HyperEdge.CorrespondingHyperedge;
+            var relationPortsLinks = rel.HyperedgeOwner.CorrespondingHyperedge == null ? new RelationsPortsHyperedge() : rel.HyperedgeOwner.CorrespondingHyperedge;
             relationPortsLinks.AddConnection(rel, p);
             AddHyperEdge(relationPortsLinks);
+        }
+
+        public void AddRelationToHyperedge(HyperedgeVertex hedge, EntityPort source, EntityPort target, Role r)
+        {
+            var sourceRel = hedge.Relations.Where(x => x.RelationRole == r && x.CorrespondingPort == null);
+            var targetRel = hedge.Relations.Where(x => x.RelationRole == r.OppositeRole && x.CorrespondingPort == null);
+            if (sourceRel.Any() && targetRel.Any())
+            {
+                AddLinkBetweenPortAndRelation(source, sourceRel.First());
+                AddLinkBetweenPortAndRelation(target, targetRel.First());
+            }
+        }
+        public void AddRelationToHyperedge(HyperedgeVertex hedge, EntityVertex source, EntityVertex target, Role r)
+        {
+            var sourceRel = hedge.Relations.Where(x => x.RelationRole == r && x.CorrespondingPort == null);
+            var targetRel = hedge.Relations.Where(x => x.RelationRole == r.OppositeRole && x.CorrespondingPort == null);
+
+            var sourcePort = source.Ports.Where(x => x.AcceptedRoles.Contains(r));
+            var targetPort = target.Ports.Where(x => x.AcceptedRoles.Contains(r.OppositeRole));
+
+            if (sourceRel.Any() && targetRel.Any() && sourcePort.Any() && targetPort.Any())
+            {
+                AddLinkBetweenPortAndRelation(sourcePort.First(), sourceRel.First());
+                AddLinkBetweenPortAndRelation(targetPort.First(), targetRel.First());
+            }
         }
 
         public void SetBaseElement(Model baseElement)

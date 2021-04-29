@@ -21,7 +21,8 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         public List<ElementAttribute> Attributes { get; set; }
         public HyperedgeRelation BaseElement { get; set; }
         public List<HyperedgeRelation> Instances { get; set; }
-        public HyperedgeVertex HyperEdge
+        public EntityPort CorrespondingPort { get; set; }
+        public HyperedgeVertex HyperedgeOwner
         {
             get
             {
@@ -54,7 +55,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         public void SetBaseElement(HyperedgeRelation baseElement)
         {
             BaseElement = baseElement;
-            baseElement.Instances.Add(baseElement);
+            baseElement.Instances.Add(this);
         }
 
         public HyperedgeRelation Instantiate(string label)

@@ -13,6 +13,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Label = label;
             Attributes = new List<ElementAttribute>();
             Instances = new List<HyperedgeVertex>();
+            Poles = new List<Pole>();
         }
         public List<HyperedgeRelation> Relations
         {
@@ -49,14 +50,17 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         /// Производится добавление сразу обоих полюсов отношение, т.к. само отношение - составное
         /// </summary>
         /// <param name="relation">Добавляемое отношение</param>
-        public void AddRelationPairToHyperedge(HyperedgeRelation relation)
+        public void AddRelationPairToHyperedge(HyperedgeRelation relation1, HyperedgeRelation relation2)
         {
-            AddPole(relation);
-            AddPole(relation.OppositeRelation);
+            relation1.SetOppositeRelation(relation2);
+            AddPole(relation1);
+            AddPole(relation2);
             foreach (var instance in Instances)
             {
-                instance.AddRelationPairToHyperedge(relation.Instantiate(relation.Label));
-                instance.AddRelationPairToHyperedge(relation.OppositeRelation.Instantiate(relation.OppositeRelation.Label));
+                var rel1 = relation1.Instantiate(relation1.Label);
+                var rel2 = relation2.Instantiate(relation2.Label);
+
+                instance.AddRelationPairToHyperedge(rel1, rel2);
             }
         }
 
@@ -66,6 +70,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         /// <param name="relation">Удаляемое отношение</param>
         public void RemoveRelationFromHyperedge(HyperedgeRelation relation)
         {
+            relation.BaseElement?.DeleteInstance(relation);
+            relation.OppositeRelation.BaseElement?.DeleteInstance(relation.OppositeRelation);
+
             RemovePole(relation);
             RemovePole(relation.OppositeRelation);
 
@@ -73,7 +80,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             foreach (var instance in Instances)
             {
                 var relations = relation.Instances.Where(x => x.VertexOwner == instance);
-                foreach (var item in relations)
+                foreach (var item in relations.ToList())
                 {
                     instance.RemoveRelationFromHyperedge(item);
                     instance.RemoveRelationFromHyperedge(item.OppositeRelation);
@@ -106,16 +113,26 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
             // Временное решение для учета связей между отношениями
             var hyperedgeRelationInstances = new Dictionary<HyperedgeRelation, HyperedgeRelation>();
-            foreach (var rel in Relations)
+
+            var relationList = new List<HyperedgeRelation>();
+            foreach(var rel in Relations)
             {
-                var instance = rel.Instantiate(rel.Label);
-                newHyperedgeVertex.AddRelationPairToHyperedge(instance);
-                hyperedgeRelationInstances.Add(rel, instance);
+                if (!relationList.Contains(rel) && !relationList.Contains(rel.OppositeRelation))
+                    relationList.Add(rel);
             }
-            foreach (var instRel in newHyperedgeVertex.Relations)
+
+            foreach (var rel in relationList)
+            {
+                var instance1 = rel.Instantiate(rel.Label);
+                var instance2 = rel.OppositeRelation.Instantiate(rel.OppositeRelation.Label);                
+
+                newHyperedgeVertex.AddRelationPairToHyperedge(instance1, instance2);
+                hyperedgeRelationInstances.Add(rel, instance1);
+            }
+            /*foreach (var instRel in newHyperedgeVertex.Relations)
             {
                 instRel.SetOppositeRelation(hyperedgeRelationInstances[instRel.BaseElement]);
-            }
+            }*/
 
             return newHyperedgeVertex;
         }

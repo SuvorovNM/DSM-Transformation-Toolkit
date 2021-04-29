@@ -60,7 +60,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             var portRelations = port.Relations;
             foreach(var rel in portRelations)
             {
-                rel.HyperEdge.RemoveRelationFromHyperedge(rel);
+                rel.HyperedgeOwner.RemoveRelationFromHyperedge(rel);
             }
 
             port.BaseElement?.DeleteInstance(port);
@@ -68,7 +68,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             foreach(var element in Instances)
             {
                 var ports = port.Instances.Where(x => x.VertexOwner == element);
-                foreach(var item in ports)
+                foreach(var item in ports.ToList())
                 {
                     element.RemovePortFromEntity(item);
                 }

@@ -25,7 +25,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             }
         }
 
-        public void AddConnection(HyperedgeRelation rel, EntityPort p)
+        public void AddConnection(HyperedgeRelation rel, EntityPort p) // TODO: Сделать RemoveConnection?
         {
             if (p.AcceptedRoles.Contains(rel.RelationRole) &&
                 (rel.BaseElement == null || p.BaseElement == null || p.BaseElement.Relations.Contains(rel.BaseElement)))
@@ -35,6 +35,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 if (!Ports.Contains(p))
                     AddPort(p);
                 AddLink(rel, p);
+                rel.CorrespondingPort = p;
             }
             else
                 throw new Exception("Невозможно простроить связь - порт не может принимать отношение с выбранной ролью!");

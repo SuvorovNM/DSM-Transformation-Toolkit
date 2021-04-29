@@ -32,6 +32,13 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return EdgeOwners.SelectMany(x => x.Links.Where(y => y.SourcePole == this).Select(y => y.TargetPole as HyperedgeRelation)).Union(EdgeOwners.SelectMany(x => x.Links.Where(y => y.TargetPole == this).Select(y => y.SourcePole as HyperedgeRelation))).ToList();
             }
         }
+        public EntityVertex EntityOwner
+        {
+            get
+            {
+                return VertexOwner as EntityVertex;
+            }
+        }
 
         public void SetLabel(string label)
         {
