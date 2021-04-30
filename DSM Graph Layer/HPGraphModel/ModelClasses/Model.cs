@@ -1,5 +1,6 @@
 ﻿using DSM_Graph_Layer.HPGraphModel.GraphClasses;
 using DSM_Graph_Layer.HPGraphModel.Interfaces;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching;
 using DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,18 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Label = label;
             Attributes = new List<ElementAttribute>();
             Instances = new List<Model>();
+        }
+        public Model(
+            IEnumerable<EntityVertex> entities,
+            IEnumerable<HyperedgeVertex> hyperedges,
+            IEnumerable<RelationsPortsHyperedge> hyperedgeConnectors=null,
+            IEnumerable<Pole> externalPoles=null)
+        {
+            Vertices = entities == null ? new List<Vertex>() : new List<Vertex>(entities);
+            if (hyperedges != null) 
+                Vertices.AddRange(hyperedges);
+            Edges = hyperedgeConnectors == null ? new List<Hyperedge>() : new List<Hyperedge>(hyperedgeConnectors);
+            ExternalPoles = externalPoles == null ? new List<Pole>() : new List<Pole>(externalPoles);
         }
 
         public List<Role> Roles { get; }
@@ -261,10 +274,31 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public List<Model> FindIsomorphicModels(Model model)
         {
-            var subgraphFinder = new IsomorphicModelVertexFinder(this, model);
-            subgraphFinder.Recurse();
+            var submodelFinder = new IsomorphicModelVertexFinder(this, model);
+            submodelFinder.Recurse();
 
-            var results = subgraphFinder.GeneratedAnswers;
+            var results = submodelFinder.GeneratedAnswers;
+
+            var modelList = new List<Model>();
+            foreach (var (vertices, edges, poles) in results)
+            {
+                var submodel = new Model();
+                submodel.Vertices.AddRange(vertices.Values);
+                submodel.ExternalPoles.AddRange(poles.Values.Where(x => x.VertexOwner == null));
+                submodel.Edges.AddRange(edges.Values);
+
+                modelList.Add(submodel);
+            }
+
+            return modelList;
+        }
+
+        public List<Model> FindAllInstancesOfPartialMetamodel(Model partialMetamodel)
+        {
+            var submetamodelFinder = new IsomorphicMetamodelVertexFinder(this, partialMetamodel);
+            submetamodelFinder.Recurse();
+
+            var results = submetamodelFinder.GeneratedAnswers;
 
             var modelList = new List<Model>();
             foreach (var (vertices, edges, poles) in results)

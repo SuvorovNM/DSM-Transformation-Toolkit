@@ -25,6 +25,13 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Poles.Where(x => x as HyperedgeRelation != null).Select(x => x as HyperedgeRelation).ToList();
             }
         }
+        public HyperedgeVertex CorrespondingHyperedgeVertex
+        {
+            get
+            {
+                return Relations.First().HyperedgeOwner;
+            }
+        }
 
         public void AddConnection(HyperedgeRelation rel, EntityPort p) // TODO: Сделать RemoveConnection?
         {

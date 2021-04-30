@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
+namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
 {
-    public class IsomorphicModelVertexFinder : IsomorphicVertexFinder
+    class IsomorphicMetamodelVertexFinder : IsomorphicVertexFinder
     {
-        public IsomorphicModelVertexFinder(Model source, Model target) : base(source, target)
+        public IsomorphicMetamodelVertexFinder(Model source, Model target) : base(source, target)
         {
 
         }
@@ -19,7 +19,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
             if (CoreTarget.Values.All(x => x != null) && ValidateVertexIsomorphism())
             {
                 // Переход на уровень гиперребер
-                var edgeFinder = new IsomorphicModelHyperedgeConnectorFinder(HPGraphSource as Model, HPGraphTarget as Model, CoreSource, CoreTarget);
+                var edgeFinder = new IsomorphicMetamodelHyperedgeConnectorFinder(HPGraphSource as Model, HPGraphTarget as Model, CoreSource, CoreTarget);
                 edgeFinder.Recurse();
 
                 // Если ответы нашлись, то получить матрицы соответствий, добавить несвязанные полюса к матрице соответствий полюсов и добавить ответ в список изоморфных подграфов
@@ -69,24 +69,12 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
                 {
                     if (source.GetType() == typeof(EntityVertex))
                     {
-                        var check = true;
-                        check &= (source as EntityVertex).Label == (target as EntityVertex).Label;
-                        foreach (var attr in (target as EntityVertex).Attributes)
-                        {
-                            check &= (source as EntityVertex).Attributes.Any(x => x.DataType == attr.DataType && x.DataValue == attr.DataValue);
-                        }
-                        if (check)
+                        if ((source as EntityVertex).BaseElement == target)
                             resultPairList.Add((source, target));
                     }
                     else if (source.GetType() == typeof(HyperedgeVertex))
                     {
-                        var check = true;
-                        check &= (source as HyperedgeVertex).Label == (target as HyperedgeVertex).Label;
-                        foreach (var attr in (target as HyperedgeVertex).Attributes)
-                        {
-                            check &= (source as HyperedgeVertex).Attributes.Any(x => x.DataType == attr.DataType && x.DataValue == attr.DataValue);
-                        }
-                        if (check)
+                        if ((source as HyperedgeVertex).BaseElement == target)
                             resultPairList.Add((source, target));
                     }
                 }

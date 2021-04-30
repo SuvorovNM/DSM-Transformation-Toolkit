@@ -14,15 +14,15 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// <summary>
         /// Внешние полюса графа
         /// </summary>
-        public List<Pole> ExternalPoles { get; }
+        public List<Pole> ExternalPoles { get; set; }
         /// <summary>
         /// Гиперребра графа
         /// </summary>
-        public List<Hyperedge> Edges { get; }
+        public List<Hyperedge> Edges { get; set; }
         /// <summary>
         /// Вершины графа
         /// </summary>
-        public List<Vertex> Vertices { get; }
+        public List<Vertex> Vertices { get; set; }
 
         /// <summary>
         /// Создать новый гиперграф с полюсами

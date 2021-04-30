@@ -450,6 +450,32 @@ namespace Graph_Model_Tests
             Assert.IsTrue(answers.First().Entities.First().Ports.Count == entity.Ports.Count);
         }
 
+        [Test]
+        public void SingleEntitySubmetamodelMatchingTest()
+        {
+            var model = Metamodel.Instantiate("Test model");
+            var entities = CreateAllEntityInstances();
+            foreach(var item in entities)
+            {
+                model.AddNewEntityVertex(item);
+            }
+
+            var hedges = CreateAllHyperedgeInstances();
+            foreach(var item in hedges)
+            {
+                model.AddNewHyperedgeVertex(item);
+            }
+
+            var submetamodel = new Model(new[] { Metamodel.Entities.First() }, null);
+
+            var answers = model.FindAllInstancesOfPartialMetamodel(submetamodel);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Entities.Count == 1);
+            Assert.Zero(answers.First().Hyperedges.Count);
+            Assert.IsTrue(answers.First().Entities.First().BaseElement == Metamodel.Entities.First());
+        }
+
         private List<HyperedgeVertex> CreateAllHyperedgeInstances()
         {
             var instances = new List<HyperedgeVertex>();

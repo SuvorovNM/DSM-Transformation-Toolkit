@@ -169,6 +169,8 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
 
         private bool CheckConsistencyRule(Vertex source, Vertex target)
         {
+            var test = GetConnectedVertices(source, HPGraphSource).ToList();
+
             var matchedConnectedToSource = GetConnectedVertices(source, HPGraphSource).Where(x => CoreSource[x] != null);
             var matchedConnectedToTarget = GetConnectedVertices(target, HPGraphTarget).Where(x => CoreTarget[x] != null);
             var result = true;
@@ -237,7 +239,8 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         /// <returns>Связанные вершины</returns>
         private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex, HPGraph graph)
         {
-            return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count() > 0);
+            //return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count() > 0);
+            return graph.Edges.Where(x => x.Poles.Any(y => y.VertexOwner == vertex)).SelectMany(x => x.Poles.Where(y => y.VertexOwner!=null).Select(y => y.VertexOwner)).Distinct() ?? new List<Vertex>();
         }
 
 

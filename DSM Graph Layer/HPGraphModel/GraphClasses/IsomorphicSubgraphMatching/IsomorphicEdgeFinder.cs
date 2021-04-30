@@ -189,7 +189,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         /// </summary>
         /// <param name="source">Гиперребро</param>
         /// <returns>Коллекция вершин</returns>
-        private static IEnumerable<Vertex> GetVerticesForHyperedge(Hyperedge source)
+        protected static IEnumerable<Vertex> GetVerticesForHyperedge(Hyperedge source)
         {
             return source.Poles.Select(x => x.VertexOwner).Distinct();
         }
