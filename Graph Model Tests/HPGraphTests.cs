@@ -35,6 +35,7 @@ namespace Graph_Model_Tests
             Assert.IsTrue(testRole.OppositeRole != null && testRole.OppositeRole.Name == testRole.Name && testRole.OppositeRole.OppositeRole == testRole);
         }
 
+        #region Manipulations with verticies
         [Test]
         public void AddNewVertexWithPolesTest()
         {
@@ -47,8 +48,23 @@ namespace Graph_Model_Tests
             Assert.AreEqual(polesCount + 1, vertex.Poles.Count);
             Assert.AreEqual(startVertexCount + 1, SourceGraph.Vertices.Count);
             Assert.IsTrue(vertex.OwnerGraph == SourceGraph);
-        }       
-        
+        }
+
+        [Test]
+        public void RemoveVertexTest()
+        {
+            var startVerticesCount = SourceGraph.Vertices.Count;
+            var removedVerticeId = SourceGraph.Vertices[0].Id;
+
+            SourceGraph.RemoveStructure(SourceGraph.Vertices[0]);
+
+            Assert.AreEqual(startVerticesCount - 1, SourceGraph.Vertices.Count);
+            Assert.IsTrue(!SourceGraph.Vertices.Any(x => x.Id == removedVerticeId));
+            Assert.IsTrue(!SourceGraph.Edges.Any(x => x.Poles.Any(x => x.VertexOwner.Id == removedVerticeId)));
+        }
+        #endregion
+
+        #region Manipulations with hyperedges
         [Test]
         public void AddNewHyperEdgeTest()
         {
@@ -66,19 +82,6 @@ namespace Graph_Model_Tests
         }
 
         [Test]
-        public void RemoveVertexTest()
-        {
-            var startVerticesCount = SourceGraph.Vertices.Count;
-            var removedVerticeId = SourceGraph.Vertices[0].Id;
-
-            SourceGraph.RemoveStructure(SourceGraph.Vertices[0]);
-
-            Assert.AreEqual(startVerticesCount - 1, SourceGraph.Vertices.Count);
-            Assert.IsTrue(!SourceGraph.Vertices.Any(x => x.Id == removedVerticeId));
-            Assert.IsTrue(!SourceGraph.Edges.Any(x => x.Poles.Any(x=>x.VertexOwner.Id == removedVerticeId)));
-        }
-
-        [Test]
         public void RemoveEdgeTest()
         {
             var startEdgeCount = SourceGraph.Edges.Count;
@@ -91,7 +94,9 @@ namespace Graph_Model_Tests
             Assert.IsTrue(!SourceGraph.Edges.Any(x => x.Id == removedEdgeId));
             Assert.AreEqual(totalPolesCount, SourceGraph.Vertices.Sum(x => x.Poles.Count) + SourceGraph.ExternalPoles.Count);
         }
+        #endregion
 
+        #region Manipulations with poles
         [Test]
         public void AddPoleToVertexTest()
         {
@@ -193,7 +198,9 @@ namespace Graph_Model_Tests
 
             Assert.AreEqual(startVerticesCount, SourceGraph.Vertices.Count);
         }
+        #endregion
 
+        #region Manipulations with links
         [Test]
         public void RemoveLinkFromHyperEdgeTest()
         {
@@ -221,7 +228,9 @@ namespace Graph_Model_Tests
             Assert.Zero(hEdge.Links.Count);
             Assert.AreEqual(hyperedgesCount - 1, SourceGraph.Edges.Count);
         }
+        #endregion
 
+        #region Manipulations with decompositions
         [Test]
         public void DefineDecompositionTest()
         {
@@ -274,7 +283,9 @@ namespace Graph_Model_Tests
             Assert.IsTrue(hpGraph.ParentGraph == SourceGraph);
             Assert.AreEqual(hpGraph.ExternalPoles.Count, decomposingEdge.Poles.Count);
         }
+        #endregion
 
+        #region Subgraph matching
         [Test]
         public void SingleSubgraphSearchTest()
         {
@@ -383,7 +394,9 @@ namespace Graph_Model_Tests
 
             Assert.IsTrue(results.Count == SourceGraph.Vertices.Count);
         }
+        #endregion
 
+        #region Graph Transformations
         [Test]
         public void SingleSubgraphTransformationTest()
         {
@@ -634,7 +647,7 @@ namespace Graph_Model_Tests
             Assert.IsTrue(SourceGraph.Edges.Count(x => x.Poles.Count == hedge.Poles.Count) >= 2);
             Assert.IsTrue(SourceGraph.Edges.Count(x => x.Links.Count == hedge.Links.Count) >= 2);
         }
-
+        #endregion
         private static (Vertex,Vertex,Hyperedge) CreateSubgraphWithIncompleteVertex(VertexForTransformation incompleteVertex)
         {
             var addedVertex = CreateVertex(51);

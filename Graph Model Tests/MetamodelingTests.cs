@@ -62,7 +62,7 @@ namespace Graph_Model_Tests
             var entityEntity = Metamodel.AddHyperedgeWithRelation(entityLinksPort, entityLinksPort, sourceRole);
             entityEntity.SetLabel("Суперсущность_Подсущность");
         }
-
+        #region Initialization
         [Test]
         public void ModelInitializationTest()
         {
@@ -146,7 +146,9 @@ namespace Graph_Model_Tests
             Assert.IsTrue(attrEntity.Relations.Count == 1 && attrEntity.EdgeOwners.Count == 1);
             Assert.IsTrue(entAttr.EdgeOwners.First().Links.Count == 2);
         }
+        #endregion
 
+        #region Manipulations with ports
         [Test]
         public void AddPortToMetamodelEntityTest()
         {
@@ -225,7 +227,9 @@ namespace Graph_Model_Tests
             Assert.AreEqual(metamodelVerticiesCount - 1, Metamodel.Entities.Count);
             Assert.IsTrue(!Metamodel.Entities.Contains(targetEntity));
         }
+        #endregion
 
+        #region Manipulations with relations
         [Test]
         public void AddRelationToMetamodelTest()
         {
@@ -260,6 +264,175 @@ namespace Graph_Model_Tests
             Assert.IsTrue(!instance.Relations.Any(x => x.BaseElement == addedRelation1) && !instance.Relations.Any(x => x.BaseElement == addedRelation2));
             Assert.IsTrue(!Metamodel.Hyperedges.First().Relations.Contains(addedRelation1) && !Metamodel.Hyperedges.First().Relations.Contains(addedRelation2));
         }
+
+        [Test]
+        public void RemoveLinkedRelationFromMetamodelTest()
+        {
+            var addedRelation1 = new HyperedgeRelation(Metamodel.Roles.First(), "TestRel1");
+            var addedRelation2 = new HyperedgeRelation(Metamodel.Roles.First().OppositeRole, "TestRel2");
+            Metamodel.Hyperedges.First().AddRelationPairToHyperedge(addedRelation1, addedRelation2);
+
+            var model = Metamodel.Instantiate("Model");
+            var removedRel = Metamodel.Hyperedges.First().Relations.First();
+
+            var connectedEntity1 = removedRel.CorrespondingPort.EntityOwner;
+            var connectedEntity2 = removedRel.OppositeRelation.CorrespondingPort.EntityOwner;
+
+            var hyperedgeInstance = Metamodel.Hyperedges.First().Instantiate("Test instance");
+            var connectedEntityInstance1 = connectedEntity1.Instantiate("Entity instance 1");
+            var connectedEntityInstance2 = connectedEntity2.Instantiate("Entity instance 2");
+
+            model.AddNewEntityVertex(connectedEntityInstance1);
+            model.AddNewEntityVertex(connectedEntityInstance2);
+            model.AddNewHyperedgeVertex(hyperedgeInstance);
+            model.AddRelationToHyperedge(hyperedgeInstance, connectedEntity1, connectedEntity2, removedRel.RelationRole);
+            var instanceRelsCount = hyperedgeInstance.Relations.Count;
+
+            Metamodel.Hyperedges.First().RemoveRelationFromHyperedge(removedRel);
+
+            Assert.AreEqual(instanceRelsCount - 2, hyperedgeInstance.Relations.Count);
+            Assert.IsTrue(!hyperedgeInstance.Relations.Any(x => x.BaseElement == removedRel) && !hyperedgeInstance.Relations.Any(x => x.BaseElement == removedRel.OppositeRelation));
+            Assert.IsTrue(!Metamodel.Hyperedges.First().Relations.Contains(removedRel) && !Metamodel.Hyperedges.First().Relations.Contains(removedRel.OppositeRelation));
+            Assert.IsTrue(Metamodel.Hyperedges.Contains(hyperedgeInstance.BaseElement));
+            Assert.IsTrue(model.Hyperedges.Contains(hyperedgeInstance));
+        }
+
+        [Test]
+        public void RemoveLinkedRelationFromSinglePairMetamodelHyperedgeTest()
+        {
+            var model = Metamodel.Instantiate("Test model");
+            var hyperedge = Metamodel.Hyperedges.First();
+            var removedRel = hyperedge.Relations.First();
+            var connectedEntity1 = removedRel.CorrespondingPort.EntityOwner;
+            var connectedEntity2 = removedRel.OppositeRelation.CorrespondingPort.EntityOwner;
+
+            var hyperedgeInstance = hyperedge.Instantiate("Test instance");
+            var connectedEntityInstance1 = connectedEntity1.Instantiate("Entity instance 1");
+            var connectedEntityInstance2 = connectedEntity2.Instantiate("Entity instance 2");
+
+            model.AddNewEntityVertex(connectedEntityInstance1);
+            model.AddNewEntityVertex(connectedEntityInstance2);
+            model.AddNewHyperedgeVertex(hyperedgeInstance);
+            model.AddRelationToHyperedge(hyperedgeInstance, connectedEntity1, connectedEntity2, removedRel.RelationRole);
+            var hyperedgeVertexCountInModel = model.Hyperedges.Count;
+            var hyperedgeConnectorsCountInModel = model.Edges.Count;
+
+            hyperedge.RemoveRelationFromHyperedge(removedRel);
+
+            Assert.AreEqual(hyperedgeVertexCountInModel - 1, model.Hyperedges.Count);
+            Assert.AreEqual(hyperedgeConnectorsCountInModel - 1, model.Edges.Count);
+            Assert.IsTrue(!Metamodel.Hyperedges.Contains(hyperedge));
+            Assert.IsTrue(!model.Hyperedges.Any(x => x.BaseElement == hyperedge));
+        }
+        #endregion
+
+        #region Manipulations with entities
+        [Test]
+        public void MetamodelEntityDeletionTest()
+        {
+            var model = Metamodel.Instantiate("TestModel");
+            var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
+            var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
+
+            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+
+            model.AddNewEntityVertex(entityInst);
+            model.AddNewEntityVertex(attrInst);
+            model.AddHyperedgeWithRelation(entityInst, entityInst, sourceRole);
+            model.AddHyperedgeWithRelation(entityInst, attrInst, attrRole);
+            var entityModelCount = model.Entities.Count;
+            var entityMetamodelCount = Metamodel.Entities.Count;
+
+            Metamodel.RemoveEntityVertex(entityInst.BaseElement);
+
+            Assert.AreEqual(entityModelCount - 1, model.Entities.Count);
+            Assert.AreEqual(entityMetamodelCount - 1, Metamodel.Entities.Count);
+            Assert.Zero(model.Edges.Count);
+            Assert.IsTrue(!model.Entities.Contains(entityInst));
+            Assert.IsTrue(!Metamodel.Entities.Contains(entityInst.BaseElement));
+        }
+
+        [Test]
+        public void ModelEntityDeletionTest()
+        {
+            var model = Metamodel.Instantiate("TestModel");
+            var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
+            var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
+
+            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+
+            model.AddNewEntityVertex(entityInst);
+            model.AddNewEntityVertex(attrInst);
+            model.AddHyperedgeWithRelation(entityInst, entityInst, sourceRole);
+            model.AddHyperedgeWithRelation(entityInst, attrInst, attrRole);
+            var entityModelCount = model.Entities.Count;
+            var entityMetamodelCount = Metamodel.Entities.Count;
+
+            model.RemoveEntityVertex(entityInst);
+
+            Assert.AreEqual(entityModelCount - 1, model.Entities.Count);
+            Assert.AreEqual(entityMetamodelCount, Metamodel.Entities.Count);
+            Assert.Zero(model.Edges.Count);
+            Assert.IsTrue(!model.Entities.Contains(entityInst));
+            Assert.Zero(Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instances.Count);
+        }
+        #endregion
+
+        #region Manipulations with hyperedges
+        [Test]
+        public void MetamodelHyperedgeDeletionTest()
+        {
+            var model = Metamodel.Instantiate("TestModel");
+            var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
+            var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
+
+            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+
+            model.AddNewEntityVertex(entityInst);
+            model.AddNewEntityVertex(attrInst);
+            var hyperedgeInst = model.AddHyperedgeWithRelation(entityInst, attrInst, attrRole);
+            var hyperedgeModelCount = model.Hyperedges.Count;
+            var hyperedgeMetamodelCount = Metamodel.Hyperedges.Count;
+
+            Metamodel.RemoveHyperedgeVertex(hyperedgeInst.BaseElement);
+
+            Assert.AreEqual(hyperedgeModelCount - 1, model.Hyperedges.Count);
+            Assert.AreEqual(hyperedgeMetamodelCount - 1, Metamodel.Hyperedges.Count);
+            Assert.Zero(model.Edges.Count);
+            Assert.Zero(entityInst.Ports.Sum(x => x.Relations.Count));
+            Assert.IsTrue(!model.Hyperedges.Contains(hyperedgeInst));
+            Assert.IsTrue(!Metamodel.Hyperedges.Contains(hyperedgeInst.BaseElement));
+        }
+
+        [Test]
+        public void ModelHyperedgeDeletionTest()
+        {
+            var model = Metamodel.Instantiate("TestModel");
+            var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
+            var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
+
+            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+
+            model.AddNewEntityVertex(entityInst);
+            model.AddNewEntityVertex(attrInst);
+            var hyperedgeInst = model.AddHyperedgeWithRelation(entityInst, attrInst, attrRole);
+            var hyperedgeModelCount = model.Hyperedges.Count;
+            var hyperedgeMetamodelCount = Metamodel.Hyperedges.Count;
+
+            model.RemoveHyperedgeVertex(hyperedgeInst);
+
+            Assert.AreEqual(hyperedgeModelCount - 1, model.Hyperedges.Count);
+            Assert.AreEqual(hyperedgeMetamodelCount, Metamodel.Hyperedges.Count);
+            Assert.Zero(model.Edges.Count);
+            Assert.Zero(entityInst.Ports.Sum(x => x.Relations.Count));
+            Assert.Zero(model.Hyperedges.Sum(x => x.Instances.Count));
+            Assert.IsTrue(!model.Hyperedges.Contains(hyperedgeInst));
+        }
+        #endregion
 
         private List<HyperedgeVertex> CreateAllHyperedgeInstances()
         {

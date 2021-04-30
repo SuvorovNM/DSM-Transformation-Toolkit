@@ -163,6 +163,8 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 var appropriateHyperedges = BaseElement.Hyperedges
                     .Where(x => x.Relations.Select(y => y.RelationRole).Contains(role) && x.Relations.Select(y => y.RelationRole).Contains(role.OppositeRole))
                     .Where(x=>x.Relations.Select(y=>y.CorrespondingPort).Contains(source.BaseElement) && x.Relations.Select(y => y.CorrespondingPort).Contains(target.BaseElement));
+                // TODO: убрать странный костыль
+                appropriateHyperedges = appropriateHyperedges.Where(x => x.Relations.Where(y => y.CorrespondingPort == source.BaseElement && y.OppositeRelation.CorrespondingPort == target.BaseElement).Any());
 
                 if (appropriateHyperedges.Any())
                 {
