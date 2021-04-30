@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
     /// <summary>
     /// Гиперребро HP-графа
@@ -45,7 +45,7 @@ namespace DSM_Graph_Layer.HPGraphModel
                 RemoveLinksForPole(p);
                 p.EdgeOwners.Remove(this);
                 Poles.Remove(p);
-            }               
+            }
 
             if (!Poles.Any())
                 OwnerGraph.RemoveStructure(this);
@@ -106,7 +106,7 @@ namespace DSM_Graph_Layer.HPGraphModel
         private void RemoveLinksForPole(Pole p)
         {
             var links = Links.Where(x => x.SourcePole == p || x.TargetPole == p).ToList();
-            foreach(var link in links)
+            foreach (var link in links)
             {
                 RemoveLink(link);
             }

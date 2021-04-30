@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
 {
     /// <summary>
     /// Класс для поиска изоморфизма на уровне полюсов
@@ -55,27 +55,27 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <summary>
         /// Гиперребро исходного графа
         /// </summary>
-        private Hyperedge HyperedgeSource { get; set; }
+        protected Hyperedge HyperedgeSource { get; set; }
         /// <summary>
         /// Гиперребро графа-паттерна
         /// </summary>
-        private Hyperedge HyperedgeTarget { get; set; }
+        protected Hyperedge HyperedgeTarget { get; set; }
         /// <summary>
         /// Матрица соответствий для вершин исходного графа
         /// </summary>
-        private Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
+        protected Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
         /// <summary>
         /// Матрица соответствий для вершин графа-паттерна
         /// </summary>
-        private Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
+        protected Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
         /// <summary>
         /// Матрица соответствий для гиперребер исходного графа
         /// </summary>
-        private Dictionary<Hyperedge, Hyperedge> CoreSourceW { get; set; }
+        protected Dictionary<Hyperedge, Hyperedge> CoreSourceW { get; set; }
         /// <summary>
         /// Матрица соответствий для гиперребер графа-паттерна
         /// </summary>
-        private Dictionary<Hyperedge, Hyperedge> CoreTargetW { get; set; }
+        protected Dictionary<Hyperedge, Hyperedge> CoreTargetW { get; set; }
 
         /// <summary>
         /// Основная операция - рекурсивный поиск изоморфных полюсов гиперребер
@@ -92,7 +92,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             }
 
             var pairs = GetAllCandidatePairs();
-            foreach((var potentialSource, var potentialTarget) in pairs)
+            foreach ((var potentialSource, var potentialTarget) in pairs)
             {
                 if (CheckFisibiltyRules(potentialSource, potentialTarget))
                 {

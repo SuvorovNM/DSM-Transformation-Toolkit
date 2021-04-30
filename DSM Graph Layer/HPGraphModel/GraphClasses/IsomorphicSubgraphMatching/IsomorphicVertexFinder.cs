@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
 {
     /// <summary>
     /// Класс для поиска изоморфизма на уровне вершин
@@ -42,11 +42,11 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <summary>
         /// Исходный граф
         /// </summary>
-        private HPGraph HPGraphSource { get; }
+        protected HPGraph HPGraphSource { get; }
         /// <summary>
         /// Граф-паттерн
         /// </summary>
-        private HPGraph HPGraphTarget { get; }
+        protected HPGraph HPGraphTarget { get; }
         /// <summary>
         /// Список найденных изоморфных подграфов в виде словарей соответствий (см. CoreTarget)
         /// </summary>
@@ -59,8 +59,8 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <param name="step">Шаг</param>
         /// <param name="source">Вершина исходного графа, добавленная на прошлом шаге</param>
         /// <param name="target">Вершина графа-паттерна, добавленная на прошлом шаге</param>
-        public void Recurse(long step = 1, Vertex source = null, Vertex target = null)
-        {            
+        public virtual void Recurse(long step = 1, Vertex source = null, Vertex target = null)
+        {
             if (CoreTarget.Values.All(x => x != null) && ValidateVertexIsomorphism())
             {
                 // Переход на уровень гиперребер
@@ -153,7 +153,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var resultPairList = new List<(Vertex, Vertex)>();
             foreach (var source in candidateSourceVertices)
             {
-                foreach (var target in candidateTargetVertices.Where(x=>source.Poles.Count >= x.Poles.Count))
+                foreach (var target in candidateTargetVertices.Where(x => source.Poles.Count >= x.Poles.Count))
                 {
                     resultPairList.Add((source, target));
                 }
@@ -207,7 +207,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// </summary>
         /// <param name="polCorr">Матрица соответствий полюсов</param>
         /// <returns></returns>
-        private void AppendUnlinkedMatches(Dictionary<Pole, Pole> polCorr)
+        protected void AppendUnlinkedMatches(Dictionary<Pole, Pole> polCorr)
         {
             var sourceExternalPoles = HPGraphSource.ExternalPoles.Except(polCorr.Values).ToList();
             var targetExternalPoles = HPGraphTarget.ExternalPoles.Except(polCorr.Keys).ToList();
@@ -217,7 +217,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 polCorr.Add(sourceExternalPoles[i], targetExternalPoles[i]);
             }
 
-            foreach(var targetV in HPGraphTarget.Vertices)
+            foreach (var targetV in HPGraphTarget.Vertices)
             {
                 var targetInternalPoles = targetV.Poles.Except(polCorr.Keys).ToList();
                 var sourceInternalPoles = CoreTarget[targetV].Poles.Except(polCorr.Values).ToList();
@@ -237,7 +237,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <returns>Связанные вершины</returns>
         private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex, HPGraph graph)
         {
-            return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count()>0);
+            return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count() > 0);
         }
 
 
@@ -245,11 +245,11 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// Валидация для исключения дубликатов ответов, разница в которых лишь в разном порядке обхода вершин
         /// </summary>
         /// <returns>True, если валидация прошла успешно</returns>
-        private bool ValidateVertexIsomorphism()
+        protected bool ValidateVertexIsomorphism()
         {
             var createdVertexAnswers = GeneratedAnswers.Select(x => x.vertices);
 
-            foreach(var dict in createdVertexAnswers)
+            foreach (var dict in createdVertexAnswers)
             {
                 if (dict.All(x => CoreTarget[x.Key] == x.Value))
                     return false;

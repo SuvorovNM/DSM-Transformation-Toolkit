@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
     /// <summary>
     /// Полюс HP-графа
@@ -91,9 +91,9 @@ namespace DSM_Graph_Layer.HPGraphModel
         /// <returns>Копия полюса</returns>
         public virtual object Clone()
         {
-            var pole = new Pole(this.Type);
-            pole.VertexOwner = this.VertexOwner;
-            pole.GraphOwner = this.GraphOwner;
+            var pole = new Pole(Type);
+            pole.VertexOwner = VertexOwner;
+            pole.GraphOwner = GraphOwner;
             return pole;
         }
     }

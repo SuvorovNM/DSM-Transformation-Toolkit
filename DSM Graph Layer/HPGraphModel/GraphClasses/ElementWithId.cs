@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
     public abstract class ElementWithId
     {

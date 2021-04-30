@@ -1,4 +1,5 @@
-﻿using DSM_Graph_Layer.HPGraphModel.Interfaces;
+﻿using DSM_Graph_Layer.HPGraphModel.GraphClasses;
+using DSM_Graph_Layer.HPGraphModel.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

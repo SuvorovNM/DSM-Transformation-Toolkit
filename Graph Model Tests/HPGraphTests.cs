@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using DSM_Graph_Layer.HPGraphModel.GraphClasses;
 
 namespace Graph_Model_Tests
 {

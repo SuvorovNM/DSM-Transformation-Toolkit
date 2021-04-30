@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
 {
     /// <summary>
     /// Класс для поиска изомоформизмов на уровне гиперребер
@@ -19,9 +19,9 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <param name="coreSourceV">Матрица соответствий для вершин исходного графа</param>
         /// <param name="coreTargetV">Матрица соответствий для вершин графа-паттерна</param>
         public IsomorphicEdgeFinder(
-            HPGraph source, 
-            HPGraph target, 
-            Dictionary<Vertex, Vertex> coreSourceV, 
+            HPGraph source,
+            HPGraph target,
+            Dictionary<Vertex, Vertex> coreSourceV,
             Dictionary<Vertex, Vertex> coreTargetV)
         {
             HPGraphSource = source;
@@ -51,19 +51,19 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <summary>
         /// Исходный граф
         /// </summary>
-        private HPGraph HPGraphSource { get; }
+        protected HPGraph HPGraphSource { get; }
         /// <summary>
         /// Граф-паттерн
         /// </summary>
-        private HPGraph HPGraphTarget { get; }
+        protected HPGraph HPGraphTarget { get; }
         /// <summary>
         /// Матрица соответствий для вершин исходного графа
         /// </summary>
-        private Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
+        protected Dictionary<Vertex, Vertex> CoreSourceV { get; set; }
         /// <summary>
         /// Матрица соответствий для вершин графа-паттерна
         /// </summary>
-        private Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
+        protected Dictionary<Vertex, Vertex> CoreTargetV { get; set; }
         /// <summary>
         /// Матрица соответствий для полюсов гиперребер
         /// </summary>
@@ -80,7 +80,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// <param name="source">Гиперребро исходного графа, добавленное на предыдущем шаге</param>
         /// <param name="target">Гиперребро графа-паттерна, добавленное на предыдущем шаге</param>
         /// <returns></returns>
-        public bool Recurse(long step = 1, Hyperedge source = null, Hyperedge target = null)
+        public virtual bool Recurse(long step = 1, Hyperedge source = null, Hyperedge target = null)
         {
             if (CoreTarget.Values.All(x => x != null))
             {
@@ -103,14 +103,14 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
                 // Следует также учитывать и случаи, когда гиперребра в графе отсутствуют
                 if (PolCorr.Any() || HPGraphTarget.Edges.Count == 0)
                 {
-                    GeneratedAnswers.Add((new Dictionary<Hyperedge, Hyperedge>(CoreTarget), new Dictionary<Pole,Pole>(PolCorr)));
+                    GeneratedAnswers.Add((new Dictionary<Hyperedge, Hyperedge>(CoreTarget), new Dictionary<Pole, Pole>(PolCorr)));
                     return true;
                 }
             }
             else
             {
                 var pairs = GetAllCandidatePairs();
-                foreach((var potentialSource, var potentialTarget) in pairs)
+                foreach ((var potentialSource, var potentialTarget) in pairs)
                 {
                     // TODO: возможно, стоит добавить проверку
                     UpdateVectors(step, potentialSource, potentialTarget);
@@ -127,8 +127,8 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
         protected override void RestoreVectors(long step, Hyperedge source, Hyperedge target)
         {
-            CoreSource[source] = (Hyperedge)null;
-            CoreTarget[target] = (Hyperedge)null;
+            CoreSource[source] = null;
+            CoreTarget[target] = null;
 
             /*foreach (var item in HPGraphSource.Edges)
             {
@@ -158,7 +158,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
             var candidateTargetEdges = HPGraphTarget.Edges.Where(x => CoreTarget[x] == null);
 
             var resultList = new List<(Hyperedge, Hyperedge)>();
-            foreach(var source in candidateSourceEdges)
+            foreach (var source in candidateSourceEdges)
             {
                 // Получить вершины гиперребер и провести проверку на соответствия, установленные при поиске изоморфизма на уровне вершин
                 // Вершины пар гиперребер должны быть полностью изоморфны
@@ -198,7 +198,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// Сгруппировать гиперребра по признаку инцидентности
         /// </summary>
         /// <returns>Список сгруппированных гиперребер</returns>
-        private List<(Hyperedge, Hyperedge)> GroupByIncidence()
+        protected List<(Hyperedge, Hyperedge)> GroupByIncidence()
         {
             var groupList = new List<List<Hyperedge>>();
 
@@ -226,13 +226,13 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
 
             // Преобразовать группы в гиперребра, объединив связи и полюса гиперребер из группы
             var incidenceList = new List<(Hyperedge, Hyperedge)>();
-            foreach(var group in groupList)
+            foreach (var group in groupList)
             {
                 var hEdge = new Hyperedge();
                 var matchedHedge = new Hyperedge();
                 var poles = new List<Pole>();
                 var matchedPoles = new List<Pole>();
-                foreach(var item in group)
+                foreach (var item in group)
                 {
                     hEdge.Links.AddRange(item.Links);
                     poles.AddRange(item.Poles);
@@ -254,7 +254,7 @@ namespace DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching
         /// </summary>
         /// <param name="polesMatching">Добавляемая матрица соответствий</param>
         /// <returns>Результат попытки добавления - True, если добавление прошло успешно</returns>
-        private bool TryAppendToPolesMatching(Dictionary<Pole, Pole> polesMatching)
+        protected bool TryAppendToPolesMatching(Dictionary<Pole, Pole> polesMatching)
         {
             foreach ((var key, var val) in polesMatching)
             {

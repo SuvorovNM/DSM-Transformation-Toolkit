@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DSM_Graph_Layer.HPGraphModel;
+using DSM_Graph_Layer.HPGraphModel.GraphClasses;
 
 namespace DSM_Graph_Layer
 {

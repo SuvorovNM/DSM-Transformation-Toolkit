@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching;
 
 namespace Graph_Model_Tests
 {
@@ -433,6 +434,21 @@ namespace Graph_Model_Tests
             Assert.IsTrue(!model.Hyperedges.Contains(hyperedgeInst));
         }
         #endregion
+
+        [Test]
+        public void SingleEntitySubmodelMatchingTest()
+        {
+            var entity = Metamodel.Entities.First();
+            var model = new Model("Pattern");
+            model.AddNewEntityVertex(entity);
+
+            var answers = Metamodel.FindIsomorphicModels(model);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Entities.Count == 1);
+            Assert.Zero(answers.First().Hyperedges.Count);
+            Assert.IsTrue(answers.First().Entities.First().Ports.Count == entity.Ports.Count);
+        }
 
         private List<HyperedgeVertex> CreateAllHyperedgeInstances()
         {

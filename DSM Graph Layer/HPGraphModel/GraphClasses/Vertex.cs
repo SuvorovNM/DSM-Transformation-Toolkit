@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
     /// <summary>
     /// Вершина HP-графа
@@ -62,7 +62,7 @@ namespace DSM_Graph_Layer.HPGraphModel
         /// Инициализация вершины для трансформации
         /// </summary>
         /// <param name="isIncomplete">Является ли вершина неполной (True, если да)</param>
-        public VertexForTransformation(bool isIncomplete = false) :base()
+        public VertexForTransformation(bool isIncomplete = false) : base()
         {
             IsIncomplete = isIncomplete;
         }

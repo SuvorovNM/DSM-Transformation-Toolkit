@@ -1,4 +1,6 @@
-﻿using DSM_Graph_Layer.HPGraphModel.Interfaces;
+﻿using DSM_Graph_Layer.HPGraphModel.GraphClasses;
+using DSM_Graph_Layer.HPGraphModel.Interfaces;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -255,6 +257,27 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                     hyperedge.BaseElement.DeleteInstance(hyperedge);
                 }
             }
+        }
+
+        public List<Model> FindIsomorphicModels(Model model)
+        {
+            var subgraphFinder = new IsomorphicModelVertexFinder(this, model);
+            subgraphFinder.Recurse();
+
+            var results = subgraphFinder.GeneratedAnswers;
+
+            var modelList = new List<Model>();
+            foreach (var (vertices, edges, poles) in results)
+            {
+                var submodel = new Model();
+                submodel.Vertices.AddRange(vertices.Values);
+                submodel.ExternalPoles.AddRange(poles.Values.Where(x => x.VertexOwner == null));
+                submodel.Edges.AddRange(edges.Values);
+
+                modelList.Add(submodel);
+            }
+
+            return modelList;
         }
     }
 }

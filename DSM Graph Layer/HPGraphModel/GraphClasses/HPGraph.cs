@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DSM_Graph_Layer.HPGraphModel.IsomorphicSubgraphMatching;
+using DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
     public class HPGraph : ElementWithId
     {
@@ -278,19 +278,19 @@ namespace DSM_Graph_Layer.HPGraphModel
         {
             foreach (var edge in subgraph.Edges)
             {
-                this.RemoveStructure(edge);
+                RemoveStructure(edge);
             }
 
             var verticesForDeletion = subgraph.Vertices.Except(matching.Where(x => x.Key as VertexForTransformation != null && (x.Key as VertexForTransformation).IsIncomplete).Select(y => y.Value));
             foreach (var vertex in verticesForDeletion)
             {
-                this.RemoveStructure(vertex);
+                RemoveStructure(vertex);
             }
 
             var polesForDeletion = subgraph.ExternalPoles.Where(x => !x.EdgeOwners.Any());
             foreach (var pole in polesForDeletion)
             {
-                this.RemoveExternalPole(pole);
+                RemoveExternalPole(pole);
             }
         }
 
@@ -352,7 +352,7 @@ namespace DSM_Graph_Layer.HPGraphModel
                 newGraph.AddExternalPole(newExtPole);
                 poleMatching.TryAdd(extPole, newExtPole);
             }
-            foreach (var vertex in subgraph.Vertices.Where(x => (x as VertexForTransformation == null) || !(x as VertexForTransformation).IsIncomplete))
+            foreach (var vertex in subgraph.Vertices.Where(x => x as VertexForTransformation == null || !(x as VertexForTransformation).IsIncomplete))
             {
                 var newVertex = new VertexForTransformation(false);
                 poleMatching.TryAdd(vertex.Poles.First(), newVertex.Poles.First());
@@ -365,7 +365,7 @@ namespace DSM_Graph_Layer.HPGraphModel
                 }
                 newGraph.AddVertex(newVertex);
             }
-            foreach (var vertex in subgraph.Vertices.Where(x => (x as VertexForTransformation != null) && (x as VertexForTransformation).IsIncomplete))
+            foreach (var vertex in subgraph.Vertices.Where(x => x as VertexForTransformation != null && (x as VertexForTransformation).IsIncomplete))
             {
                 newGraph.AddVertex(vertex);
                 foreach (var pole in vertex.Poles)

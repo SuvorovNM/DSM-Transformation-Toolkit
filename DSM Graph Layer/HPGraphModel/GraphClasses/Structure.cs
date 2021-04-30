@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
     /// <summary>
     /// Структура HP-графа: вершина или гиперребро
@@ -17,7 +17,7 @@ namespace DSM_Graph_Layer.HPGraphModel
         /// <summary>
         /// Полюса структуры
         /// </summary>
-        public List<Pole> Poles { get; set;  }
+        public List<Pole> Poles { get; set; }
         /// <summary>
         /// Семантический тип структуры
         /// </summary>
