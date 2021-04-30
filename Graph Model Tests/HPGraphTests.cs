@@ -385,7 +385,7 @@ namespace Graph_Model_Tests
         }
 
         [Test]
-        public void SingleIncompleteVertexSubgraphSearch()
+        public void SingleIncompleteVertexSubgraphSearch() // TODO: Корректный ли тест??
         {
             var newHPGraph = new HPGraph();
             var vertex = new Vertex();

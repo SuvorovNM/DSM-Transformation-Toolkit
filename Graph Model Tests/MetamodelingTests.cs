@@ -435,21 +435,148 @@ namespace Graph_Model_Tests
         }
         #endregion
 
+        #region Submodel matching
         [Test]
         public void SingleEntitySubmodelMatchingTest()
         {
-            var entity = Metamodel.Entities.First();
+            var entity = new EntityVertex("Сущность");
+            entity.AddPortToEntity(new EntityPort("Связи"));
             var model = new Model("Pattern");
             model.AddNewEntityVertex(entity);
 
-            var answers = Metamodel.FindIsomorphicModels(model);
+            var answers = Metamodel.FindIsomorphicSubmodels(model);
 
             Assert.IsTrue(answers.Count == 1);
             Assert.IsTrue(answers.First().Entities.Count == 1);
             Assert.Zero(answers.First().Hyperedges.Count);
-            Assert.IsTrue(answers.First().Entities.First().Ports.Count == entity.Ports.Count);
+            Assert.IsTrue(answers.First().Entities.First()==Metamodel.Entities.First());
         }
 
+        [Test]
+        public void SingleHyperedgeSubmodelMatchingTest()
+        {
+            var sourceRole = new Role("Источник связи");
+            var targetRole = new Role(sourceRole, "Приемник связи");
+
+            var hyperedge = new HyperedgeVertex("Сущность_Связь");
+            hyperedge.AddRelationPairToHyperedge(new HyperedgeRelation(sourceRole), new HyperedgeRelation(targetRole));
+            var model = new Model("Pattern");
+            model.AddNewHyperedgeVertex(hyperedge);
+
+            var answers = Metamodel.FindIsomorphicSubmodels(model);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.Zero(answers.First().Entities.Count);
+            Assert.IsTrue(answers.First().Hyperedges.Count == 1);
+            Assert.IsTrue(answers.First().Hyperedges.First() == Metamodel.Hyperedges.First());
+        }
+
+        [Test]
+        public void MultipleEntitiesSubmodelMatchingTest()
+        {
+            var entity = new EntityVertex("Сущность");
+            entity.AddPortToEntity(new EntityPort("Связи", new[] { new Role("Приемник связи") }));
+            var link = new EntityVertex("Связь");
+            link.AddPortToEntity(new EntityPort("Связи с сущностями", new[] { new Role("Источник связи") }));
+
+            var model = new Model("Pattern");
+            model.AddNewEntityVertex(entity);
+            model.AddNewEntityVertex(link);
+
+            var answers = Metamodel.FindIsomorphicSubmodels(model);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Entities.Count == 2);
+            Assert.Zero(answers.First().Hyperedges.Count);
+            Assert.IsTrue(answers.First().Entities.Any(x => x.Label == entity.Label) && answers.First().Entities.Any(x => x.Label == link.Label));
+        }
+
+        [Test]
+        public void MultipleHyperedgesSubmodelMatchingTest()
+        {
+            var sourceRole = new Role("Источник связи");
+            var targetRole = new Role(sourceRole, "Приемник связи");
+            var attributeOwnerRole = new Role("Владелец атрибута");
+            var attributeServantRole = new Role(attributeOwnerRole, "Атрибут");
+
+            var hyperedge1 = new HyperedgeVertex("Сущность_Связь");
+            hyperedge1.AddRelationPairToHyperedge(new HyperedgeRelation(sourceRole), new HyperedgeRelation(targetRole));
+            var hyperedge2 = new HyperedgeVertex("Принадлежит");
+            hyperedge2.AddRelationPairToHyperedge(new HyperedgeRelation(attributeOwnerRole), new HyperedgeRelation(attributeServantRole));
+            var model = new Model("Pattern");
+            model.AddNewHyperedgeVertex(hyperedge1);
+            model.AddNewHyperedgeVertex(hyperedge2);
+
+            var answers = Metamodel.FindIsomorphicSubmodels(model);
+
+            Assert.IsTrue(answers.Count == 2);
+            Assert.Zero(answers.First().Entities.Count);
+            Assert.Zero(answers.Last().Entities.Count);
+            Assert.IsTrue(answers.First().Hyperedges.Count == 2);
+            Assert.IsTrue(answers.Last().Hyperedges.Count == 2);
+            Assert.IsTrue(answers.First().Hyperedges.Any(x => x.Label == hyperedge1.Label) && answers.First().Hyperedges.Any(x => x.Label == hyperedge2.Label));
+            Assert.IsTrue(answers.Last().Hyperedges.Any(x => x.Label == hyperedge1.Label) && answers.Last().Hyperedges.Any(x => x.Label == hyperedge2.Label));
+        }
+
+        [Test]
+        public void MultipleHyperedgeInclusionsMatchingTest()
+        {
+            var attributeOwnerRole = new Role("Владелец атрибута");
+            var attributeServantRole = new Role(attributeOwnerRole, "Атрибут");
+
+            var hyperedge = new HyperedgeVertex("Принадлежит");
+            hyperedge.AddRelationPairToHyperedge(new HyperedgeRelation(attributeOwnerRole), new HyperedgeRelation(attributeServantRole));
+            var model = new Model("Pattern");
+            model.AddNewHyperedgeVertex(hyperedge);
+
+            var answers = Metamodel.FindIsomorphicSubmodels(model);
+
+            Assert.IsTrue(answers.Count == 2);
+            Assert.IsTrue(answers.All(x=>x.Entities.Count==0));
+            Assert.IsTrue(answers.All(x=>x.Hyperedges.Count == 1));
+        }
+
+        [Test]
+        public void ConnectedEntityiesSubmodelMatchingTest()
+        {
+            var reciever = new Role("Приемник связи");
+            var source = new Role("Источник связи");
+            reciever.OppositeRole = source;
+
+            var entity = new EntityVertex("Сущность");
+            entity.AddPortToEntity(new EntityPort("Связи", new[] { reciever }));
+            var link = new EntityVertex("Связь");
+            link.AddPortToEntity(new EntityPort("Связи с сущностями", new[] { source }));
+
+            var model = new Model("Pattern");
+            model.AddNewEntityVertex(entity);
+            model.AddNewEntityVertex(link);
+            var entityLink = model.AddHyperedgeWithRelation(entity, link, reciever);
+            entityLink.SetLabel("Сущность_Связь");
+
+            var answers = Metamodel.FindIsomorphicSubmodels(model);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Entities.Count == 2);
+            Assert.IsTrue(answers.First().Hyperedges.Count == 1);
+            Assert.IsTrue(answers.First().Edges.Count == 1);
+            Assert.IsTrue(answers.First().Entities.Any(x => x.Label == entity.Label) && answers.First().Entities.Any(x => x.Label == link.Label));
+            Assert.IsTrue(answers.First().Edges.First().Links.Count == 2);
+        }
+
+        [Test]
+        public void FullIsomorphismMatchingTest()
+        {
+            var answers = Metamodel.FindIsomorphicSubmodels(Metamodel);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.AreEqual(Metamodel.Entities.Count, answers.First().Entities.Count);
+            Assert.AreEqual(Metamodel.Hyperedges.Count, answers.First().Hyperedges.Count);
+            Assert.AreEqual(Metamodel.Edges.Count, answers.First().Edges.Count);
+        }
+        #endregion
+
+        #region Submetamodel matching
         [Test]
         public void SingleEntitySubmetamodelMatchingTest()
         {
@@ -475,6 +602,138 @@ namespace Graph_Model_Tests
             Assert.Zero(answers.First().Hyperedges.Count);
             Assert.IsTrue(answers.First().Entities.First().BaseElement == Metamodel.Entities.First());
         }
+
+        [Test]
+        public void SingleHyperedgeSubmetamodelMatchingTest()
+        {
+            var model = Metamodel.Instantiate("Test model");
+            var entities = CreateAllEntityInstances();
+            foreach (var item in entities)
+            {
+                model.AddNewEntityVertex(item);
+            }
+
+            var hedges = CreateAllHyperedgeInstances();
+            foreach (var item in hedges)
+            {
+                model.AddNewHyperedgeVertex(item);
+            }
+
+            var submetamodel = new Model(null, new[] { Metamodel.Hyperedges.First() });
+
+            var answers = model.FindAllInstancesOfPartialMetamodel(submetamodel);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Hyperedges.Count == 1);
+            Assert.Zero(answers.First().Entities.Count);
+            Assert.IsTrue(answers.First().Hyperedges.First().BaseElement == Metamodel.Hyperedges.First());
+        }
+
+        [Test]
+        public void MultipleEntitiesSubmetamodelMatchingTest()
+        {
+            var model = Metamodel.Instantiate("Test model");
+            var entities = CreateAllEntityInstances();
+            foreach (var item in entities)
+            {
+                model.AddNewEntityVertex(item);
+            }
+
+            var hedges = CreateAllHyperedgeInstances();
+            foreach (var item in hedges)
+            {
+                model.AddNewHyperedgeVertex(item);
+            }
+
+            var submetamodel = new Model(new[] { Metamodel.Entities.First(), Metamodel.Entities.Last() }, null);
+
+            var answers = model.FindAllInstancesOfPartialMetamodel(submetamodel);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Entities.Count == 2);
+            Assert.Zero(answers.First().Hyperedges.Count);
+            Assert.IsTrue(answers.First().Entities.First().BaseElement == Metamodel.Entities.First() && answers.First().Entities.Last().BaseElement == Metamodel.Entities.Last());
+        }
+
+        [Test]
+        public void MultipleHyperedgesSubmetamodelMatchingTest()
+        {
+            var model = Metamodel.Instantiate("Test model");
+            var entities = CreateAllEntityInstances();
+            foreach (var item in entities)
+            {
+                model.AddNewEntityVertex(item);
+            }
+
+            var hedges = CreateAllHyperedgeInstances();
+            foreach (var item in hedges)
+            {
+                model.AddNewHyperedgeVertex(item);
+            }
+
+            var submetamodel = new Model(null, new[] { Metamodel.Hyperedges.First(), Metamodel.Hyperedges.Last() });
+
+            var answers = model.FindAllInstancesOfPartialMetamodel(submetamodel);
+
+            Assert.IsTrue(answers.Count == 1);
+            Assert.IsTrue(answers.First().Hyperedges.Count == 2);
+            Assert.Zero(answers.First().Entities.Count);
+            Assert.IsTrue(answers.First().Hyperedges.First().BaseElement == Metamodel.Hyperedges.First() && answers.First().Hyperedges.Last().BaseElement == Metamodel.Hyperedges.Last());
+        }
+
+        [Test]
+        public void MultipleInstancesMatchingTest()
+        {
+            var model = Metamodel.Instantiate("TestModel");
+            var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
+            var attrInst1 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 1");
+            var attrInst2 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 2");
+            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+
+            model.AddNewEntityVertex(entityInst);
+            model.AddNewEntityVertex(attrInst1);
+            model.AddNewEntityVertex(attrInst2);
+            var hyperedgeInst1 = model.AddHyperedgeWithRelation(entityInst, attrInst1, attrRole);
+            var hyperedgeInst2 = model.AddHyperedgeWithRelation(entityInst, attrInst2, attrRole);
+            var hyperedgeModelCount = model.Hyperedges.Count;
+            var hyperedgeMetamodelCount = Metamodel.Hyperedges.Count;
+
+            var submetamodel = new Model(new[] { entityInst.BaseElement, attrInst1.BaseElement }, new[] { hyperedgeInst1.BaseElement}, new[] { hyperedgeInst1.BaseElement.CorrespondingHyperedge });
+            
+            var answers = model.FindAllInstancesOfPartialMetamodel(submetamodel);
+
+            Assert.IsTrue(answers.Count == 2);
+            Assert.IsTrue(answers.All(x => x.Edges.Count == 1 && x.Entities.Count == 2 && x.Hyperedges.Count == 1));
+            Assert.IsTrue(answers.All(x => x.Entities.Any(y => y.Label == "TestEntityInstance") && x.Entities.Any(y => y.Label.StartsWith("TestAttrInstance"))));
+        }
+
+        [Test]
+        public void MatchingNonExistentElementsTest()
+        {
+            var model = Metamodel.Instantiate("TestModel");
+
+            var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
+            var attrInst1 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 1");
+            var attrInst2 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 2");
+            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+
+            model.AddNewEntityVertex(entityInst);
+            model.AddNewEntityVertex(attrInst1);
+            model.AddNewEntityVertex(attrInst2);
+            var hyperedgeInst1 = model.AddHyperedgeWithRelation(entityInst, attrInst1, attrRole);
+            var hyperedgeInst2 = model.AddHyperedgeWithRelation(entityInst, attrInst2, attrRole);
+
+            var relEntity = Metamodel.Entities.Where(x => x.Label == "Связь").First();
+            var attrEntity = Metamodel.Entities.Where(x => x.Label == "Атрибут").First();
+            var hyperedge = Metamodel.Hyperedges.Where(x => x.Label == "Принадлежит" && x.Relations.Any(y => y.CorrespondingPort.VertexOwner == relEntity)).First();
+
+            var submetamodel = new Model(new[] { relEntity, attrEntity }, new[] { hyperedge }, new[] { hyperedge.CorrespondingHyperedge });
+
+            var answers = model.FindAllInstancesOfPartialMetamodel(submetamodel);
+
+            Assert.Zero(answers.Count);
+        }
+        #endregion
 
         private List<HyperedgeVertex> CreateAllHyperedgeInstances()
         {

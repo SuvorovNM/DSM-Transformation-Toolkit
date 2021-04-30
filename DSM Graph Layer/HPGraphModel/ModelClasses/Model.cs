@@ -272,7 +272,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             }
         }
 
-        public List<Model> FindIsomorphicModels(Model model)
+        public List<Model> FindIsomorphicSubmodels(Model model)
         {
             var submodelFinder = new IsomorphicModelVertexFinder(this, model);
             submodelFinder.Recurse();

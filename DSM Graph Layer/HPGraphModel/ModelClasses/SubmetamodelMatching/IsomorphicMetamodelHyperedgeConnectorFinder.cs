@@ -28,11 +28,10 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
                 {
                     // Переход на уровень полюсов и поиск полного изоморфизма
                     var poleFinder = new IsomorphicMetamodelPoleFinder(sourceGroup, targetGroup, CoreSourceV, CoreTargetV, CoreSource, CoreTarget);
-                    poleFinder.Recurse();
-                    var polCorr = poleFinder.CoreTarget;
+                    var res = poleFinder.Recurse();
 
                     // Попытка добавить соответствия в матрицу PolCorr
-                    if (!TryAppendToPolesMatching(polCorr))
+                    if (!res || !TryAppendToPolesMatching(poleFinder.CoreTarget))
                     {
                         PolCorr = new Dictionary<Pole, Pole>();
                         break;

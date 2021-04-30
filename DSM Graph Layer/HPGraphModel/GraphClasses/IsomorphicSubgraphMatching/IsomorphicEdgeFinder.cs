@@ -216,7 +216,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
                     var oldCount = group.Count;
                     foreach (var pole in group.SelectMany(x => x.Poles))
                     {
-                        group = group.Union(pole.EdgeOwners).ToList();
+                        group = group.Union(pole.EdgeOwners.Intersect(HPGraphTarget.Edges)).ToList();
                     }
                     anyChanges = oldCount != group.Count;
                 } while (anyChanges);

@@ -177,7 +177,8 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
 
             foreach (var vertex in matchedConnectedToSource)
             {
-                result &= matchedConnectedToTarget.Any(x => CoreTarget[x] == vertex);
+                if (matchedConnectedToTarget.Any()) // TODO: костыль! нуждается в проверке!
+                    result &= matchedConnectedToTarget.Any(x => CoreTarget[x] == vertex);
             }
             foreach (var vertex in matchedConnectedToTarget)
             {
