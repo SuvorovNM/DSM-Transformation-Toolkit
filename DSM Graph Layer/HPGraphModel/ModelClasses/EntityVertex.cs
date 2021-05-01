@@ -36,6 +36,13 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         public List<ElementAttribute> Attributes { get; set; }
         public EntityVertex BaseElement { get; set; }
         public List<EntityVertex> Instances { get; set; }
+        public List<EntityVertex> ConnectedVertices
+        {
+            get
+            {
+                return Ports.SelectMany(x => x.Relations.Select(y => y.OppositeRelation.CorrespondingPort.EntityOwner)).ToList();
+            }
+        }
 
         public void SetLabel(string label)
         {
@@ -125,29 +132,5 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 }
             }
         }
-    }
-
-    public class EntityVertexForTransformation: EntityVertex
-    {
-        public EntityVertexForTransformation(bool isIncomplete = false) :base()
-        {
-            IsIncomplete = isIncomplete;
-        }
-        public EntityVertexForTransformation(EntityVertex vertex, bool isIncomplete)
-        {
-            Attributes = vertex.Attributes;
-            Poles = vertex.Poles;
-            Instances = vertex.Instances;
-            Decompositions = vertex.Decompositions;
-            Label = vertex.Label;
-            Id = vertex.Id;
-            BaseElement = vertex.BaseElement;
-            IsIncomplete = isIncomplete;
-        }
-
-        /// <summary>
-        /// Является ли вершина-сущность неполной
-        /// </summary>
-        public bool IsIncomplete { get; set; }
     }
 }

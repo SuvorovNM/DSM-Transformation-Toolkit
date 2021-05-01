@@ -122,62 +122,64 @@ namespace Graph_Model_Tests
             model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
 
             var educating = sourceModel.Entities.First(x => x.Label == "Связь").Instantiate("Обучает");
+            model.AddNewEntityVertex(educating);
             model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
             model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
 
             var resultModel = model.ExecuteTransformations(targetModel);
+            var check = resultModel.Entities.First().ConnectedVertices;
 
             Assert.IsTrue(resultModel.Entities.Count == 2);
-            Assert.IsTrue(resultModel.Hyperedges.Count == 2);
-            Assert.IsTrue(resultModel.HyperedgeConnectors.Count == 2);
+            Assert.IsTrue(resultModel.Hyperedges.Count == 1);
+            Assert.IsTrue(resultModel.HyperedgeConnectors.Count == 1);
+            Assert.IsTrue(resultModel.Entities.First().ConnectedVertices.First() == resultModel.Entities.Last());
         }
 
-        private static Model GetClassAssociationSubmodel(Model targetModel)
+        private static ModelForTransformation GetClassAssociationSubmodel(Model targetModel)
         {
             var targetClass = targetModel.Entities.First(x => x.Label == "Класс");
             var targetHyperedge = targetModel.Hyperedges.First(x => x.Label == "Ассоциация");
             var targetHyperedgeConnector = targetHyperedge.CorrespondingHyperedge;
-            var rightPart = new Model(new[] { targetClass }, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
+            var rightPart = new ModelForTransformation(new[] { targetClass }, null, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
             return rightPart;
         }
 
-        private static Model GetClassSubmodel(Model targetModel)
+        private static ModelForTransformation GetClassSubmodel(Model targetModel)
         {
             var targetClass = targetModel.Entities.First(x => x.Label == "Класс");
-            var rightPart = new Model(new[] { targetClass }, null);
+            var rightPart = new ModelForTransformation(new[] { targetClass }, null, null);
             return rightPart;
         }
 
-        private static Model GetAssociationSubmodel(Model targetModel)
+        private static ModelForTransformation GetAssociationSubmodel(Model targetModel)
         {
             var targetClass = targetModel.Entities.First(x => x.Label == "Класс");
-            var incompleteClass = new EntityVertexForTransformation(targetClass, true);
 
             var targetHyperedge = targetModel.Hyperedges.First(x => x.Label == "Ассоциация");
             var targetHyperedgeConnector = targetHyperedge.CorrespondingHyperedge;
-            var rightPart = new Model(new[] { incompleteClass }, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
+            var rightPart = new ModelForTransformation(new[] { targetClass }, new[] { targetClass }, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
             return rightPart;
         }
 
-        private static Model GetSourceAttributeSubmodel(Model sourceModel)
+        private static ModelForTransformation GetSourceAttributeSubmodel(Model sourceModel)
         {
             var sourceEntity = sourceModel.Entities.First(x => x.Label == "Сущность");
             var sourceAttr = sourceModel.Entities.First(x => x.Label == "Атрибут");
             var sourceHyperedge = sourceModel.Hyperedges.First(x => x.Label == "Принадлежит" && x.Relations.Any(x => x.CorrespondingPort.EntityOwner == sourceEntity));
             var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;
-            var pattern = new Model(new[] { sourceEntity, sourceAttr }, new[] { sourceHyperedge }, new[] { sourceHyperedgeConnector });
+            var pattern = new ModelForTransformation(new[] { sourceEntity, sourceAttr },null, new[] { sourceHyperedge }, new[] { sourceHyperedgeConnector });
             return pattern;
         }
 
-        private static Model GetLinkSubmodel(Model sourceModel)
+        private static ModelForTransformation GetLinkSubmodel(Model sourceModel)
         {
             var sourceEntity = sourceModel.Entities.First(x => x.Label == "Сущность");
-            var incompleteEntity = new EntityVertexForTransformation(sourceEntity, true);
 
             var linkEntity = sourceModel.Entities.First(x => x.Label == "Связь");
-            var sourceHyperedge = sourceModel.Hyperedges.First(x => x.Label == "Сущность_Связь");
-            var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;
-            var pattern = new Model(new[] { incompleteEntity, linkEntity }, new[] { sourceHyperedge }, new[] { sourceHyperedgeConnector });
+            /*var sourceHyperedge = sourceModel.Hyperedges.First(x => x.Label == "Сущность_Связь");
+            var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;*/
+
+            var pattern = new ModelForTransformation(new[] { linkEntity }, null, null);//new[] { sourceHyperedge}, new[] { sourceHyperedgeConnector}
             return pattern;
         }
 

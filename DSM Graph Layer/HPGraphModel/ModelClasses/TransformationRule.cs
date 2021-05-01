@@ -8,8 +8,8 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     public class TransformationRule
     {
         public TransformationRule(
-            Model leftPart, 
-            Model rightPart, 
+             ModelForTransformation leftPart,
+             ModelForTransformation rightPart,
             string ruleName,
             Dictionary<Pole, Pole> poleCorrespondence = null)
         {
@@ -18,9 +18,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             RuleName = ruleName;
             CorrespondingPoles = poleCorrespondence ?? new Dictionary<Pole, Pole>();
         }
-        public Model LeftPart { get; set; }
-        public Model RightPart { get; set; }
+        public ModelForTransformation LeftPart { get; set; }
+        public ModelForTransformation RightPart { get; set; }
         public string RuleName { get; set; }
-        public Dictionary<Pole,Pole> CorrespondingPoles { get; set; }
+        public Dictionary<Pole, Pole> CorrespondingPoles { get; set; }
     }
 }

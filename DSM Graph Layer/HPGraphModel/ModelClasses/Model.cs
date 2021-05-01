@@ -369,13 +369,16 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             {
                 var addedEntities = CreateEntityVerticies(targetModel, rule, correspondingVerticies, searchResult);
                 var addedHyperedges = CreateHyperedgeVerticies(targetModel, rule);
-                CreateHyperedgeConnections(targetModel, rule, correspondingVerticies, addedEntities, addedHyperedges);
+
+                //var currentIncomplete = searchResult.Entities.Where(x => rule.LeftPart.IncompleteVertices.Contains(x.BaseElement)).ToList();
+                var currentIncomplete = searchResult.Entities.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities).ToList();
+                CreateHyperedgeConnections(targetModel, rule, correspondingVerticies, addedEntities, addedHyperedges, currentIncomplete);
             }
 
             return targetModel;
         }
 
-        private static void CreateHyperedgeConnections(Model targetModel, TransformationRule rule, Dictionary<EntityVertex, List<EntityVertex>> correspondingVerticies, List<EntityVertex> addedEntities, List<HyperedgeVertex> addedHyperedges)
+        private static void CreateHyperedgeConnections(Model targetModel, TransformationRule rule, Dictionary<EntityVertex, List<EntityVertex>> correspondingVerticies, List<EntityVertex> addedEntities, List<HyperedgeVertex> addedHyperedges, List<EntityVertex> incompletes)
         {
             // Создание связующих гиперребер
             foreach (var hyperedgeConn in rule.RightPart.HyperedgeConnectors)
@@ -392,14 +395,13 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 else
                 {
                     // Если не совпало, необходимо учесть неполные вершины
-                    var verticiesId = hyperedgeConn.Ports.Select(y => y.VertexOwner.Id).Distinct();
-                    foreach (var v in rule.LeftPart.Entities
-                        .Where(x => x as EntityVertexForTransformation != null
-                            && (x as EntityVertexForTransformation).IsIncomplete
-                            && verticiesId.Contains(x.Id)))
+                    var verticies = hyperedgeConn.Ports.Select(y => y.EntityOwner).Distinct();
+                    foreach (var v in incompletes) // СДЕЛАТЬ ПРОЩЕ!
                     {
-                        correspondingVerticies.TryGetValue(v, out var targetVerticies);
-                        addedEntities.AddRange(targetVerticies);
+                        if (correspondingVerticies.TryGetValue(v, out var targetVerticies))
+                        {
+                            addedEntities.AddRange(targetVerticies.Where(x => verticies.Contains(x.BaseElement)));
+                        }
                     }
 
                     connectedPortInstances = addedEntities.SelectMany(x => x.Ports).Where(y => hyperedgeConn.Ports.Contains(y.BaseElement));
@@ -419,9 +421,19 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             {
                 hyperedgeConnectorInstance.AddPole(rel);
                 var port = hyperedgeConn.Relations.First(x => rel.BaseElement == x).CorrespondingPort;
-                var portInst = connectedPortInstances.First(x => x.BaseElement == port);
 
-                hyperedgeConnectorInstance.AddLink(rel, portInst);
+                // Вынужденная недетерминированность - способ по возможности избегать генерации петель
+                EntityPort portInst;
+                if (connectedPortInstances.Any(x => x.BaseElement == port && !hyperedgeConnectorInstance.Links.Any(y => y.TargetPole == x)))
+                {
+                    portInst = connectedPortInstances.First(x => x.BaseElement == port && !hyperedgeConnectorInstance.Links.Any(y => y.TargetPole == x));
+                }
+                else
+                {
+                    portInst = connectedPortInstances.First(x => x.BaseElement == port);
+                }
+
+                hyperedgeConnectorInstance.AddConnection(rel, portInst);
             }
 
             targetModel.AddHyperEdge(hyperedgeConnectorInstance);
@@ -444,17 +456,16 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         {
             var addedEntities = new List<EntityVertex>();
             // Создание вершин-сущностей
-            foreach (var entity in rule.RightPart.Entities.Where(x => x as EntityVertexForTransformation == null || !(x as EntityVertexForTransformation).IsIncomplete))
+            foreach (var entity in rule.RightPart.Entities.Except(rule.RightPart.IncompleteVertices))
             {
                 var entityInstance = entity.Instantiate(entity.Label);
                 targetModel.AddNewEntityVertex(entityInstance);
                 addedEntities.Add(entityInstance);
                 // TODO: продумать соотнесение полюсов
             }
-            foreach (var ent in rule.LeftPart.Entities
-                .Where(x => x as EntityVertexForTransformation == null || !(x as EntityVertexForTransformation).IsIncomplete && searchResult.Entities.Any(y=>y.BaseElement.Id==x.Id)))
+            foreach (var ent in rule.LeftPart.Entities)//.IncompleteVertices
             {
-                var entInst = searchResult.Entities.First(y => y.BaseElement.Id == ent.Id);
+                var entInst = searchResult.Entities.First(y => y.BaseElement == ent);
                 if (!correspondingVerticies.TryGetValue(entInst, out var targetV))
                 {
                     correspondingVerticies.Add(entInst, addedEntities);
