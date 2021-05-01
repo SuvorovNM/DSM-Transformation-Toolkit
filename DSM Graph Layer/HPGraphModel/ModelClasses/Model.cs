@@ -14,9 +14,10 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         public Model(string label = "")
         {
             Label = label;
-            Roles = new List<Role>();            
+            Roles = new List<Role>();
             Attributes = new List<ElementAttribute>();
             Instances = new List<Model>();
+            Transformations = new Dictionary<Model, List<TransformationRule>>();
         }
         public Model(Model parentGraph, string label = "", List<Pole> externalPoles = null) : base(parentGraph, externalPoles)
         {
@@ -24,15 +25,16 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Label = label;
             Attributes = new List<ElementAttribute>();
             Instances = new List<Model>();
+            Transformations = new Dictionary<Model, List<TransformationRule>>();
         }
         public Model(
             IEnumerable<EntityVertex> entities,
             IEnumerable<HyperedgeVertex> hyperedges,
-            IEnumerable<RelationsPortsHyperedge> hyperedgeConnectors=null,
-            IEnumerable<Pole> externalPoles=null)
+            IEnumerable<RelationsPortsHyperedge> hyperedgeConnectors = null,
+            IEnumerable<Pole> externalPoles = null)
         {
             Vertices = entities == null ? new List<Vertex>() : new List<Vertex>(entities);
-            if (hyperedges != null) 
+            if (hyperedges != null)
                 Vertices.AddRange(hyperedges);
             Edges = hyperedgeConnectors == null ? new List<Hyperedge>() : new List<Hyperedge>(hyperedgeConnectors);
             ExternalPoles = externalPoles == null ? new List<Pole>() : new List<Pole>(externalPoles);
@@ -41,12 +43,12 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         public List<Role> Roles { get; }
         public string Label { get; set; }
         public List<ElementAttribute> Attributes { get; set; }
-        public List<EntityVertex> Entities 
-        { 
+        public List<EntityVertex> Entities
+        {
             get
             {
                 return Vertices.Where(x => x as EntityVertex != null).Select(x => x as EntityVertex).ToList();
-            } 
+            }
         }
         public List<HyperedgeVertex> Hyperedges
         {
@@ -55,9 +57,16 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Vertices.Where(x => x as HyperedgeVertex != null).Select(x => x as HyperedgeVertex).ToList();
             }
         }
-
+        public List<RelationsPortsHyperedge> HyperedgeConnectors
+        {
+            get
+            {
+                return Edges.Where(x => x as RelationsPortsHyperedge != null).Select(x => x as RelationsPortsHyperedge).ToList();
+            }
+        }
         public Model BaseElement { get; set; }
         public List<Model> Instances { get; set; }
+        public Dictionary<Model, List<TransformationRule>> Transformations { get; set; }
 
         /// <summary>
         /// Добавить новую пару ролей к графу
@@ -102,22 +111,22 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         {
             if (Entities.Contains(entity))
             {
-                foreach(var port in entity.Ports)
+                foreach (var port in entity.Ports)
                 {
                     entity.RemovePortFromEntity(port);
                 }
                 entity.BaseElement?.DeleteInstance(entity);
 
-                foreach(var instance in Instances)
+                foreach (var instance in Instances)
                 {
                     var entities = entity.Instances.Where(x => x.OwnerGraph == instance);
-                    foreach(var entityInst in entities)
+                    foreach (var entityInst in entities)
                     {
                         instance.RemoveEntityVertex(entityInst);
                     }
                 }
                 RemoveStructure(entity);
-            }            
+            }
         }
 
         public void AddNewHyperedgeVertex(HyperedgeVertex hyperedge) // TODO: Определить момент добавления/изменения гиперребра
@@ -133,16 +142,16 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         {
             if (Hyperedges.Contains(hyperedge))
             {
-                foreach(var rel in hyperedge.Relations)
+                foreach (var rel in hyperedge.Relations)
                 {
                     hyperedge.RemoveRelationFromHyperedge(rel);
                 }
                 hyperedge.BaseElement?.DeleteInstance(hyperedge);
 
-                foreach(var instance in Instances)
+                foreach (var instance in Instances)
                 {
                     var hyperedges = hyperedge.Instances.Where(x => x.OwnerGraph == instance);
-                    foreach(var hyperedgeInst in hyperedges)
+                    foreach (var hyperedgeInst in hyperedges)
                     {
                         instance.RemoveHyperedgeVertex(hyperedgeInst);
                     }
@@ -161,9 +170,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public HyperedgeVertex AddHyperedgeWithRelation(EntityPort source, EntityPort target, Role role)
         {
-            var hyperedge = (HyperedgeVertex) null;
-            var rel1 = (HyperedgeRelation) null;
-            var rel2 = (HyperedgeRelation) null;
+            var hyperedge = (HyperedgeVertex)null;
+            var rel1 = (HyperedgeRelation)null;
+            var rel2 = (HyperedgeRelation)null;
             if (BaseElement == null)
             {
                 hyperedge = new HyperedgeVertex();
@@ -177,7 +186,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             {
                 var appropriateHyperedges = BaseElement.Hyperedges
                     .Where(x => x.Relations.Select(y => y.RelationRole).Contains(role) && x.Relations.Select(y => y.RelationRole).Contains(role.OppositeRole))
-                    .Where(x=>x.Relations.Select(y=>y.CorrespondingPort).Contains(source.BaseElement) && x.Relations.Select(y => y.CorrespondingPort).Contains(target.BaseElement));
+                    .Where(x => x.Relations.Select(y => y.CorrespondingPort).Contains(source.BaseElement) && x.Relations.Select(y => y.CorrespondingPort).Contains(target.BaseElement));
                 // TODO: убрать странный костыль
                 appropriateHyperedges = appropriateHyperedges.Where(x => x.Relations.Where(y => y.CorrespondingPort == source.BaseElement && y.OppositeRelation.CorrespondingPort == target.BaseElement).Any());
 
@@ -312,6 +321,178 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             }
 
             return modelList;
+        }
+
+        public bool AddTransformationRule(Model targetModel, TransformationRule rule)
+        {
+            if (!Transformations.TryGetValue(targetModel, out var rules))
+                rules = InitializeTransformationRuleSequence(targetModel);
+
+            if (rule.RightPart.Vertices.All(x => x.OwnerGraph == targetModel) && rule.RightPart.Hyperedges.All(x => x.OwnerGraph == targetModel))
+            {
+                rules.Add(rule);
+                return true;
+            }
+
+            return false;
+        }
+        public bool RemoveTransformationRule(Model targetModel, TransformationRule rule)
+        {
+            if (!Transformations.TryGetValue(targetModel, out var rules) || !rules.Contains(rule))
+                return false;
+
+            rules.Remove(rule);
+            return true;
+        }
+
+        public Model ExecuteTransformations(Model targetMetamodel)
+        {
+            if (BaseElement == null)
+                throw new Exception("Для выполнения трансформации необходимо перейти на уровень модели!");
+            if (!BaseElement.Transformations.TryGetValue(targetMetamodel, out var rules))
+                throw new Exception("Данное преобразование не было задано!");
+
+            var newModel = targetMetamodel.Instantiate(targetMetamodel.Label);
+
+            var correspondingVerticies = new Dictionary<EntityVertex, List<EntityVertex>>();
+            foreach (var rule in rules)
+            {
+                newModel = ExecuteTransformationRule(newModel, rule, correspondingVerticies);
+            }
+
+            return newModel;
+        }
+        private Model ExecuteTransformationRule(Model targetModel, TransformationRule rule, Dictionary<EntityVertex, List<EntityVertex>> correspondingVerticies)
+        {
+            var submetamodelSearchResults = FindAllInstancesOfPartialMetamodel(rule.LeftPart);
+            foreach (var searchResult in submetamodelSearchResults)
+            {
+                var addedEntities = CreateEntityVerticies(targetModel, rule, correspondingVerticies, searchResult);
+                var addedHyperedges = CreateHyperedgeVerticies(targetModel, rule);
+                CreateHyperedgeConnections(targetModel, rule, correspondingVerticies, addedEntities, addedHyperedges);
+            }
+
+            return targetModel;
+        }
+
+        private static void CreateHyperedgeConnections(Model targetModel, TransformationRule rule, Dictionary<EntityVertex, List<EntityVertex>> correspondingVerticies, List<EntityVertex> addedEntities, List<HyperedgeVertex> addedHyperedges)
+        {
+            // Создание связующих гиперребер
+            foreach (var hyperedgeConn in rule.RightPart.HyperedgeConnectors)
+            {
+                var correspondingHyperedgeInstance = addedHyperedges.First(x => x.BaseElement == hyperedgeConn.CorrespondingHyperedgeVertex);
+                var hyperedgeConnectorInstance = new RelationsPortsHyperedge();
+
+                var connectedPortInstances = addedEntities.SelectMany(x => x.Ports).Where(y => hyperedgeConn.Ports.Contains(y.BaseElement));
+                if (connectedPortInstances.Count() == hyperedgeConn.Ports.Count)
+                {
+                    // Если количество портов совпало, значит просто создаем на их основе гиперребро
+                    CreateSingleHyperedgeConnector(targetModel, hyperedgeConn, correspondingHyperedgeInstance, hyperedgeConnectorInstance, connectedPortInstances);
+                }
+                else
+                {
+                    // Если не совпало, необходимо учесть неполные вершины
+                    var verticiesId = hyperedgeConn.Ports.Select(y => y.VertexOwner.Id).Distinct();
+                    foreach (var v in rule.LeftPart.Entities
+                        .Where(x => x as EntityVertexForTransformation != null
+                            && (x as EntityVertexForTransformation).IsIncomplete
+                            && verticiesId.Contains(x.Id)))
+                    {
+                        correspondingVerticies.TryGetValue(v, out var targetVerticies);
+                        addedEntities.AddRange(targetVerticies);
+                    }
+
+                    connectedPortInstances = addedEntities.SelectMany(x => x.Ports).Where(y => hyperedgeConn.Ports.Contains(y.BaseElement));
+                    CreateSingleHyperedgeConnector(targetModel, hyperedgeConn, correspondingHyperedgeInstance, hyperedgeConnectorInstance, connectedPortInstances);
+                }
+            }
+        }
+
+        private static void CreateSingleHyperedgeConnector(Model targetModel, RelationsPortsHyperedge hyperedgeConn, HyperedgeVertex correspondingHyperedgeInstance, RelationsPortsHyperedge hyperedgeConnectorInstance, IEnumerable<EntityPort> connectedPortInstances)
+        {
+            foreach (var port in connectedPortInstances)
+            {
+                hyperedgeConnectorInstance.AddPole(port);
+            }
+
+            foreach (var rel in correspondingHyperedgeInstance.Relations)
+            {
+                hyperedgeConnectorInstance.AddPole(rel);
+                var port = hyperedgeConn.Relations.First(x => rel.BaseElement == x).CorrespondingPort;
+                var portInst = connectedPortInstances.First(x => x.BaseElement == port);
+
+                hyperedgeConnectorInstance.AddLink(rel, portInst);
+            }
+
+            targetModel.AddHyperEdge(hyperedgeConnectorInstance);
+        }
+
+        private List<HyperedgeVertex> CreateHyperedgeVerticies(Model targetModel, TransformationRule rule)
+        {
+            var addedHyperedges = new List<HyperedgeVertex>();
+            // Создание вершин-гиперребер
+            foreach (var hyperedge in rule.RightPart.Hyperedges)
+            {
+                var hyperedgeInstance = hyperedge.Instantiate(hyperedge.Label);// Надо учитывать соотнесение информации (labels, attrs) с левой и правой частей
+                targetModel.AddNewHyperedgeVertex(hyperedgeInstance);
+                addedHyperedges.Add(hyperedgeInstance);
+            }
+            return addedHyperedges;
+        }
+
+        private List<EntityVertex> CreateEntityVerticies(Model targetModel, TransformationRule rule, Dictionary<EntityVertex, List<EntityVertex>> correspondingVerticies, Model searchResult)
+        {
+            var addedEntities = new List<EntityVertex>();
+            // Создание вершин-сущностей
+            foreach (var entity in rule.RightPart.Entities.Where(x => x as EntityVertexForTransformation == null || !(x as EntityVertexForTransformation).IsIncomplete))
+            {
+                var entityInstance = entity.Instantiate(entity.Label);
+                targetModel.AddNewEntityVertex(entityInstance);
+                addedEntities.Add(entityInstance);
+                // TODO: продумать соотнесение полюсов
+            }
+            foreach (var ent in rule.LeftPart.Entities
+                .Where(x => x as EntityVertexForTransformation == null || !(x as EntityVertexForTransformation).IsIncomplete && searchResult.Entities.Any(y=>y.BaseElement.Id==x.Id)))
+            {
+                var entInst = searchResult.Entities.First(y => y.BaseElement.Id == ent.Id);
+                if (!correspondingVerticies.TryGetValue(entInst, out var targetV))
+                {
+                    correspondingVerticies.Add(entInst, addedEntities);
+                }
+                else
+                {
+                    targetV.AddRange(addedEntities);
+                }
+            }
+
+            return addedEntities;
+        }
+
+        private List<TransformationRule> InitializeTransformationRuleSequence(Model targetModel)
+        {
+            var transformationRules = new List<TransformationRule>();
+            Transformations.Add(targetModel, transformationRules);
+
+            return transformationRules;
+        }
+    }
+
+    public class ModelForTransformation : Model
+    {
+        public List<EntityVertex> IncompleteVertices { get; set; }
+
+        public ModelForTransformation(IEnumerable<EntityVertex> entities,
+            IEnumerable<EntityVertex> incompleteEntities,
+            IEnumerable<HyperedgeVertex> hyperedges,
+            IEnumerable<RelationsPortsHyperedge> hyperedgeConnectors = null,
+            IEnumerable<Pole> externalPoles = null) : base(entities, hyperedges, hyperedgeConnectors, externalPoles)
+        {
+            Vertices = entities == null ? new List<Vertex>() : new List<Vertex>(entities);
+            IncompleteVertices = incompleteEntities == null ? new List<EntityVertex>() : new List<EntityVertex>(incompleteEntities);
+            if (hyperedges != null)
+                Vertices.AddRange(hyperedges);
+            Edges = hyperedgeConnectors == null ? new List<Hyperedge>() : new List<Hyperedge>(hyperedgeConnectors);
+            ExternalPoles = externalPoles == null ? new List<Pole>() : new List<Pole>(externalPoles);
         }
     }
 }

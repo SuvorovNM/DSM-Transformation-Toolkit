@@ -126,4 +126,28 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             }
         }
     }
+
+    public class EntityVertexForTransformation: EntityVertex
+    {
+        public EntityVertexForTransformation(bool isIncomplete = false) :base()
+        {
+            IsIncomplete = isIncomplete;
+        }
+        public EntityVertexForTransformation(EntityVertex vertex, bool isIncomplete)
+        {
+            Attributes = vertex.Attributes;
+            Poles = vertex.Poles;
+            Instances = vertex.Instances;
+            Decompositions = vertex.Decompositions;
+            Label = vertex.Label;
+            Id = vertex.Id;
+            BaseElement = vertex.BaseElement;
+            IsIncomplete = isIncomplete;
+        }
+
+        /// <summary>
+        /// Является ли вершина-сущность неполной
+        /// </summary>
+        public bool IsIncomplete { get; set; }
+    }
 }

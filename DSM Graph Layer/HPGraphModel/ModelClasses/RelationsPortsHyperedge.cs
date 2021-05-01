@@ -9,8 +9,6 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
     public class RelationsPortsHyperedge : Hyperedge
     {
-        public RelationsPortsHyperedge BaseElement { get; set; }
-        public List<RelationsPortsHyperedge> Instances { get; set; }
         public List<EntityPort> Ports
         {
             get
