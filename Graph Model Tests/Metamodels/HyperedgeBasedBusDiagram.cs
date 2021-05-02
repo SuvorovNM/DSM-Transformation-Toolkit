@@ -1,5 +1,6 @@
 ﻿using DSM_Graph_Layer.HPGraphModel;
 using DSM_Graph_Layer.HPGraphModel.ModelClasses;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +40,8 @@ namespace Graph_Model_Tests.Metamodels
             model.AddNewEntityVertex(periphery);
 
             var busLink = model.AddHyperedgeWithRelation(proc, ram, connectionRole);
-            model.AddRelationToHyperedge(busLink, ram, periphery, connectionRole);
-            model.AddRelationToHyperedge(busLink, periphery, proc, connectionRole);
+            busLink.AddRelationToHyperedge(ram, periphery, connectionRole);
+            busLink.AddRelationToHyperedge(periphery, proc, connectionRole);
             busLink.SetLabel("Bus");
 
             return model;

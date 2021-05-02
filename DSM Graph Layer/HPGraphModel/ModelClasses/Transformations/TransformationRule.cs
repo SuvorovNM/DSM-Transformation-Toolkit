@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
+namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
 {
     /// <summary>
     /// Правило трансформации

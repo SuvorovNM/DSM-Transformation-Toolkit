@@ -118,6 +118,65 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             }
         }
 
+
+        /// <summary>
+        /// Добавить связь между портом и отношением
+        /// </summary>
+        /// <param name="p">Порт</param>
+        /// <param name="rel">Отношение</param>
+        private void AddLinkBetweenPortAndRelation(EntityPort p, HyperedgeRelation rel)
+        {
+            var relationPortsLinks = CorrespondingHyperedge ?? new RelationsPortsHyperedge();
+            relationPortsLinks.AddConnection(rel, p);
+            // Добавление гиперребра происходит только в том случае, если оно еще не было добавлено
+            OwnerGraph.AddHyperEdge(relationPortsLinks);
+        }
+
+        /// <summary>
+        /// Добавить к гиперребру отношение заданной роли между 2 портами
+        /// </summary>
+        /// <param name="source">Исходный порт</param>
+        /// <param name="target">Целевой порт</param>
+        /// <param name="r">Роль отношения</param>
+        public void AddRelationToHyperedge(EntityPort source, EntityPort target, Role r)
+        {
+            var sourceRel = Relations.Where(x => x.RelationRole == r && x.CorrespondingPort == null);
+            var targetRel = Relations.Where(x => x.RelationRole == r.OppositeRole && x.CorrespondingPort == null);
+            if (sourceRel.Any() && targetRel.Any())
+            {
+                AddLinkBetweenPortAndRelation(source, sourceRel.First());
+                AddLinkBetweenPortAndRelation(target, targetRel.First());
+            }
+        }
+
+        /// <summary>
+        /// Добавить к гиперребру отношение заданной роли между 2 вершинами
+        /// </summary>
+        /// <param name="source">Исходный порт</param>
+        /// <param name="target">Целевой порт</param>
+        /// <param name="r">Роль отношения</param>
+        public void AddRelationToHyperedge(EntityVertex source, EntityVertex target, Role r)
+        {
+            var sourceRel = Relations.Where(x => x.RelationRole == r && x.CorrespondingPort == null).FirstOrDefault();
+            var targetRel = sourceRel?.OppositeRelation;
+            if (sourceRel == null || targetRel == null)
+            {
+                sourceRel = new HyperedgeRelation(r);
+                targetRel = new HyperedgeRelation(r.OppositeRole);
+                AddRelationPairToHyperedge(sourceRel, targetRel);
+
+            }
+
+            var sourcePort = source.Ports.Where(x => x.AcceptedRoles.Contains(r));
+            var targetPort = target.Ports.Where(x => x.AcceptedRoles.Contains(r.OppositeRole));
+
+            if (sourceRel != null && targetRel != null && sourcePort.Any() && targetPort.Any())
+            {
+                AddLinkBetweenPortAndRelation(sourcePort.First(), sourceRel);
+                AddLinkBetweenPortAndRelation(targetPort.First(), targetRel);
+            }
+        }
+
         public void SetBaseElement(HyperedgeVertex baseElement)
         {
             if (BaseElement != null)
@@ -173,5 +232,6 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 }
             }
         }
+
     }
 }

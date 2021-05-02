@@ -242,7 +242,7 @@ namespace Graph_Model_Tests
             model.AddNewEntityVertex(connectedEntityInstance1);
             model.AddNewEntityVertex(connectedEntityInstance2);
             model.AddNewHyperedgeVertex(hyperedgeInstance);
-            model.AddRelationToHyperedge(hyperedgeInstance, connectedEntity1, connectedEntity2, removedRel.RelationRole);
+            hyperedgeInstance.AddRelationToHyperedge(connectedEntity1, connectedEntity2, removedRel.RelationRole);
             var instanceRelsCount = hyperedgeInstance.Relations.Count;
 
             Metamodel.Hyperedges.First().RemoveRelationFromHyperedge(removedRel);
@@ -270,7 +270,7 @@ namespace Graph_Model_Tests
             model.AddNewEntityVertex(connectedEntityInstance1);
             model.AddNewEntityVertex(connectedEntityInstance2);
             model.AddNewHyperedgeVertex(hyperedgeInstance);
-            model.AddRelationToHyperedge(hyperedgeInstance, connectedEntity1, connectedEntity2, removedRel.RelationRole);
+            hyperedgeInstance.AddRelationToHyperedge(connectedEntity1, connectedEntity2, removedRel.RelationRole);
             var hyperedgeVertexCountInModel = model.Hyperedges.Count;
             var hyperedgeConnectorsCountInModel = model.Edges.Count;
 

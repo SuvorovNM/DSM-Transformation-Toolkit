@@ -8,6 +8,7 @@ using System.Linq;
 using System;
 using DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching;
 using Graph_Model_Tests.Metamodels;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations;
 
 namespace Graph_Model_Tests
 {
@@ -232,8 +233,8 @@ namespace Graph_Model_Tests
             busDiagram.AddNewEntityVertex(periphery);
 
             var busLink = busDiagram.AddHyperedgeWithRelation(proc, ram, sourceModel.Roles.First());
-            busDiagram.AddRelationToHyperedge(busLink, ram, periphery, sourceModel.Roles.First());
-            busDiagram.AddRelationToHyperedge(busLink, periphery, proc, sourceModel.Roles.First());
+            busLink.AddRelationToHyperedge(ram, periphery, sourceModel.Roles.First());
+            busLink.AddRelationToHyperedge(periphery, proc, sourceModel.Roles.First());
 
             var resultModel = busDiagram.ExecuteTransformations(targetModel);
 
