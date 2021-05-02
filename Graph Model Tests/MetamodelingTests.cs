@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching;
+using Graph_Model_Tests.Metamodels;
 
 namespace Graph_Model_Tests
 {
@@ -16,52 +17,7 @@ namespace Graph_Model_Tests
         [SetUp]        
         public void Setup()
         {
-            Metamodel = new Model("Entity-Relation Diagram");
-
-            var sourceRole = new Role("Источник связи");
-            var targetRole = new Role(sourceRole, "Приемник связи");
-            Metamodel.AddNewRolePairToGraph(targetRole);
-            var attributeOwnerRole = new Role("Владелец атрибута");
-            var attributeServantRole = new Role(attributeOwnerRole, "Атрибут");
-            Metamodel.AddNewRolePairToGraph(attributeServantRole);
-
-            var entity = new EntityVertex("Сущность");
-            var entityLinksPort = new EntityPort("Связи", new[] { targetRole, sourceRole });
-            var entityAttrPort = new EntityPort("Атрибуты", new[] { attributeOwnerRole });
-            entity.AddPortToEntity(entityLinksPort);
-            entity.AddPortToEntity(entityAttrPort);
-            entity.Attributes.Add(new ElementAttribute("string", "Имя"));
-            entity.Attributes.Add(new ElementAttribute("string", "Описание"));
-            Metamodel.AddNewEntityVertex(entity);
-
-            var link = new EntityVertex("Связь");
-            var linkEntityLinksPort = new EntityPort("Связи с сущностями", new[] { sourceRole });
-            var linkAttributesPort = new EntityPort("Атрибуты", new[] { attributeOwnerRole });
-            link.AddPortToEntity(linkEntityLinksPort);
-            link.AddPortToEntity(linkAttributesPort);
-            link.Attributes.Add(new ElementAttribute("string", "Имя"));
-            link.Attributes.Add(new ElementAttribute("string", "Описание"));
-            Metamodel.AddNewEntityVertex(link);
-
-            var attr = new EntityVertex("Атрибут");
-            var attrLinksPort = new EntityPort("Связи атрибутов с элементами", new[] { attributeServantRole });
-            attr.AddPortToEntity(attrLinksPort);
-            attr.Attributes.Add(new ElementAttribute("string", "Имя"));
-            attr.Attributes.Add(new ElementAttribute("string", "Тип"));
-            attr.Attributes.Add(new ElementAttribute("string", "Описание"));
-            Metamodel.AddNewEntityVertex(attr);
-
-            var entityLink = Metamodel.AddHyperedgeWithRelation(entityLinksPort, linkEntityLinksPort, targetRole);
-            entityLink.SetLabel("Сущность_Связь");
-
-            var entityAttr = Metamodel.AddHyperedgeWithRelation(entityAttrPort,attrLinksPort, attributeOwnerRole);
-            entityAttr.SetLabel("Принадлежит");
-
-            var linkAttr = Metamodel.AddHyperedgeWithRelation(linkAttributesPort, attrLinksPort, attributeOwnerRole);
-            linkAttr.SetLabel("Принадлежит");
-
-            var entityEntity = Metamodel.AddHyperedgeWithRelation(entityLinksPort, entityLinksPort, sourceRole);
-            entityEntity.SetLabel("Суперсущность_Подсущность");
+            Metamodel = new EntityRelationDiagram().Metamodel;
         }
         #region Initialization
         [Test]

@@ -40,7 +40,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         {
             get
             {
-                return Ports.SelectMany(x => x.Relations.Select(y => y.OppositeRelation.CorrespondingPort.EntityOwner)).ToList();
+                return Ports.SelectMany(x => x.Relations.Select(y => y.OppositeRelation.CorrespondingPort?.EntityOwner)).ToList();
             }
         }
 

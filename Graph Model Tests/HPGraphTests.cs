@@ -796,16 +796,15 @@ namespace Graph_Model_Tests
             return hEdge;
         }
 
-        // TODO: Убрать рандомную генерацию
         private HPGraph CreateRandomGraph()
         {
             var rnd = new Random();
             var graph = new HPGraph();
-            for (int i = 0; i< rnd.Next(1, 100); i++)
+            for (int i = 0; i< 10; i++)
             {
                 var vertex = new Vertex();
 
-                for (int j=0; j<rnd.Next(1,10); j++)
+                for (int j=0; j<15; j++)
                 {
                     var pole = new Pole();
                     vertex.AddPole(pole);
@@ -813,31 +812,31 @@ namespace Graph_Model_Tests
                 graph.AddVertex(vertex);
             }
 
-            for (int i = 0; i < rnd.Next(1, 20); i++)
+            for (int i = 0; i < 10; i++)
             {
                 graph.AddExternalPole(new Pole());
             }
 
-            for (int j = 0; j< rnd.Next(1, 10); j++)
+            for (int j = 0; j< 3; j++)
             {
                 var edge = new Hyperedge();
-                for (int k = 0; k < rnd.Next(1, 10); k++)
+                for (int k = 0; k < 10; k++)
                 {
-                    var vertex = graph.Vertices[rnd.Next(graph.Vertices.Count)];
-                    var pole = vertex.Poles[rnd.Next(vertex.Poles.Count)];
+                    var vertex = graph.Vertices[k];
+                    var pole = vertex.Poles[k / (j+1)];
                     edge.AddPole(pole);
                     if (edge.Poles.Count > 1)
                     {
-                        edge.AddLink(edge.Poles[rnd.Next(edge.Poles.Count)], pole);
+                        edge.AddLink(edge.Poles[k-1], pole);
                     }
                 }
-                for (int k = 0; k < rnd.Next(1, 5); k++)
+                for (int k = 0; k < 3; k++)
                 {
-                    var extPole = graph.ExternalPoles[rnd.Next(graph.ExternalPoles.Count)];
+                    var extPole = graph.ExternalPoles[k];
                     edge.AddPole(extPole);
                     if (edge.Poles.Count > 1)
                     {
-                        edge.AddLink(extPole, edge.Poles[rnd.Next(edge.Poles.Count)]);
+                        edge.AddLink(extPole, edge.Poles[j]);
                     }
                 }
                 graph.AddHyperEdge(edge);

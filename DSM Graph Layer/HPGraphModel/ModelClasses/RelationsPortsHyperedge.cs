@@ -33,8 +33,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public void AddConnection(HyperedgeRelation rel, EntityPort p) // TODO: Сделать RemoveConnection?
         {
-            if (p.AcceptedRoles.Contains(rel.RelationRole) &&
-                (rel.BaseElement == null || p.BaseElement == null || p.BaseElement.Relations.Contains(rel.BaseElement)))
+            if (p.AcceptedRoles.Select(x=>x.Name).Contains(rel.RelationRole.Name))//&&(rel.BaseElement == null || p.BaseElement == null || p.BaseElement.Relations.Contains(rel.BaseElement) || p.BaseElement.Relations.Contains(rel.OppositeRelation.BaseElement))
             {
                 if (!Relations.Contains(rel))
                     AddRelation(rel);

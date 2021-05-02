@@ -63,6 +63,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             relation1.SetOppositeRelation(relation2);
             AddPole(relation1);
             AddPole(relation2);
+            relation1.VertexOwner = this;
+            relation2.VertexOwner = this;
+
             foreach (var instance in Instances)
             {
                 var rel1 = relation1.Instantiate(relation1.Label);

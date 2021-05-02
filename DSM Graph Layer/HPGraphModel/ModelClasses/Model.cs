@@ -195,8 +195,8 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                     hyperedge = appropriateHyperedges.First().Instantiate("");
                     AddNewHyperedgeVertex(hyperedge);
 
-                    rel1 = hyperedge.Relations.Where(x => x.RelationRole == role).First();
-                    rel2 = hyperedge.Relations.Where(x => x.RelationRole == role.OppositeRole).First();
+                    rel1 = hyperedge.Relations.Where(x => x.RelationRole == role && x.CorrespondingPort == null).First();
+                    rel2 = rel1.OppositeRelation;
                 }
             }
             if (hyperedge != null && rel1 != null && rel2 != null)
@@ -229,16 +229,23 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         }
         public void AddRelationToHyperedge(HyperedgeVertex hedge, EntityVertex source, EntityVertex target, Role r)
         {
-            var sourceRel = hedge.Relations.Where(x => x.RelationRole == r && x.CorrespondingPort == null);
-            var targetRel = hedge.Relations.Where(x => x.RelationRole == r.OppositeRole && x.CorrespondingPort == null);
+            var sourceRel = hedge.Relations.Where(x => x.RelationRole == r && x.CorrespondingPort == null).FirstOrDefault();
+            var targetRel = sourceRel?.OppositeRelation;
+            if (sourceRel==null || targetRel==null)
+            {
+                sourceRel = new HyperedgeRelation(r);
+                targetRel = new HyperedgeRelation(r.OppositeRole);
+                hedge.AddRelationPairToHyperedge(sourceRel, targetRel);
+                
+            }
 
             var sourcePort = source.Ports.Where(x => x.AcceptedRoles.Contains(r));
             var targetPort = target.Ports.Where(x => x.AcceptedRoles.Contains(r.OppositeRole));
 
-            if (sourceRel.Any() && targetRel.Any() && sourcePort.Any() && targetPort.Any())
+            if (sourceRel!=null && targetRel!=null && sourcePort.Any() && targetPort.Any())
             {
-                AddLinkBetweenPortAndRelation(sourcePort.First(), sourceRel.First());
-                AddLinkBetweenPortAndRelation(targetPort.First(), targetRel.First());
+                AddLinkBetweenPortAndRelation(sourcePort.First(), sourceRel);
+                AddLinkBetweenPortAndRelation(targetPort.First(), targetRel);
             }
         }
 
@@ -370,9 +377,10 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 var addedEntities = CreateEntityVerticies(targetModel, rule, correspondingVerticies, searchResult);
                 var addedHyperedges = CreateHyperedgeVerticies(targetModel, rule);
 
-                //var currentIncomplete = searchResult.Entities.Where(x => rule.LeftPart.IncompleteVertices.Contains(x.BaseElement)).ToList();
                 var currentIncomplete = searchResult.Entities.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities).ToList();
                 currentIncomplete = currentIncomplete.Union(searchResult.Hyperedges.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities)).ToList();
+                //currentIncomplete = currentIncomplete.Union(searchResult.Entities.Where(x => rule.LeftPart.IncompleteVertices.Contains(x.BaseElement))).ToList();
+
                 CreateHyperedgeConnections(targetModel, rule, correspondingVerticies, addedEntities, addedHyperedges, currentIncomplete);
             }
 
