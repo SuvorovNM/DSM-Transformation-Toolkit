@@ -176,7 +176,6 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// <param name="p">Удаляемый полюс</param>
         public void RemoveInternalPole(Pole p)
         {
-            // TODO: уточнить проверку
             if (p.VertexOwner == null || p.VertexOwner.OwnerGraph != this)
             {
                 throw new Exception("Данный полюс невозможно удалить из текущего графа!");
@@ -204,11 +203,6 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
                 var edge = link.EdgeOwner;
                 edge.RemoveLink(link);
             }
-        }
-
-        public bool IsSubgraph(HPGraph g) // TODO: определить необходимость метода
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -239,7 +233,11 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
                     AddSubgraph(insertedGraph, dict);
                 }
             }
-            finally { }
+            finally 
+            { 
+                // Может быть добавлено логирование или уведомление пользователя о наличии ошибок при трансформации
+                // Блок finally нужен для возможности продолжения серии трансформаций даже при получении ошибки
+            }
         }
 
         /// <summary>
@@ -276,17 +274,22 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// <param name="matching">Словарь соответствия вершин, полученный при поиске изоморфных подграфов</param>
         private void DeleteSubgraph(HPGraph subgraph, Dictionary<Vertex, Vertex> matching)
         {
+            // Удаление гиперребер
             foreach (var edge in subgraph.Edges)
             {
                 RemoveStructure(edge);
             }
 
-            var verticesForDeletion = subgraph.Vertices.Except(matching.Where(x => x.Key as VertexForTransformation != null && (x.Key as VertexForTransformation).IsIncomplete).Select(y => y.Value));
+            // Удаление полных вершин
+            var verticesForDeletion = subgraph.Vertices
+                .Except(matching.Where(x => x.Key as VertexForTransformation != null && (x.Key as VertexForTransformation).IsIncomplete)
+                .Select(y => y.Value));
             foreach (var vertex in verticesForDeletion)
             {
                 RemoveStructure(vertex);
             }
 
+            // Удаление внешних полюсов
             var polesForDeletion = subgraph.ExternalPoles.Where(x => !x.EdgeOwners.Any());
             foreach (var pole in polesForDeletion)
             {
@@ -302,17 +305,20 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// <param name="matching">Соответствие ID полюса в графе-паттерне и изоморфного ему полюса в текущем графе (используется для неполных вершин)</param>
         private void AddSubgraph(HPGraph subgraph, Dictionary<long, Pole> matching)
         {
+            // Добавление внешний полюсов
             foreach (var pole in subgraph.ExternalPoles)
             {
                 AddExternalPole(pole);
             }
 
+            // Добавление полных вершин
             var verticesForInsertion = subgraph.Vertices.Where(x => x as VertexForTransformation == null || !(x as VertexForTransformation).IsIncomplete);
             foreach (var vertex in verticesForInsertion)
             {
                 AddVertex(vertex);
             }
 
+            // Добавление гиперребер
             foreach (var edge in subgraph.Edges.ToList())
             {
                 foreach (var pole in edge.Poles.ToList())
@@ -346,12 +352,16 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         {
             var newGraph = new HPGraph();
             var poleMatching = new Dictionary<Pole, Pole>();
+
+            // Создание внешних полюсов
             foreach (var extPole in subgraph.ExternalPoles)
             {
                 var newExtPole = new Pole(extPole.Type);
                 newGraph.AddExternalPole(newExtPole);
                 poleMatching.TryAdd(extPole, newExtPole);
             }
+
+            // Создание полных вершин
             foreach (var vertex in subgraph.Vertices.Where(x => x as VertexForTransformation == null || !(x as VertexForTransformation).IsIncomplete))
             {
                 var newVertex = new VertexForTransformation(false);
@@ -365,6 +375,8 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
                 }
                 newGraph.AddVertex(newVertex);
             }
+
+            // Добавление существующих неполных вершин
             foreach (var vertex in subgraph.Vertices.Where(x => x as VertexForTransformation != null && (x as VertexForTransformation).IsIncomplete))
             {
                 newGraph.AddVertex(vertex);
@@ -373,6 +385,8 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
                     poleMatching.TryAdd(pole, pole);
                 }
             }
+
+            // Добавление гиперребер
             foreach (var hedge in subgraph.Edges)
             {
                 var newHedge = new Hyperedge();

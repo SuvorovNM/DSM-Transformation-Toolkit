@@ -21,11 +21,11 @@ namespace DSM_Graph_Layer.HPGraphModel.Interfaces
         /// <summary>
         /// Вспомогательный словарь соответствий (Элемент исходного графа, Шаг, на котором был добавлен в словарь)
         /// </summary>
-        public Dictionary<T, long> ConnSource { get; set; }
+        protected Dictionary<T, long> ConnSource { get; set; }
         /// <summary>
         /// Вспомогательный словарь соответствий (Элемент графа-паттерна, Шаг, на котором был добавлен в словарь)
         /// </summary>
-        public Dictionary<T, long> ConnTarget { get; set; }
+        protected Dictionary<T, long> ConnTarget { get; set; }
 
         /// <summary>
         /// Обновить словари-векторы для перехода на следующий уровень

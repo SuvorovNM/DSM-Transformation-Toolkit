@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
 {
+    /// <summary>
+    /// Класс поиска подмоделей в модели на уровне полюсов
+    /// </summary>
     class IsomorphicModelPoleFinder : IsomorphicPoleFinder
     {
         public IsomorphicModelPoleFinder(Hyperedge hyperEdgeSource,
@@ -33,13 +36,12 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
             var resultPairList = new List<(Pole, Pole)>();
 
             // Пары полюсов - те полюса, которые принадлежат паре изоморфных вершин и содержат аналогичные гиперребра
+            // Парами могут считаться только полюса одного типа - т.е. либо только порты, либо только отношения
             foreach (var sourcePole in sourceCandidatePoles)
             {
-                // TODO: Можно потом добавить еще проверку на количество связей, если потребуется
                 foreach (var targetPole in targetCandidatePoles
                                             .Where(x => CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner && 
-                                                    sourcePole.EdgeOwners.Count >= x.EdgeOwners.Count &&
-                                                    x.GetType() == sourcePole.GetType())) // TODO: Проверка на тип в данном случае может быть избыточной
+                                                    sourcePole.EdgeOwners.Count >= x.EdgeOwners.Count))
                 {
                     var checkCorrectness = true;
                     foreach (var edge in targetPole.EdgeOwners.Intersect(CoreTargetW.Keys))
@@ -49,7 +51,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
                     {
                         foreach(var role in (targetPole as EntityPort).AcceptedRoles)
                         {
-                            checkCorrectness &= (sourcePole as EntityPort).AcceptedRoles.Any(x => x.Name == role.Name);
+                            checkCorrectness &= (sourcePole as EntityPort).AcceptedRoles.Any(x => x.Label == role.Label);
                         }
                         foreach(var attr in (targetPole as EntityPort).Attributes)
                         {
@@ -62,7 +64,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
                         {
                             checkCorrectness &= (sourcePole as HyperedgeRelation).Attributes.Any(x => x.DataType == attr.DataType && x.DataValue == attr.DataValue);
                         }
-                        checkCorrectness &= (sourcePole as HyperedgeRelation).RelationRole.Name == (targetPole as HyperedgeRelation).RelationRole.Name;
+                        checkCorrectness &= (sourcePole as HyperedgeRelation).RelationRole.Label == (targetPole as HyperedgeRelation).RelationRole.Label;
                     }
 
                     if (checkCorrectness)

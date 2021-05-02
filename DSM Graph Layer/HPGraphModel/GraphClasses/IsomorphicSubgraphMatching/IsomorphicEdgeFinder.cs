@@ -30,19 +30,15 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
             CoreTargetV = coreTargetV;
 
             CoreSource = new Dictionary<Hyperedge, Hyperedge>();
-            ConnSource = new Dictionary<Hyperedge, long>();
             foreach (var edge in HPGraphSource.Edges)
             {
                 CoreSource.Add(edge, null);
-                ConnSource.Add(edge, 0);
             }
 
             CoreTarget = new Dictionary<Hyperedge, Hyperedge>();
-            ConnTarget = new Dictionary<Hyperedge, long>();
             foreach (var edge in HPGraphTarget.Edges)
             {
                 CoreTarget.Add(edge, null);
-                ConnTarget.Add(edge, 0);
             }
 
             PolCorr = new Dictionary<Pole, Pole>();
@@ -112,7 +108,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
                 var pairs = GetAllCandidatePairs();
                 foreach ((var potentialSource, var potentialTarget) in pairs)
                 {
-                    // TODO: возможно, стоит добавить проверку
+                    // В данный момент нет необходимости проверки дополнительных правил (feasibility rules) при проверке кандидатов
                     UpdateVectors(step, potentialSource, potentialTarget);
                     if (Recurse(step + 1, potentialSource, potentialTarget))
                         return true;
@@ -129,17 +125,6 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         {
             CoreSource[source] = null;
             CoreTarget[target] = null;
-
-            /*foreach (var item in HPGraphSource.Edges)
-            {
-                if (ConnSource[item] == step)
-                    ConnSource[item] = 0;
-            }
-            foreach(var item in HPGraphTarget.Edges)
-            {
-                if (ConnTarget[item] == step)
-                    ConnTarget[item] = 0;
-            }*/
         }
 
         protected override void UpdateVectors(long step, Hyperedge source, Hyperedge target)
@@ -147,6 +132,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
             CoreSource[source] = target;
             CoreTarget[target] = source;
         }
+
         protected override bool CheckFisibiltyRules(Hyperedge source, Hyperedge target)
         {
             throw new NotImplementedException();

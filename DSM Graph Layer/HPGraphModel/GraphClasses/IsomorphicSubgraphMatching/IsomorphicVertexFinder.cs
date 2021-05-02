@@ -172,13 +172,13 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
             var test = GetConnectedVertices(source, HPGraphSource).ToList();
 
             var matchedConnectedToSource = GetConnectedVertices(source, HPGraphSource).Where(x => CoreSource[x] != null);
-            var matchedConnectedToTarget = GetConnectedVertices(target, HPGraphTarget).Where(x => CoreTarget[x] != null);//CoreTarget.TryGetValue(x, out var t) == true && t != null
+            var matchedConnectedToTarget = GetConnectedVertices(target, HPGraphTarget).Where(x => CoreTarget[x] != null);
             var result = true;
 
             foreach (var vertex in matchedConnectedToSource)
             {
-                if (matchedConnectedToTarget.Any()) // TODO: костыль! нуждается в проверке!
-                    result &= matchedConnectedToTarget.Any(x => CoreTarget[x] == vertex);//CoreTarget.TryGetValue(x, out var t) == true && t == vertex
+                if (matchedConnectedToTarget.Any())
+                    result &= matchedConnectedToTarget.Any(x => CoreTarget[x] == vertex);
             }
             foreach (var vertex in matchedConnectedToTarget)
             {
@@ -240,8 +240,12 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         /// <returns>Связанные вершины</returns>
         private IEnumerable<Vertex> GetConnectedVertices(Vertex vertex, HPGraph graph)
         {
-            //return graph.Vertices.Where(x => x.Poles.SelectMany(x => x.EdgeOwners).Intersect(vertex.Poles.SelectMany(x => x.EdgeOwners)).Count() > 0);
-            return graph.Edges.Where(x => x.Poles.Any(y => y.VertexOwner == vertex)).SelectMany(x => x.Poles.Where(y => y.VertexOwner != null).Select(y => y.VertexOwner)).Distinct().Intersect(graph.Vertices) ?? new List<Vertex>();
+            return graph.Edges
+                .Where(x => x.Poles.Any(y => y.VertexOwner == vertex))
+                .SelectMany(x => x.Poles.Where(y => y.VertexOwner != null)
+                .Select(y => y.VertexOwner))
+                .Distinct()
+                .Intersect(graph.Vertices) ?? new List<Vertex>();
         }
 
 

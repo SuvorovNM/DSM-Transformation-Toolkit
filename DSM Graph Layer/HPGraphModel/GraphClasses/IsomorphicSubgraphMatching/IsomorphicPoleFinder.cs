@@ -165,7 +165,6 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
             // Пары полюсов - те полюса, которые принадлежат паре изоморфных вершин и содержат аналогичные гиперребра
             foreach (var sourcePole in sourceCandidatePoles)
             {
-                // TODO: Можно потом добавить еще проверку на количество связей, если потребуется
                 foreach (var targetPole in targetCandidatePoles
                                             .Where(x => CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner && sourcePole.EdgeOwners.Count >= x.EdgeOwners.Count))
                 {

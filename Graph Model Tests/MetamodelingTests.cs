@@ -92,7 +92,7 @@ namespace Graph_Model_Tests
 
             var entAttr = ent.Ports.Where(x => x.BaseElement.Label == "Атрибуты").First();
             var attrEntity = attr.Ports.Where(x => x.BaseElement.Label == "Связи атрибутов с элементами").First();
-            var roleOwner = model.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var roleOwner = model.Roles.Where(x => x.Label == "Владелец атрибута").First();
             var roleServant = roleOwner.OppositeRole;
 
             model.AddHyperedgeWithRelation(entAttr, attrEntity, roleOwner);
@@ -291,8 +291,8 @@ namespace Graph_Model_Tests
             var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
             var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
 
-            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
-            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var sourceRole = Metamodel.Roles.Where(x => x.Label == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Label == "Владелец атрибута").First();
 
             model.AddNewEntityVertex(entityInst);
             model.AddNewEntityVertex(attrInst);
@@ -317,8 +317,8 @@ namespace Graph_Model_Tests
             var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
             var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
 
-            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
-            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var sourceRole = Metamodel.Roles.Where(x => x.Label == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Label == "Владелец атрибута").First();
 
             model.AddNewEntityVertex(entityInst);
             model.AddNewEntityVertex(attrInst);
@@ -345,8 +345,8 @@ namespace Graph_Model_Tests
             var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
             var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
 
-            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
-            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var sourceRole = Metamodel.Roles.Where(x => x.Label == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Label == "Владелец атрибута").First();
 
             model.AddNewEntityVertex(entityInst);
             model.AddNewEntityVertex(attrInst);
@@ -371,8 +371,8 @@ namespace Graph_Model_Tests
             var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
             var attrInst = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance");
 
-            var sourceRole = Metamodel.Roles.Where(x => x.Name == "Источник связи").First();
-            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var sourceRole = Metamodel.Roles.Where(x => x.Label == "Источник связи").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Label == "Владелец атрибута").First();
 
             model.AddNewEntityVertex(entityInst);
             model.AddNewEntityVertex(attrInst);
@@ -644,7 +644,7 @@ namespace Graph_Model_Tests
             var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
             var attrInst1 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 1");
             var attrInst2 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 2");
-            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Label == "Владелец атрибута").First();
 
             model.AddNewEntityVertex(entityInst);
             model.AddNewEntityVertex(attrInst1);
@@ -671,7 +671,7 @@ namespace Graph_Model_Tests
             var entityInst = Metamodel.Entities.Where(x => x.Label == "Сущность").First().Instantiate("TestEntityInstance");
             var attrInst1 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 1");
             var attrInst2 = Metamodel.Entities.Where(x => x.Label == "Атрибут").First().Instantiate("TestAttrInstance 2");
-            var attrRole = Metamodel.Roles.Where(x => x.Name == "Владелец атрибута").First();
+            var attrRole = Metamodel.Roles.Where(x => x.Label == "Владелец атрибута").First();
 
             model.AddNewEntityVertex(entityInst);
             model.AddNewEntityVertex(attrInst1);

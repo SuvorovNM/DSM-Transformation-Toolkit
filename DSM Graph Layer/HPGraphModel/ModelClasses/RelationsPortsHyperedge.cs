@@ -7,8 +7,14 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    /// <summary>
+    /// Гиперребро, связывающее порты с отношениями гиперребра
+    /// </summary>
     public class RelationsPortsHyperedge : Hyperedge
     {
+        /// <summary>
+        /// Список портов, инцидентных гиперребру-коннектору
+        /// </summary>
         public List<EntityPort> Ports
         {
             get
@@ -16,6 +22,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Poles.Where(x => x as EntityPort != null).Select(x => x as EntityPort).ToList();
             }
         }
+        /// <summary>
+        /// Список отношений, инцидентных гиперребру-коннектору
+        /// </summary>
         public List<HyperedgeRelation> Relations
         {
             get
@@ -23,6 +32,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Poles.Where(x => x as HyperedgeRelation != null).Select(x => x as HyperedgeRelation).ToList();
             }
         }
+        /// <summary>
+        /// Вершина-гиперребро, соответствующая гиперребру-коннектору
+        /// </summary>
         public HyperedgeVertex CorrespondingHyperedgeVertex
         {
             get
@@ -30,10 +42,14 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Relations.First().HyperedgeOwner;
             }
         }
-
-        public void AddConnection(HyperedgeRelation rel, EntityPort p) // TODO: Сделать RemoveConnection?
+        /// <summary>
+        /// Добавить связь между отношением и портом
+        /// </summary>
+        /// <param name="rel">Отношение гиперребра</param>
+        /// <param name="p">Порт</param>
+        public void AddConnection(HyperedgeRelation rel, EntityPort p)
         {
-            if (p.AcceptedRoles.Select(x=>x.Name).Contains(rel.RelationRole.Name))//&&(rel.BaseElement == null || p.BaseElement == null || p.BaseElement.Relations.Contains(rel.BaseElement) || p.BaseElement.Relations.Contains(rel.OppositeRelation.BaseElement))
+            if (p.AcceptedRoles.Select(x=>x.Label).Contains(rel.RelationRole.Label))
             {
                 if (!Relations.Contains(rel))
                     AddRelation(rel);
@@ -45,11 +61,33 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             else
                 throw new Exception("Невозможно простроить связь - порт не может принимать отношение с выбранной ролью!");
         }
-        public void AddRelation(HyperedgeRelation rel)
+        /// <summary>
+        /// Удалить связь между отношением и портом
+        /// </summary>
+        /// <param name="rel">Отношение гиперребра</param>
+        /// <param name="p">Порт</param>
+        public void RemoveConnection(HyperedgeRelation rel, EntityPort p)
+        {
+            var link = Links.First(x => x.SourcePole == rel && x.TargetPole == p || x.SourcePole == p && x.TargetPole == rel);
+            if (link!= null)
+            {
+                Links.Remove(link);
+            }
+            rel.CorrespondingPort = null;
+        }
+        /// <summary>
+        /// Добавить отношение
+        /// </summary>
+        /// <param name="rel">Отношение</param>
+        private void AddRelation(HyperedgeRelation rel)
         {
             AddPole(rel);
         }
-        public void AddPort(EntityPort port)
+        /// <summary>
+        /// Добавить порт
+        /// </summary>
+        /// <param name="port">Порт</param>
+        private void AddPort(EntityPort port)
         {
             AddPole(port);
         }

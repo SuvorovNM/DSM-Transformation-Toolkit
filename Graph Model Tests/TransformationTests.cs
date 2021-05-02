@@ -58,7 +58,7 @@ namespace Graph_Model_Tests
             var fio = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("ФИО");
             model.AddNewEntityVertex(teacher);
             model.AddNewEntityVertex(fio);
-            model.AddHyperedgeWithRelation(teacher, fio, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(teacher, fio, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var resultModel = model.ExecuteTransformations(targetModel);
 
@@ -83,13 +83,13 @@ namespace Graph_Model_Tests
             var fio = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("ФИО");
             model.AddNewEntityVertex(teacher);
             model.AddNewEntityVertex(fio);
-            model.AddHyperedgeWithRelation(teacher, fio, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(teacher, fio, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var student = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Ученик");
             var stage = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Класс");
             model.AddNewEntityVertex(student);
             model.AddNewEntityVertex(stage);
-            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var resultModel = model.ExecuteTransformations(targetModel);
 
@@ -119,20 +119,20 @@ namespace Graph_Model_Tests
             var fio = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("ФИО");
             model.AddNewEntityVertex(teacher);
             model.AddNewEntityVertex(fio);
-            model.AddHyperedgeWithRelation(teacher, fio, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(teacher, fio, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var student = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Ученик");
             var stage = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Класс");
             model.AddNewEntityVertex(student);
             model.AddNewEntityVertex(stage);
-            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var educating = sourceModel.Entities.First(x => x.Label == "Связь").Instantiate("Обучает");
             var price = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Бесплатно");
             model.AddNewEntityVertex(educating);
             model.AddNewEntityVertex(price);
-            model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
-            model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
+            model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
 
             var resultModel = model.ExecuteTransformations(targetModel);
 
@@ -167,28 +167,28 @@ namespace Graph_Model_Tests
             var fio = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("ФИО");
             model.AddNewEntityVertex(person);
             model.AddNewEntityVertex(fio);
-            model.AddHyperedgeWithRelation(person, fio, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(person, fio, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var teacher = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Учитель");
             var post = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Должность");
             model.AddNewEntityVertex(teacher);
             model.AddNewEntityVertex(post);
-            model.AddHyperedgeWithRelation(teacher, post, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
-            model.AddHyperedgeWithRelation(teacher, person, sourceModel.Roles.First(x => x.Name == "Источник связи"));
+            model.AddHyperedgeWithRelation(teacher, post, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(teacher, person, sourceModel.Roles.First(x => x.Label == "Источник связи"));
 
             var student = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Ученик");
             var stage = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Класс");
             model.AddNewEntityVertex(student);
             model.AddNewEntityVertex(stage);
-            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
-            model.AddHyperedgeWithRelation(student, person, sourceModel.Roles.First(x => x.Name == "Источник связи"));
+            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(student, person, sourceModel.Roles.First(x => x.Label == "Источник связи"));
 
             var educating = sourceModel.Entities.First(x => x.Label == "Связь").Instantiate("Обучает");
             var price = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Бесплатно");
             model.AddNewEntityVertex(educating);
             model.AddNewEntityVertex(price);
-            model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
-            model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
+            model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
 
             var resultModel = model.ExecuteTransformations(targetModel);
 
@@ -279,9 +279,9 @@ namespace Graph_Model_Tests
             var bus = sourceModel.Entities.First(x => x.Label == "Bus").Instantiate("Шина компьютера");
             busDiagram.AddNewEntityVertex(bus);
 
-            busDiagram.AddHyperedgeWithRelation(proc, bus, sourceModel.Roles.First(x=>x.Name== "Processor connection"));
-            busDiagram.AddHyperedgeWithRelation(ram, bus, sourceModel.Roles.First(x=>x.Name== "RAM Connection"));
-            busDiagram.AddHyperedgeWithRelation(periphery, bus, sourceModel.Roles.First(x=>x.Name== "Periphery connection"));
+            busDiagram.AddHyperedgeWithRelation(proc, bus, sourceModel.Roles.First(x=>x.Label== "Processor connection"));
+            busDiagram.AddHyperedgeWithRelation(ram, bus, sourceModel.Roles.First(x=>x.Label== "RAM Connection"));
+            busDiagram.AddHyperedgeWithRelation(periphery, bus, sourceModel.Roles.First(x=>x.Label== "Periphery connection"));
 
             var resultModel = busDiagram.ExecuteTransformations(targetModel);
 
@@ -315,42 +315,42 @@ namespace Graph_Model_Tests
             var fio = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("ФИО");
             model.AddNewEntityVertex(person);
             model.AddNewEntityVertex(fio);
-            model.AddHyperedgeWithRelation(person, fio, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(person, fio, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var teacher = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Учитель");
             var post = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Должность");
             model.AddNewEntityVertex(teacher);
             model.AddNewEntityVertex(post);
-            model.AddHyperedgeWithRelation(teacher, post, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
-            model.AddHyperedgeWithRelation(teacher, person, sourceModel.Roles.First(x => x.Name == "Источник связи"));
+            model.AddHyperedgeWithRelation(teacher, post, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(teacher, person, sourceModel.Roles.First(x => x.Label == "Источник связи"));
 
             var student = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Ученик");
             var stage = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Направление");
             model.AddNewEntityVertex(student);
             model.AddNewEntityVertex(stage);
-            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
-            model.AddHyperedgeWithRelation(student, person, sourceModel.Roles.First(x => x.Name == "Источник связи"));
+            model.AddHyperedgeWithRelation(student, stage, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(student, person, sourceModel.Roles.First(x => x.Label == "Источник связи"));
 
             var examCard = sourceModel.Entities.First(x => x.Label == "Сущность").Instantiate("Билет");
             var question = sourceModel.Entities.First(x => x.Label == "Атрибут").Instantiate("Вопрос");
             model.AddNewEntityVertex(examCard);
             model.AddNewEntityVertex(question);
-            model.AddHyperedgeWithRelation(examCard, question, sourceModel.Roles.First(x => x.Name == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(examCard, question, sourceModel.Roles.First(x => x.Label == "Владелец атрибута"));
 
             var educating = sourceModel.Entities.First(x => x.Label == "Связь").Instantiate("Сдавать экзамен");
             model.AddNewEntityVertex(educating);
-            model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
-            model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
+            model.AddHyperedgeWithRelation(teacher, educating, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(student, educating, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
 
             var gettingCard = sourceModel.Entities.First(x => x.Label == "Связь").Instantiate("Тянет");
             model.AddNewEntityVertex(gettingCard);
-            model.AddHyperedgeWithRelation(student, gettingCard, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
-            model.AddHyperedgeWithRelation(examCard, gettingCard, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
+            model.AddHyperedgeWithRelation(student, gettingCard, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(examCard, gettingCard, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
 
             var creatingCard = sourceModel.Entities.First(x => x.Label == "Связь").Instantiate("Составляет");
             model.AddNewEntityVertex(creatingCard);
-            model.AddHyperedgeWithRelation(teacher, creatingCard, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
-            model.AddHyperedgeWithRelation(examCard, creatingCard, sourceModel.Roles.First(x => x.Name == "Приемник связи"));
+            model.AddHyperedgeWithRelation(teacher, creatingCard, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(examCard, creatingCard, sourceModel.Roles.First(x => x.Label == "Приемник связи"));
 
             var resultModel = model.ExecuteTransformations(targetModel);
 

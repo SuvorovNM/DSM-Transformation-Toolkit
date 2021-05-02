@@ -251,6 +251,8 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public void SetBaseElement(Model baseElement)
         {
+            if (BaseElement != null)
+                BaseElement.DeleteInstance(this);
             BaseElement = baseElement;
             baseElement.Instances.Add(this);
         }

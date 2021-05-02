@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
 {
+    /// <summary>
+    /// Класс поиска подмоделей в модели на уровне гиперребер
+    /// </summary>
     class IsomorphicModelHyperedgeConnectorFinder : IsomorphicEdgeFinder
     {
         public IsomorphicModelHyperedgeConnectorFinder(Model source,
@@ -49,7 +52,6 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
                 var pairs = GetAllCandidatePairs();
                 foreach ((var potentialSource, var potentialTarget) in pairs)
                 {
-                    // TODO: возможно, стоит добавить проверку
                     UpdateVectors(step, potentialSource, potentialTarget);
                     if (Recurse(step + 1, potentialSource, potentialTarget))
                         return true;

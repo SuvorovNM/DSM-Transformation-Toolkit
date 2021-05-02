@@ -7,9 +7,16 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    /// <summary>
+    /// Непосредственно сущность, представляемая вершиной
+    /// </summary>
     public class EntityVertex : Vertex, ILabeledElement, IAttributedElement, IMetamodelingElement<EntityVertex>
     {
-        public EntityVertex(string label = "") //: base()
+        /// <summary>
+        /// Инициализировать сущность с заданной меткой
+        /// </summary>
+        /// <param name="label">Метка (наименование)</param>
+        public EntityVertex(string label = "")
         {
             GraphEnumerator.SetNextId(this);
             Attributes = new List<ElementAttribute>();
@@ -18,6 +25,14 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Decompositions = new List<HPGraph>();
             Label = label;
         }
+        public string Label { get; set; }
+        public List<ElementAttribute> Attributes { get; set; }
+        public EntityVertex BaseElement { get; set; }
+        public List<EntityVertex> Instances { get; set; }
+
+        /// <summary>
+        /// Порты сущности
+        /// </summary>
         public List<EntityPort> Ports
         {
             get
@@ -25,6 +40,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Poles.Select(x => x as EntityPort).ToList();
             }
         }
+        /// <summary>
+        /// Возможные декомпозиции сущности
+        /// </summary>
         public List<Model> ModelDecompositions
         {
             get
@@ -32,10 +50,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Decompositions.Select(x => x as Model).ToList();
             }
         }
-        public string Label { get; set; }
-        public List<ElementAttribute> Attributes { get; set; }
-        public EntityVertex BaseElement { get; set; }
-        public List<EntityVertex> Instances { get; set; }
+        /// <summary>
+        /// Вершины, связанные с текущей
+        /// </summary>
         public List<EntityVertex> ConnectedVertices
         {
             get
@@ -48,9 +65,13 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         {
             Label = label;
         }
+
+        /// <summary>
+        /// Добавить порт к сущности. На данный момент позволяется добавлять порт даже к экземплярам сущностей
+        /// </summary>
+        /// <param name="port">Порт сущности</param>
         public void AddPortToEntity(EntityPort port)
         {
-            // TODO: Предпроверка на то, является ли элемент без BaseElement - наверное, не нужно
             AddPole(port);
             foreach(var element in Instances)
             {
@@ -60,7 +81,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         }
 
         /// <summary>
-        /// Удалить порт из сущности - на данный момент позволяется иметь несколько инициализаций порта в сущности
+        /// Удалить порт из сущности
         /// </summary>
         /// <param name="port">Удаляемый порт</param>
         public void RemovePortFromEntity(EntityPort port)
@@ -85,16 +106,17 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public void SetBaseElement(EntityVertex baseElement)
         {
+            if (BaseElement != null)
+                BaseElement.DeleteInstance(this);
             BaseElement = baseElement;
             baseElement.Instances.Add(this);
         }
 
         /// <summary>
-        /// Создание экземпляра сущности. Создание экземпляров декомпозиций под вопросом.
+        /// Создание экземпляра сущности. Декомпозиции также создаются и являются экземплярами исходных декомпозиций
         /// Имена портов/декомпозиций получаются от родительских элементов
         /// </summary>
-        /// <param name="label"></param>
-        /// <returns></returns>
+        /// <param name="label">Метка модели</param>
         public EntityVertex Instantiate(string label)
         {
             var newEntity = new EntityVertex(label);

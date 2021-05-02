@@ -33,7 +33,7 @@ namespace Graph_Model_Tests
         {
             var testRole = new Role("Ассоциация");
 
-            Assert.IsTrue(testRole.OppositeRole != null && testRole.OppositeRole.Name == testRole.Name && testRole.OppositeRole.OppositeRole == testRole);
+            Assert.IsTrue(testRole.OppositeRole != null && testRole.OppositeRole.Label == testRole.Label && testRole.OppositeRole.OppositeRole == testRole);
         }
 
         #region Manipulations with verticies

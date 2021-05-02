@@ -6,8 +6,16 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    /// <summary>
+    /// Отношение - является полюсом вершины-гиперребра
+    /// </summary>
     public class HyperedgeRelation : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<HyperedgeRelation>
     {
+        /// <summary>
+        /// Инициализировать отношений с заданной ролью
+        /// </summary>
+        /// <param name="role">Роль отношения</param>
+        /// <param name="label">Метка</param>
         public HyperedgeRelation(Role role, string label = "") : base()
         {
             RelationRole = role;
@@ -15,14 +23,25 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Attributes = new List<ElementAttribute>();
             Instances = new List<HyperedgeRelation>();
         }
-
-        public HyperedgeRelation OppositeRelation { get; set; }
-        public Role RelationRole { get; set; }
         public string Label { get; set; }
         public List<ElementAttribute> Attributes { get; set; }
         public HyperedgeRelation BaseElement { get; set; }
         public List<HyperedgeRelation> Instances { get; set; }
+        /// <summary>
+        /// Парное отношение - является противоположной частью текущего отношения (пример: это отношение "источник", парное - "приемник")
+        /// </summary>
+        public HyperedgeRelation OppositeRelation { get; set; }
+        /// <summary>
+        /// Роль отношения (задается наименованием)
+        /// </summary>
+        public Role RelationRole { get; set; }
+        /// <summary>
+        /// Порт, с которым связано данное отношение
+        /// </summary>
         public EntityPort CorrespondingPort { get; set; }
+        /// <summary>
+        /// Гиперребро, владеющее отношением
+        /// </summary>
         public HyperedgeVertex HyperedgeOwner
         {
             get
@@ -47,6 +66,10 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             return relation;
         }
 
+        /// <summary>
+        /// Установить противоположное отношение для текущего отношения
+        /// </summary>
+        /// <param name="relation">Противоположное отношение</param>
         public void SetOppositeRelation(HyperedgeRelation relation)
         {
             OppositeRelation = relation;
@@ -55,6 +78,8 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public void SetBaseElement(HyperedgeRelation baseElement)
         {
+            if (BaseElement != null)
+                BaseElement.DeleteInstance(this);
             BaseElement = baseElement;
             baseElement.Instances.Add(this);
         }

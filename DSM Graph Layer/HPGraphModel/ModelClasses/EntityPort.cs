@@ -7,8 +7,16 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    /// <summary>
+    /// Порт сущности
+    /// </summary>
     public class EntityPort : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<EntityPort>
     {
+        /// <summary>
+        /// Создание порта сущности
+        /// </summary>
+        /// <param name="label">Наименование (метка)</param>
+        /// <param name="roles">Принимаемые роли</param>
         public EntityPort(string label = "", IEnumerable<Role> roles = null) : base()
         {
             Label = label;
@@ -20,19 +28,31 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 AcceptedRoles = new List<Role>();
         }
 
-        public List<Role> AcceptedRoles { get; set; }
         public string Label { get; set; }
         public List<ElementAttribute> Attributes { get; set; }
         public EntityPort BaseElement { get; set; }
         public List<EntityPort> Instances { get; set; }
+
+        /// <summary>
+        /// Принимаемые роли
+        /// </summary>
+        public List<Role> AcceptedRoles { get; set; }
+        /// <summary>
+        /// Отношения, инцидентные порту
+        /// </summary>
         public List<HyperedgeRelation> Relations
         {
             get
             {
-                // TODO: возможно получится сделать запрос проще
-                return EdgeOwners.SelectMany(x => x.Links.Where(y => y.SourcePole == this).Select(y => y.TargetPole as HyperedgeRelation)).Union(EdgeOwners.SelectMany(x => x.Links.Where(y => y.TargetPole == this).Select(y => y.SourcePole as HyperedgeRelation))).ToList();
+                return EdgeOwners
+                    .SelectMany(x => x.Links.Where(y => y.SourcePole == this).Select(y => y.TargetPole as HyperedgeRelation))
+                    .Union(EdgeOwners.SelectMany(x => x.Links.Where(y => y.TargetPole == this).Select(y => y.SourcePole as HyperedgeRelation)))
+                    .ToList();
             }
         }
+        /// <summary>
+        /// Сущность - владелец порта
+        /// </summary>
         public EntityVertex EntityOwner
         {
             get
@@ -46,6 +66,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             Label = label;
         }
 
+        /// <summary>
+        /// Клонировать объект
+        /// </summary>
         public override object Clone()
         {
             var port = new EntityPort(this.Label, this.AcceptedRoles);
@@ -57,9 +80,11 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             return port;
         }
 
-        public void SetBaseElement(EntityPort baseElement) // Заменить на protected/private
+        public void SetBaseElement(EntityPort baseElement)
         {
-            // TODO: Продумать над проверками и необходимостью переопределения свойств
+            if (BaseElement != null)
+                BaseElement.DeleteInstance(this);
+
             BaseElement = baseElement;
             baseElement.Instances.Add(this);
         }

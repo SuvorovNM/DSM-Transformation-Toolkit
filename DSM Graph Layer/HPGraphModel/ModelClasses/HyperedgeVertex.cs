@@ -7,15 +7,29 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    /// <summary>
+    /// Гиперребро, представляемое вершиной с полюсами-отношениями
+    /// </summary>
     public class HyperedgeVertex : Vertex, ILabeledElement, IAttributedElement, IMetamodelingElement<HyperedgeVertex>
     {
-        public HyperedgeVertex(string label = "") // base или нет?
+        /// <summary>
+        /// Инициализация вершины
+        /// </summary>
+        /// <param name="label">Метка</param>
+        public HyperedgeVertex(string label = "")
         {
             Label = label;
             Attributes = new List<ElementAttribute>();
             Instances = new List<HyperedgeVertex>();
             Poles = new List<Pole>();
         }
+        public string Label { get; set; }
+        public List<ElementAttribute> Attributes { get; set; }
+        public HyperedgeVertex BaseElement { get; set; }
+        public List<HyperedgeVertex> Instances { get; set; }
+        /// <summary>
+        /// Отношения, включаемые в гиперребро
+        /// </summary>
         public List<HyperedgeRelation> Relations
         {
             get
@@ -23,6 +37,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Poles.Select(x => x as HyperedgeRelation).ToList();
             }
         }
+        /// <summary>
+        /// Декомпозиции гиперребра
+        /// </summary>
         public List<Model> ModelDecompositions
         {
             get
@@ -30,10 +47,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Decompositions.Select(x => x as Model).ToList();
             }
         }
-        public string Label { get; set; }
-        public List<ElementAttribute> Attributes { get; set; }
-        public HyperedgeVertex BaseElement { get; set; }
-        public List<HyperedgeVertex> Instances { get; set; }
+        /// <summary>
+        /// Гиперребро-коннектор, связующее все отношения данного гиперребра
+        /// </summary>
         public RelationsPortsHyperedge CorrespondingHyperedge
         {
             get
@@ -41,6 +57,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Relations?.First()?.EdgeOwners?.FirstOrDefault() as RelationsPortsHyperedge;
             }
         }
+        /// <summary>
+        /// Связанные с гиперребром вершины
+        /// </summary>
         public List<EntityVertex> ConnectedVertices
         {
             get
@@ -101,13 +120,14 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
         public void SetBaseElement(HyperedgeVertex baseElement)
         {
+            if (BaseElement != null)
+                BaseElement.DeleteInstance(this);
             BaseElement = baseElement;
             baseElement.Instances.Add(this);
         }
 
         public HyperedgeVertex Instantiate(string label)
         {
-            // Учесть связь между отношениями!
             var newHyperedgeVertex = new HyperedgeVertex(label);
             newHyperedgeVertex.SetBaseElement(this);
 
@@ -116,14 +136,11 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 newHyperedgeVertex.Attributes.Add(new ElementAttribute(attribute.DataValue, ""));
             }
 
-            newHyperedgeVertex.SemanticType = SemanticType; // Уточнить использование Semantic Type
+            newHyperedgeVertex.SemanticType = SemanticType;
             foreach (var decomposition in ModelDecompositions)
             {
                 newHyperedgeVertex.AddDecomposition(decomposition.Instantiate(decomposition.Label));
             }
-
-            // Временное решение для учета связей между отношениями
-            var hyperedgeRelationInstances = new Dictionary<HyperedgeRelation, HyperedgeRelation>();
 
             var relationList = new List<HyperedgeRelation>();
             foreach(var rel in Relations)
@@ -138,12 +155,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 var instance2 = rel.OppositeRelation.Instantiate(rel.OppositeRelation.Label);                
 
                 newHyperedgeVertex.AddRelationPairToHyperedge(instance1, instance2);
-                hyperedgeRelationInstances.Add(rel, instance1);
             }
-            /*foreach (var instRel in newHyperedgeVertex.Relations)
-            {
-                instRel.SetOppositeRelation(hyperedgeRelationInstances[instRel.BaseElement]);
-            }*/
 
             return newHyperedgeVertex;
         }

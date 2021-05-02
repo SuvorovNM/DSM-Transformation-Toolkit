@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
 {
+    /// <summary>
+    /// Класс поиска экземпляров полюсов в модели
+    /// </summary>
     class IsomorphicMetamodelPoleFinder : IsomorphicPoleFinder
     {
         public IsomorphicMetamodelPoleFinder(Hyperedge hyperEdgeSource,
@@ -19,7 +22,10 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
 
         }
 
-
+        /// <summary>
+        /// Получение всех пар-кандидатов полюсов.
+        /// Так как информация о вершинах может быть не 1:1 (петля с объектом метамодели могут преобразоваться в 2 связанных объекта модели), проверку на вершины необходимо опустить
+        /// </summary>
         protected override List<(Pole, Pole)> GetAllCandidatePairs()
         {
             var sourceCandidatePoles = HyperedgeSource.Poles.Where(x => CoreSource[x] == null && ConnSource[x] != 0);
@@ -33,13 +39,11 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
 
             var resultPairList = new List<(Pole, Pole)>();
 
-            // Пары полюсов - те полюса, которые принадлежат паре изоморфных вершин и содержат аналогичные гиперребра
+            // Пары полюсов: (экземпляр порта/отношения; порт/отношение)
             foreach (var sourcePole in sourceCandidatePoles)
             {
-                // TODO: Можно потом добавить еще проверку на количество связей, если потребуется
                 foreach (var targetPole in targetCandidatePoles
-                                            .Where(x => //CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner &&
-                                                    x.GetType() == sourcePole.GetType())) // TODO: Проверка на тип в данном случае может быть избыточной
+                                            .Where(x => x.GetType() == sourcePole.GetType()))
                 {
                     var checkCorrectness = true;
                     if (sourcePole.GetType() == typeof(EntityPort))

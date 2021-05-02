@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
 {
+    /// <summary>
+    /// Класс поиска подмоделей в модели на уровне вершин
+    /// </summary>
     public class IsomorphicModelVertexFinder : IsomorphicVertexFinder
     {
         public IsomorphicModelVertexFinder(Model source, Model target) : base(source, target)
@@ -52,6 +55,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
             RestoreVectors(step, source, target);
         }
 
+        /// <summary>
+        /// Получение пар вершин-кандидатов, где пара - объекты одного типа (т.е. либо сущности, либо гиперребра)
+        /// </summary>
         protected override List<(Vertex, Vertex)> GetAllCandidatePairs()
         {
             var candidateSourceVertices = HPGraphSource.Vertices.Where(x => CoreSource[x] == null && ConnSource[x] != 0);

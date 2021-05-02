@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
 {
+    /// <summary>
+    /// Класс поиска экземпляров вершин в модели
+    /// </summary>
     class IsomorphicMetamodelVertexFinder : IsomorphicVertexFinder
     {
         public IsomorphicMetamodelVertexFinder(Model source, Model target) : base(source, target)
@@ -52,6 +55,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
             RestoreVectors(step, source, target);
         }
 
+        /// <summary>
+        /// Получение всех пар-кандидатов вершин, где пара - либо пара сущностей, либо пара гиперребер
+        /// </summary>
         protected override List<(Vertex, Vertex)> GetAllCandidatePairs()
         {
             var candidateSourceVertices = HPGraphSource.Vertices.Where(x => CoreSource[x] == null && ConnSource[x] != 0);
@@ -62,6 +68,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
                 candidateTargetVertices = HPGraphTarget.Vertices.Where(x => CoreTarget[x] == null);
             }
 
+            // Пары вершин: (экземпляр вершины; вершина)
             var resultPairList = new List<(Vertex, Vertex)>();
             foreach (var source in candidateSourceVertices)
             {
