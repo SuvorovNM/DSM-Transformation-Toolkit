@@ -372,6 +372,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 
                 //var currentIncomplete = searchResult.Entities.Where(x => rule.LeftPart.IncompleteVertices.Contains(x.BaseElement)).ToList();
                 var currentIncomplete = searchResult.Entities.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities).ToList();
+                currentIncomplete = currentIncomplete.Union(searchResult.Hyperedges.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities)).ToList();
                 CreateHyperedgeConnections(targetModel, rule, correspondingVerticies, addedEntities, addedHyperedges, currentIncomplete);
             }
 
@@ -458,7 +459,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             // Создание вершин-сущностей
             foreach (var entity in rule.RightPart.Entities.Except(rule.RightPart.IncompleteVertices))
             {
-                var entityInstance = entity.Instantiate(entity.Label);
+                var entityInstance = entity.Instantiate("["+entity.Label+"]");
                 targetModel.AddNewEntityVertex(entityInstance);
                 addedEntities.Add(entityInstance);
                 // TODO: продумать соотнесение полюсов
@@ -474,7 +475,12 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 {
                     targetV.AddRange(addedEntities);
                 }
+                foreach (var addedEntity in addedEntities)
+                {
+                    addedEntity.Label += entInst.Label + " ";
+                }
             }
+
 
             return addedEntities;
         }

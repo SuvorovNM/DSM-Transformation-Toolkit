@@ -72,10 +72,10 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
             {
                 // Получить вершины гиперребер и провести проверку на соответствия, установленные при поиске изоморфизма на уровне вершин
                 // Вершины пар гиперребер могут быть не полностью изоморфны
-                var sourceVertices = GetVerticesForHyperedge(source);
+                var sourceVertices = GetVerticesForHyperedge(source).Intersect(CoreSourceV.Keys);
                 foreach (var target in candidateTargetEdges.Where(x => x.CorrespondingHyperedgeVertex == source.CorrespondingHyperedgeVertex.BaseElement))
                 {
-                    var targetVertices = GetVerticesForHyperedge(target);
+                    var targetVertices = GetVerticesForHyperedge(target).Intersect(CoreTargetV.Keys);
 
                     var correctness = true;
                     foreach (var vertice in targetVertices)

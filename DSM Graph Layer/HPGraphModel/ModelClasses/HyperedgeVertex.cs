@@ -41,6 +41,13 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 return Relations?.First()?.EdgeOwners?.FirstOrDefault() as RelationsPortsHyperedge;
             }
         }
+        public List<EntityVertex> ConnectedVertices
+        {
+            get
+            {
+                return Relations.Select(x=>x.CorrespondingPort.EntityOwner).ToList();
+            }
+        }
 
         public void SetLabel(string label)
         {

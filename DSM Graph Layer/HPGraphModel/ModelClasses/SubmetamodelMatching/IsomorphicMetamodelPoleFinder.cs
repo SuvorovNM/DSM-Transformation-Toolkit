@@ -19,6 +19,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
 
         }
 
+
         protected override List<(Pole, Pole)> GetAllCandidatePairs()
         {
             var sourceCandidatePoles = HyperedgeSource.Poles.Where(x => CoreSource[x] == null && ConnSource[x] != 0);
@@ -37,7 +38,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
             {
                 // TODO: Можно потом добавить еще проверку на количество связей, если потребуется
                 foreach (var targetPole in targetCandidatePoles
-                                            .Where(x => CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner &&
+                                            .Where(x => //CoreSourceV[sourcePole.VertexOwner] == x.VertexOwner &&
                                                     x.GetType() == sourcePole.GetType())) // TODO: Проверка на тип в данном случае может быть избыточной
                 {
                     var checkCorrectness = true;

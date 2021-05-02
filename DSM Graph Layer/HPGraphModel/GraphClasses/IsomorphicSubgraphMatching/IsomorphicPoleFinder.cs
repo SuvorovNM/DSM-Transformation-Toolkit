@@ -84,7 +84,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         /// <param name="source">Полюс исходного гиперребра, добавленный на предыдущем шаге</param>
         /// <param name="target">Полюс гиперребра графа-паттерна, добавленный на предыдущем шаге</param>
         /// <returns></returns>
-        public bool Recurse(long step = 1, Pole source = null, Pole target = null)
+        public virtual bool Recurse(long step = 1, Pole source = null, Pole target = null)
         {
             if (CoreTarget.Values.All(x => x != null))
             {
@@ -226,7 +226,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         /// <param name="p">Выбранный полюс</param>
         /// <param name="w">Гиперребро, в котором производится поиск</param>
         /// <returns>Коллекция связанных полюсов</returns>
-        private IEnumerable<Pole> GetConnectedPoles(Pole p, Hyperedge w)
+        protected IEnumerable<Pole> GetConnectedPoles(Pole p, Hyperedge w)
         {
             var connectedPolesList = new List<Pole>();
 
