@@ -73,7 +73,7 @@ namespace Graph_Model_Tests.Metamodels
         {
             var targetClass = Metamodel.Hyperedges.First(x => x.Label == "Bus");
 
-            var rightPart = new ModelForTransformation(null, null, new[] { targetClass }, new[] { targetClass.CorrespondingHyperedge });
+            var rightPart = new ModelForTransformation(null, new[] { targetClass });
             return rightPart;
         }
 

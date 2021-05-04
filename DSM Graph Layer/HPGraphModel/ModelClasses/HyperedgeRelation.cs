@@ -9,7 +9,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     /// <summary>
     /// Отношение - является полюсом вершины-гиперребра
     /// </summary>
-    public class HyperedgeRelation : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<HyperedgeRelation>
+    public class HyperedgeRelation : Pole, IAttributedElement, IMetamodelingElement<HyperedgeRelation>
     {
         /// <summary>
         /// Инициализировать отношений с заданной ролью

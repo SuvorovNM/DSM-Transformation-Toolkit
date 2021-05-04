@@ -9,7 +9,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
     /// <summary>
     /// Класс для поиска изоморфизма на уровне полюсов
     /// </summary>
-    public class IsomorphicPoleFinder : IIsomorphicElementFinder<Pole>
+    public class IsomorphicPoleFinder : IsomorphicElementFinder<Pole>
     {
         /// <summary>
         /// Инициализировать экземпляр класса

@@ -73,7 +73,7 @@ namespace Graph_Model_Tests.Metamodels
             var sourceAttr = Metamodel.Entities.First(x => x.Label == "Атрибут");
             var sourceHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Принадлежит" && x.Relations.Any(x => x.CorrespondingPort.EntityOwner == sourceEntity));
             var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;
-            var pattern = new ModelForTransformation(new[] { sourceEntity, sourceAttr }, null, new[] { sourceHyperedge }, new[] { sourceHyperedgeConnector });
+            var pattern = new ModelForTransformation(new[] { sourceEntity, sourceAttr }, new[] { sourceHyperedge });
             return pattern;
         }
         public ModelForTransformation GetLinkSubmodel()
@@ -87,7 +87,7 @@ namespace Graph_Model_Tests.Metamodels
         {
             var inhLink = Metamodel.Hyperedges.First(x => x.Label == "Суперсущность_Подсущность");
 
-            var pattern = new ModelForTransformation(null, null, new[] { inhLink }, new[] { inhLink.CorrespondingHyperedge });
+            var pattern = new ModelForTransformation(null, new[] { inhLink });
             return pattern;
         }
     }

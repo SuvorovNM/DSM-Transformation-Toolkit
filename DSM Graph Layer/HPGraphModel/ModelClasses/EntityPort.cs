@@ -10,7 +10,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     /// <summary>
     /// Порт сущности
     /// </summary>
-    public class EntityPort : Pole, ILabeledElement, IAttributedElement, IMetamodelingElement<EntityPort>
+    public class EntityPort : Pole, IAttributedElement, IMetamodelingElement<EntityPort>
     {
         /// <summary>
         /// Создание порта сущности

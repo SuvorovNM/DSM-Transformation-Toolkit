@@ -10,7 +10,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     /// <summary>
     /// Непосредственно сущность, представляемая вершиной
     /// </summary>
-    public class EntityVertex : Vertex, ILabeledElement, IAttributedElement, IMetamodelingElement<EntityVertex>
+    public class EntityVertex : Vertex, IAttributedElement, IMetamodelingElement<EntityVertex>
     {
         /// <summary>
         /// Инициализировать сущность с заданной меткой

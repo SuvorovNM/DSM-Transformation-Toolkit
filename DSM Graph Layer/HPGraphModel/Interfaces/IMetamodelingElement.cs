@@ -8,7 +8,7 @@ namespace DSM_Graph_Layer.HPGraphModel.Interfaces
     /// Интерфейс объекта метамоделирования
     /// </summary>
     /// <typeparam name="T">Тип объекта</typeparam>
-    interface IMetamodelingElement<T>
+    interface IMetamodelingElement<T> : ILabeledElement
     {
         /// <summary>
         /// Базовый элемент, на котором основан текущий элемент

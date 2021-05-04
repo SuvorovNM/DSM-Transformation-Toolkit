@@ -46,7 +46,7 @@ namespace Graph_Model_Tests.Metamodels
             var targetClass = Metamodel.Entities.First(x => x.Label == "Класс");
             var targetHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Ассоциация");
             var targetHyperedgeConnector = targetHyperedge.CorrespondingHyperedge;
-            var rightPart = new ModelForTransformation(new[] { targetClass }, null, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
+            var rightPart = new ModelForTransformation(new[] { targetClass }, new[] { targetHyperedge });
             return rightPart;
         }
 
@@ -63,7 +63,7 @@ namespace Graph_Model_Tests.Metamodels
 
             var targetHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Ассоциация");
             var targetHyperedgeConnector = targetHyperedge.CorrespondingHyperedge;
-            var rightPart = new ModelForTransformation(new[] { targetClass }, new[] { targetClass }, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
+            var rightPart = new ModelForTransformation(null, new[] { targetHyperedge });
             return rightPart;
         }
 
@@ -73,7 +73,7 @@ namespace Graph_Model_Tests.Metamodels
             var targetHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Наследование");
             var targetHyperedgeConnector = targetHyperedge.CorrespondingHyperedge;
 
-            var rightPart = new ModelForTransformation(new[] { targetClass }, new[] { targetClass }, new[] { targetHyperedge }, new[] { targetHyperedgeConnector });
+            var rightPart = new ModelForTransformation(null, new[] { targetHyperedge });
             return rightPart;
         }
     }

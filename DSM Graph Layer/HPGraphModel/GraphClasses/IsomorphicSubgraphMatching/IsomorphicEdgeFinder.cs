@@ -9,7 +9,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
     /// <summary>
     /// Класс для поиска изомоформизмов на уровне гиперребер
     /// </summary>
-    public class IsomorphicEdgeFinder : IIsomorphicElementFinder<Hyperedge>
+    public class IsomorphicEdgeFinder : IsomorphicElementFinder<Hyperedge>
     {
         /// <summary>
         /// Инициализировать экземпляр класса

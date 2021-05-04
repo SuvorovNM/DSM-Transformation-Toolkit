@@ -11,9 +11,9 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching
     /// <summary>
     /// Класс поиска экземпляров гиперребер в модели
     /// </summary>
-    class IsomorphicMetamodelHyperedgeConnectorFinder : IsomorphicEdgeFinder
+    class IsomorphicMetamodelEdgeFinder : IsomorphicEdgeFinder
     {
-        public IsomorphicMetamodelHyperedgeConnectorFinder(Model source,
+        public IsomorphicMetamodelEdgeFinder(Model source,
             Model target,
             Dictionary<Vertex, Vertex> coreSourceV,
             Dictionary<Vertex, Vertex> coreTargetV) : base(source, target, coreSourceV, coreTargetV)

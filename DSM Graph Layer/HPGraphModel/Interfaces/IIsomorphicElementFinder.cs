@@ -8,7 +8,7 @@ namespace DSM_Graph_Layer.HPGraphModel.Interfaces
     /// Интерфейс для поиска изоморфного элемента
     /// </summary>
     /// <typeparam name="T">Тип элементов</typeparam>
-    public abstract class IIsomorphicElementFinder<T>
+    public abstract class IsomorphicElementFinder<T>
     {
         /// <summary>
         /// Основной словарь соответствий (Элемент исходного графа, Элемент графа-паттерна)

@@ -10,7 +10,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     /// <summary>
     /// Гиперребро, представляемое вершиной с полюсами-отношениями
     /// </summary>
-    public class HyperedgeVertex : Vertex, ILabeledElement, IAttributedElement, IMetamodelingElement<HyperedgeVertex>
+    public class HyperedgeVertex : Vertex, IAttributedElement, IMetamodelingElement<HyperedgeVertex>
     {
         /// <summary>
         /// Инициализация вершины

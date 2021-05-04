@@ -92,7 +92,7 @@ namespace Graph_Model_Tests.Metamodels
             var busToRamHedge = Metamodel.Hyperedges.First(x => x.Label == "Bus To RAM");
             var busToPeripheryHedge = Metamodel.Hyperedges.First(x => x.Label == "Bus To Periphery");
 
-            var pattern = new ModelForTransformation(new[] { targetClass }, null, new[] { busToCpuHedge, busToRamHedge, busToPeripheryHedge }, new[] { busToCpuHedge.CorrespondingHyperedge, busToRamHedge.CorrespondingHyperedge, busToPeripheryHedge.CorrespondingHyperedge });
+            var pattern = new ModelForTransformation(new[] { targetClass }, new[] { busToCpuHedge, busToRamHedge, busToPeripheryHedge });
             return pattern;
         }
 

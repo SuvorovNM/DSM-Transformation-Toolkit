@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching.IsomorphicMetamodelEdgeFinder">
+    <Position X="4.75" Y="1.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAgA=</HashCode>
+      <FileName>HPGraphModel\ModelClasses\SubmetamodelMatching\IsomorphicMetamodelEdgeFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching.IsomorphicMetamodelPoleFinder">
+    <Position X="11.5" Y="2.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>HPGraphModel\ModelClasses\SubmetamodelMatching\IsomorphicMetamodelPoleFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmetamodelMatching.IsomorphicMetamodelVertexFinder">
+    <Position X="3.25" Y="4.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAgA=</HashCode>
+      <FileName>HPGraphModel\ModelClasses\SubmetamodelMatching\IsomorphicMetamodelVertexFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching.IsomorphicModelEdgeFinder">
+    <Position X="1.25" Y="1.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>HPGraphModel\ModelClasses\SubmodelMatching\IsomorphicModelEdgeFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching.IsomorphicModelPoleFinder">
+    <Position X="8.25" Y="2.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>HPGraphModel\ModelClasses\SubmodelMatching\IsomorphicModelPoleFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching.IsomorphicModelVertexFinder">
+    <Position X="0.75" Y="4.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAgA=</HashCode>
+      <FileName>HPGraphModel\ModelClasses\SubmodelMatching\IsomorphicModelVertexFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching.IsomorphicEdgeFinder" Collapsed="true">
+    <Position X="2.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAACgAAIAAEAAAABABAAAABAIAAAAgAEAAQAEgA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\IsomorphicSubgraphMatching\IsomorphicEdgeFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching.IsomorphicPoleFinder" Collapsed="true">
+    <Position X="9.25" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAACgAAACAEAAAAAABGAAABAIAAAAgAAABIgAgA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\IsomorphicSubgraphMatching\IsomorphicPoleFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching.IsomorphicVertexFinder" Collapsed="true">
+    <Position X="2.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAACkAAAAAAAAAABQACCAAAAIAAAAgAAABQAEgA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\IsomorphicSubgraphMatching\IsomorphicVertexFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -22,7 +22,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.SubmodelMatching
             if (CoreTarget.Values.All(x => x != null) && ValidateVertexIsomorphism())
             {
                 // Переход на уровень гиперребер
-                var edgeFinder = new IsomorphicModelHyperedgeConnectorFinder(HPGraphSource as Model, HPGraphTarget as Model, CoreSource, CoreTarget);
+                var edgeFinder = new IsomorphicModelEdgeFinder(HPGraphSource as Model, HPGraphTarget as Model, CoreSource, CoreTarget);
                 edgeFinder.Recurse();
 
                 // Если ответы нашлись, то получить матрицы соответствий, добавить несвязанные полюса к матрице соответствий полюсов и добавить ответ в список изоморфных подграфов

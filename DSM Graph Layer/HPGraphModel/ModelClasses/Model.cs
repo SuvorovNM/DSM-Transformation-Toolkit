@@ -13,7 +13,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
     /// <summary>
     /// Непосредственно модель, с которой пользователь производит взаимодействие
     /// </summary>
-    public class Model : HPGraph, ILabeledElement, IAttributedElement, IMetamodelingElement<Model>
+    public class Model : HPGraph, IAttributedElement, IMetamodelingElement<Model>
     {
         /// <summary>
         /// Инициализация модели

@@ -9,7 +9,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
     /// <summary>
     /// Класс для поиска изоморфизма на уровне вершин
     /// </summary>
-    public class IsomorphicVertexFinder : IIsomorphicElementFinder<Vertex>
+    public class IsomorphicVertexFinder : IsomorphicElementFinder<Vertex>
     {
         /// <summary>
         /// Инициализация экземпляра класса

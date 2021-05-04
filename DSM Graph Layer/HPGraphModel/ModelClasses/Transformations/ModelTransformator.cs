@@ -36,15 +36,15 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
         /// <param name="rule">Правило, которое описывает преобразование</param>
         public void ExecuteTransformation(Model searchResult, TransformationRule rule)
         {
-            var addedEntities = CreateEntityVerticies(rule,  searchResult);
-            var addedHyperedges = CreateHyperedgeVerticies(rule);
+            var addedEntities = CreateEntityVertices(rule,  searchResult);
+            var addedHyperedges = CreateHyperedgeVertices(rule);
 
-            var currentIncomplete = searchResult.Entities.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities).ToList();
-            currentIncomplete = currentIncomplete.Union(searchResult.Hyperedges.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities)).ToList();
+            var currentConnected = searchResult.Entities.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities).ToList();
+            currentConnected = currentConnected.Union(searchResult.Hyperedges.SelectMany(x => x.ConnectedVertices).Distinct().Except(searchResult.Entities)).ToList();
 
-            CreateHyperedgeConnections(rule, addedEntities, addedHyperedges, currentIncomplete);
+            CreateHyperedgeConnections(rule, addedEntities, addedHyperedges, currentConnected);
         }
-        private List<HyperedgeVertex> CreateHyperedgeVerticies(TransformationRule rule)
+        private List<HyperedgeVertex> CreateHyperedgeVertices(TransformationRule rule)
         {
             var addedHyperedges = new List<HyperedgeVertex>();
             // Создание вершин-гиперребер
@@ -56,11 +56,11 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
             }
             return addedHyperedges;
         }
-        private List<EntityVertex> CreateEntityVerticies(TransformationRule rule, Model searchResult)
+        private List<EntityVertex> CreateEntityVertices(TransformationRule rule, Model searchResult)
         {
             var addedEntities = new List<EntityVertex>();
             // Создание вершин-сущностей
-            foreach (var entity in rule.RightPart.Entities.Except(rule.RightPart.IncompleteVertices))
+            foreach (var entity in rule.RightPart.Entities)
             {
                 var entityInstance = entity.Instantiate("[" + entity.Label + "]");
                 TargetModel.AddNewEntityVertex(entityInstance);
@@ -86,7 +86,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
 
             return addedEntities;
         }
-        private void CreateHyperedgeConnections(TransformationRule rule, List<EntityVertex> addedEntities, List<HyperedgeVertex> addedHyperedges, List<EntityVertex> incompletes)
+        private void CreateHyperedgeConnections(TransformationRule rule, List<EntityVertex> addedEntities, List<HyperedgeVertex> addedHyperedges, List<EntityVertex> connectedVertices)
         {
             // Создание связующих гиперребер
             foreach (var hyperedgeConn in rule.RightPart.HyperedgeConnectors)
@@ -103,7 +103,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
                 {
                     // Если не совпало, необходимо учесть неполные вершины
                     var verticies = hyperedgeConn.Ports.Select(y => y.EntityOwner).Distinct();
-                    foreach (var v in incompletes)
+                    foreach (var v in connectedVertices)
                     {
                         if (CorrespondingVerticies.TryGetValue(v, out var targetVerticies))
                         {
