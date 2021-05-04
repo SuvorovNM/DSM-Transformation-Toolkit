@@ -144,7 +144,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
                 hyperedgeConnectorInstance.AddConnection(rel, portInst);
             }
 
-            TargetModel.AddHyperEdge(hyperedgeConnectorInstance);
+            TargetModel.AddStructure(hyperedgeConnectorInstance);
         }
     }
 }

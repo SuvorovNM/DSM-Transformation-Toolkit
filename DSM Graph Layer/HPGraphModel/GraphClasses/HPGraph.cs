@@ -99,10 +99,24 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         }
 
         /// <summary>
+        /// Добавление структуры
+        /// </summary>
+        /// <param name="str">Добавляемая структура</param>
+        public void AddStructure(Structure str)
+        {
+            if (str is Vertex)
+                AddVertex(str as Vertex);
+            else if (str is Hyperedge)
+                AddHyperEdge(str as Hyperedge);
+            else
+                throw new Exception("Попытка добавления нераспознанной структуры в граф!");
+        }
+
+        /// <summary>
         /// Добавить вершину в граф (для вершины должны быть определены полюса)
         /// </summary>
         /// <param name="v">Добавляемая вершина</param>
-        public void AddVertex(Vertex v)
+        private void AddVertex(Vertex v)
         {
             if (!Vertices.Any(x => x.Id == v.Id))
             {
@@ -115,7 +129,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// Добавить гиперребро в граф (для гиперребра должны быть определены полюса и связи)
         /// </summary>
         /// <param name="e">Добавляемое гиперребро</param>
-        public void AddHyperEdge(Hyperedge e)
+        private void AddHyperEdge(Hyperedge e)
         {
             if (!Edges.Any(x => x.Id == e.Id) && e.Links.Any() && e.Poles.Any() && !e.Poles.Any(x => x.GraphOwner != this && x.GraphOwner != null))
             {
@@ -174,7 +188,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// Удалить внутренний полюс гиперграфа
         /// </summary>
         /// <param name="p">Удаляемый полюс</param>
-        public void RemoveInternalPole(Pole p)
+        private void RemoveInternalPole(Pole p)
         {
             if (p.VertexOwner == null || p.VertexOwner.OwnerGraph != this)
             {

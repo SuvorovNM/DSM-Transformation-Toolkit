@@ -63,7 +63,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         /// <summary>
         /// Матрица соответствий для полюсов гиперребер
         /// </summary>
-        public Dictionary<Pole, Pole> PolCorr { get; set; }
+        protected Dictionary<Pole, Pole> PolCorr { get; set; }
         /// <summary>
         /// Список полученных изоморфизмов
         /// </summary>
@@ -181,7 +181,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching
         }
 
         /// <summary>
-        /// Сгруппировать гиперребра по признаку инцидентности
+        /// Сгруппировать гиперребра по признаку инцидентности. TODO: подумать над алгоритмом за N^2
         /// </summary>
         /// <returns>Список сгруппированных гиперребер</returns>
         protected List<(Hyperedge, Hyperedge)> GroupByIncidence()

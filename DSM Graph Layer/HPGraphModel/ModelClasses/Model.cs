@@ -139,7 +139,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         /// <param name="entity">Добавляемая сущность</param>
         public void AddNewEntityVertex(EntityVertex entity)
         {
-            AddVertex(entity);
+            AddStructure(entity);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         /// <param name="hyperedge">Добавляемое гиперребро</param>
         public void AddNewHyperedgeVertex(HyperedgeVertex hyperedge)
         {
-            AddVertex(hyperedge);
+            AddStructure(hyperedge);
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 relationPortsLinks.AddConnection(rel1, source);
                 relationPortsLinks.AddConnection(rel2, target);
 
-                AddHyperEdge(relationPortsLinks);
+                AddStructure(relationPortsLinks);
             }
             return hyperedge;
         }        

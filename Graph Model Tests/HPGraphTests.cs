@@ -17,11 +17,11 @@ namespace Graph_Model_Tests
         {
             SourceGraph = new HPGraph();
             var vertex = CreateVertex(5);
-            SourceGraph.AddVertex(vertex);
+            SourceGraph.AddStructure(vertex);
             var vertex1 = CreateVertex(10);
-            SourceGraph.AddVertex(vertex1);
+            SourceGraph.AddStructure(vertex1);
             var hEdge = CreateHyperEdge(vertex1.Poles.First());
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(hEdge);
             SourceGraph.AddExternalPole(new Pole());
 
             var newHPGraph = CreateRandomGraph();
@@ -44,7 +44,7 @@ namespace Graph_Model_Tests
             var startVertexCount = SourceGraph.Vertices.Count;
 
             var vertex = CreateVertex(polesCount);
-            SourceGraph.AddVertex(vertex);
+            SourceGraph.AddStructure(vertex);
 
             Assert.AreEqual(polesCount + 1, vertex.Poles.Count);
             Assert.AreEqual(startVertexCount + 1, SourceGraph.Vertices.Count);
@@ -71,10 +71,10 @@ namespace Graph_Model_Tests
         {
             var startEdgeCount = SourceGraph.Edges.Count;
             var vertex = CreateVertex(5);
-            SourceGraph.AddVertex(vertex);
+            SourceGraph.AddStructure(vertex);
 
             var hEdge = CreateHyperEdge(vertex.Poles.First());
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(hEdge);
 
             Assert.AreEqual(startEdgeCount + 1, SourceGraph.Edges.Count);
             Assert.AreEqual(hEdge.Links.Count, SourceGraph.Vertices[0].Poles.Count);
@@ -166,9 +166,9 @@ namespace Graph_Model_Tests
         {
             var startEdgesCount = SourceGraph.Edges.Count;
             var vertex = CreateVertex(5);
-            SourceGraph.AddVertex(vertex);
+            SourceGraph.AddStructure(vertex);
             var hEdge = CreateHyperEdge(vertex.Poles.First());
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(hEdge);
             var totalPolesCount = SourceGraph.Vertices.Sum(x => x.Poles.Count) + SourceGraph.ExternalPoles.Count;
 
             var polesList = hEdge.Poles.ToList();
@@ -189,7 +189,7 @@ namespace Graph_Model_Tests
             var polesCount = 10;
             var startVerticesCount = SourceGraph.Vertices.Count;
             var vertex = CreateVertex(polesCount);
-            SourceGraph.AddVertex(vertex);
+            SourceGraph.AddStructure(vertex);
 
             var polesList = vertex.Poles.ToList();
             foreach (var pole in polesList)
@@ -291,15 +291,15 @@ namespace Graph_Model_Tests
         public void SingleSubgraphSearchTest()
         {
             (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hEdge);
 
             (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
             var newHPGraph = new HPGraph();
-            newHPGraph.AddVertex(newVertex);
-            newHPGraph.AddVertex(newVertex1);
-            newHPGraph.AddHyperEdge(newHedge);
+            newHPGraph.AddStructure(newVertex);
+            newHPGraph.AddStructure(newVertex1);
+            newHPGraph.AddStructure(newHedge);
 
             var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
 
@@ -311,20 +311,20 @@ namespace Graph_Model_Tests
         public void MultipleSubgraphSearchTest()
         {
             (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hEdge);
 
             (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyAddedHedge) = CreateVerticesAndHedge();
-            SourceGraph.AddVertex(secondlyAddedVertex);
-            SourceGraph.AddVertex(secondlyAddedVertex1);
-            SourceGraph.AddHyperEdge(secondlyAddedHedge);
+            SourceGraph.AddStructure(secondlyAddedVertex);
+            SourceGraph.AddStructure(secondlyAddedVertex1);
+            SourceGraph.AddStructure(secondlyAddedHedge);
 
             (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
             var newHPGraph = new HPGraph();
-            newHPGraph.AddVertex(newVertex);
-            newHPGraph.AddVertex(newVertex1);
-            newHPGraph.AddHyperEdge(newHedge);
+            newHPGraph.AddStructure(newVertex);
+            newHPGraph.AddStructure(newVertex1);
+            newHPGraph.AddStructure(newHedge);
 
             var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
 
@@ -337,17 +337,17 @@ namespace Graph_Model_Tests
         public void SingleSubgraphSearchWithIncidentHyperedgesTest()
         {
             (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hedge1);
-            SourceGraph.AddHyperEdge(hedge2);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hedge1);
+            SourceGraph.AddStructure(hedge2);
 
             (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
             var newHPGraph = new HPGraph();
-            newHPGraph.AddVertex(newVertex);
-            newHPGraph.AddVertex(newVertex1);
-            newHPGraph.AddHyperEdge(newHedge1);
-            newHPGraph.AddHyperEdge(newHedge2);
+            newHPGraph.AddStructure(newVertex);
+            newHPGraph.AddStructure(newVertex1);
+            newHPGraph.AddStructure(newHedge1);
+            newHPGraph.AddStructure(newHedge2);
 
             var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
 
@@ -359,23 +359,23 @@ namespace Graph_Model_Tests
         public void MultipleSubgraphSearchWithIncidentHyperedgesTest()
         {
             (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hedge1);
-            SourceGraph.AddHyperEdge(hedge2);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hedge1);
+            SourceGraph.AddStructure(hedge2);
 
             (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(secondlyAddedVertex1);
-            SourceGraph.AddVertex(secondlyAddedVertex);
-            SourceGraph.AddHyperEdge(secondlyHedge1);
-            SourceGraph.AddHyperEdge(secondlyHedge2);
+            SourceGraph.AddStructure(secondlyAddedVertex1);
+            SourceGraph.AddStructure(secondlyAddedVertex);
+            SourceGraph.AddStructure(secondlyHedge1);
+            SourceGraph.AddStructure(secondlyHedge2);
 
             (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
             var newHPGraph = new HPGraph();
-            newHPGraph.AddVertex(newVertex);
-            newHPGraph.AddVertex(newVertex1);
-            newHPGraph.AddHyperEdge(newHedge1);
-            newHPGraph.AddHyperEdge(newHedge2);
+            newHPGraph.AddStructure(newVertex);
+            newHPGraph.AddStructure(newVertex1);
+            newHPGraph.AddStructure(newHedge1);
+            newHPGraph.AddStructure(newHedge2);
 
             var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
 
@@ -389,7 +389,7 @@ namespace Graph_Model_Tests
         {
             var newHPGraph = new HPGraph();
             var vertex = new Vertex();
-            newHPGraph.AddVertex(vertex);
+            newHPGraph.AddStructure(vertex);
 
             var results = SourceGraph.FindIsomorphicSubgraphs(newHPGraph);
 
@@ -406,21 +406,21 @@ namespace Graph_Model_Tests
             var polesCount = 100;
 
             (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hEdge);
 
             (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
             var patternGraph = new HPGraph();
-            patternGraph.AddVertex(newVertex);
-            patternGraph.AddVertex(newVertex1);
-            patternGraph.AddHyperEdge(newHedge);
+            patternGraph.AddStructure(newVertex);
+            patternGraph.AddStructure(newVertex1);
+            patternGraph.AddStructure(newHedge);
 
             var vertex = new Vertex();
             for (int i = 1; i < polesCount; i++)
                 vertex.AddPole(new Pole());
             var replacementGraph = new HPGraph();
-            replacementGraph.AddVertex(vertex);
+            replacementGraph.AddStructure(vertex);
 
             SourceGraph.Transform(patternGraph, replacementGraph);
 
@@ -437,26 +437,26 @@ namespace Graph_Model_Tests
             var polesCount = 100;
 
             (var addedVertex, var addedVertex1, var hEdge) = CreateVerticesAndHedge();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hEdge);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hEdge);
 
             (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyAddedHedge) = CreateVerticesAndHedge();
-            SourceGraph.AddVertex(secondlyAddedVertex);
-            SourceGraph.AddVertex(secondlyAddedVertex1);
-            SourceGraph.AddHyperEdge(secondlyAddedHedge);
+            SourceGraph.AddStructure(secondlyAddedVertex);
+            SourceGraph.AddStructure(secondlyAddedVertex1);
+            SourceGraph.AddStructure(secondlyAddedHedge);
 
             (var newVertex, var newVertex1, var newHedge) = CreateVerticesAndHedge();
             var patternGraph = new HPGraph();
-            patternGraph.AddVertex(newVertex);
-            patternGraph.AddVertex(newVertex1);
-            patternGraph.AddHyperEdge(newHedge);
+            patternGraph.AddStructure(newVertex);
+            patternGraph.AddStructure(newVertex1);
+            patternGraph.AddStructure(newHedge);
 
             var vertex = new Vertex();
             for (int i = 1; i < polesCount; i++)
                 vertex.AddPole(new Pole());
             var replacementGraph = new HPGraph();
-            replacementGraph.AddVertex(vertex);
+            replacementGraph.AddStructure(vertex);
 
             SourceGraph.Transform(patternGraph, replacementGraph);
 
@@ -472,23 +472,23 @@ namespace Graph_Model_Tests
             var startHyperedgeCount = SourceGraph.Edges.Count;
 
             (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hedge1);
-            SourceGraph.AddHyperEdge(hedge2);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hedge1);
+            SourceGraph.AddStructure(hedge2);
 
             (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
             var patternGraph = new HPGraph();
-            patternGraph.AddVertex(newVertex);
-            patternGraph.AddVertex(newVertex1);
-            patternGraph.AddHyperEdge(newHedge1);
-            patternGraph.AddHyperEdge(newHedge2);
+            patternGraph.AddStructure(newVertex);
+            patternGraph.AddStructure(newVertex1);
+            patternGraph.AddStructure(newHedge1);
+            patternGraph.AddStructure(newHedge2);
 
             var replacementGraph = new HPGraph();
             var (vertex1, vertex2, hedge) = CreateVerticesAndHedge();
-            replacementGraph.AddVertex(vertex1);
-            replacementGraph.AddVertex(vertex2);
-            replacementGraph.AddHyperEdge(hedge);
+            replacementGraph.AddStructure(vertex1);
+            replacementGraph.AddStructure(vertex2);
+            replacementGraph.AddStructure(hedge);
 
             SourceGraph.Transform(patternGraph, replacementGraph);
 
@@ -507,29 +507,29 @@ namespace Graph_Model_Tests
             var startHyperedgeCount = SourceGraph.Edges.Count;
 
             (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hedge1);
-            SourceGraph.AddHyperEdge(hedge2);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hedge1);
+            SourceGraph.AddStructure(hedge2);
 
             (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(secondlyAddedVertex1);
-            SourceGraph.AddVertex(secondlyAddedVertex);
-            SourceGraph.AddHyperEdge(secondlyHedge1);
-            SourceGraph.AddHyperEdge(secondlyHedge2);
+            SourceGraph.AddStructure(secondlyAddedVertex1);
+            SourceGraph.AddStructure(secondlyAddedVertex);
+            SourceGraph.AddStructure(secondlyHedge1);
+            SourceGraph.AddStructure(secondlyHedge2);
 
             (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
             var patternGraph = new HPGraph();
-            patternGraph.AddVertex(newVertex);
-            patternGraph.AddVertex(newVertex1);
-            patternGraph.AddHyperEdge(newHedge1);
-            patternGraph.AddHyperEdge(newHedge2);
+            patternGraph.AddStructure(newVertex);
+            patternGraph.AddStructure(newVertex1);
+            patternGraph.AddStructure(newHedge1);
+            patternGraph.AddStructure(newHedge2);
 
             var replacementGraph = new HPGraph();
             var (vertex1, vertex2, hedge) = CreateVerticesAndHedge();
-            replacementGraph.AddVertex(vertex1);
-            replacementGraph.AddVertex(vertex2);
-            replacementGraph.AddHyperEdge(hedge);
+            replacementGraph.AddStructure(vertex1);
+            replacementGraph.AddStructure(vertex2);
+            replacementGraph.AddStructure(hedge);
 
             SourceGraph.Transform(patternGraph, replacementGraph);
 
@@ -548,34 +548,34 @@ namespace Graph_Model_Tests
             var startHyperedgeCount = SourceGraph.Edges.Count;
 
             (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddHyperEdge(hedge1);
-            SourceGraph.AddHyperEdge(hedge2);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(hedge1);
+            SourceGraph.AddStructure(hedge2);
 
             (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(secondlyAddedVertex1);
-            SourceGraph.AddVertex(secondlyAddedVertex);
-            SourceGraph.AddHyperEdge(secondlyHedge1);
-            SourceGraph.AddHyperEdge(secondlyHedge2);
+            SourceGraph.AddStructure(secondlyAddedVertex1);
+            SourceGraph.AddStructure(secondlyAddedVertex);
+            SourceGraph.AddStructure(secondlyHedge1);
+            SourceGraph.AddStructure(secondlyHedge2);
 
             (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
             newVertex.IsIncomplete = true;
             newVertex.Poles.RemoveAll(x => !x.EdgeOwners.Any());
 
             var patternGraph = new HPGraph();
-            patternGraph.AddVertex(newVertex);
-            patternGraph.AddVertex(newVertex1);
-            patternGraph.AddHyperEdge(newHedge1);
-            patternGraph.AddHyperEdge(newHedge2);
+            patternGraph.AddStructure(newVertex);
+            patternGraph.AddStructure(newVertex1);
+            patternGraph.AddStructure(newHedge1);
+            patternGraph.AddStructure(newHedge2);
 
             var replacementGraph = new HPGraph();
             var newIncomplete = new VertexForTransformation(newVertex);
             var (vertex1, vertex2, hedge) = CreateSubgraphWithIncompleteVertex(newIncomplete);
-            replacementGraph.AddVertex(newIncomplete);
-            replacementGraph.AddVertex(vertex1);
-            replacementGraph.AddVertex(vertex2);
-            replacementGraph.AddHyperEdge(hedge);
+            replacementGraph.AddStructure(newIncomplete);
+            replacementGraph.AddStructure(vertex1);
+            replacementGraph.AddStructure(vertex2);
+            replacementGraph.AddStructure(hedge);
 
             SourceGraph.Transform(patternGraph, replacementGraph);
 
@@ -596,44 +596,44 @@ namespace Graph_Model_Tests
             var startHyperedgeCount = SourceGraph.Edges.Count;
 
             (var addedVertex, var addedVertex1, var hedge1, var hedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(addedVertex);
-            SourceGraph.AddVertex(addedVertex1);
-            SourceGraph.AddHyperEdge(hedge1);
-            SourceGraph.AddHyperEdge(hedge2);
+            SourceGraph.AddStructure(addedVertex);
+            SourceGraph.AddStructure(addedVertex1);
+            SourceGraph.AddStructure(hedge1);
+            SourceGraph.AddStructure(hedge2);
             var nonExistingInPatternHyperedge = new Hyperedge();
             nonExistingInPatternHyperedge.AddPole(addedVertex.Poles.First());
             nonExistingInPatternHyperedge.AddPole(SourceGraph.ExternalPoles.First());
             nonExistingInPatternHyperedge.AddLink(addedVertex.Poles.First(), SourceGraph.ExternalPoles.First());
-            SourceGraph.AddHyperEdge(nonExistingInPatternHyperedge);
+            SourceGraph.AddStructure(nonExistingInPatternHyperedge);
 
             (var secondlyAddedVertex, var secondlyAddedVertex1, var secondlyHedge1, var secondlyHedge2) = CreateVerticesAndIncidentHyperedges();
-            SourceGraph.AddVertex(secondlyAddedVertex);
-            SourceGraph.AddVertex(secondlyAddedVertex1);
-            SourceGraph.AddHyperEdge(secondlyHedge1);
-            SourceGraph.AddHyperEdge(secondlyHedge2);
+            SourceGraph.AddStructure(secondlyAddedVertex);
+            SourceGraph.AddStructure(secondlyAddedVertex1);
+            SourceGraph.AddStructure(secondlyHedge1);
+            SourceGraph.AddStructure(secondlyHedge2);
             var nonExistingInPatternHyperedge1 = new Hyperedge();
             nonExistingInPatternHyperedge1.AddPole(secondlyAddedVertex.Poles.Last());
             nonExistingInPatternHyperedge1.AddPole(SourceGraph.Vertices.First().Poles.First());
             nonExistingInPatternHyperedge1.AddLink(secondlyAddedVertex.Poles.Last(), SourceGraph.Vertices.First().Poles.First());
-            SourceGraph.AddHyperEdge(nonExistingInPatternHyperedge1);
+            SourceGraph.AddStructure(nonExistingInPatternHyperedge1);
 
             (var newVertex, var newVertex1, var newHedge1, var newHedge2) = CreateVerticesAndIncidentHyperedges();
             newVertex.IsIncomplete = true;
             newVertex.Poles.RemoveAll(x => !x.EdgeOwners.Any());
 
             var patternGraph = new HPGraph();
-            patternGraph.AddVertex(newVertex);
-            patternGraph.AddVertex(newVertex1);
-            patternGraph.AddHyperEdge(newHedge1);
-            patternGraph.AddHyperEdge(newHedge2);
+            patternGraph.AddStructure(newVertex);
+            patternGraph.AddStructure(newVertex1);
+            patternGraph.AddStructure(newHedge1);
+            patternGraph.AddStructure(newHedge2);
 
             var replacementGraph = new HPGraph();
             var newIncomplete = new VertexForTransformation(newVertex);
             var (vertex1, vertex2, hedge) = CreateSubgraphWithIncompleteVertex(newIncomplete);
-            replacementGraph.AddVertex(newIncomplete);
-            replacementGraph.AddVertex(vertex1);
-            replacementGraph.AddVertex(vertex2);
-            replacementGraph.AddHyperEdge(hedge);
+            replacementGraph.AddStructure(newIncomplete);
+            replacementGraph.AddStructure(vertex1);
+            replacementGraph.AddStructure(vertex2);
+            replacementGraph.AddStructure(hedge);
 
             SourceGraph.Transform(patternGraph, replacementGraph);
 
@@ -809,7 +809,7 @@ namespace Graph_Model_Tests
                     var pole = new Pole();
                     vertex.AddPole(pole);
                 }
-                graph.AddVertex(vertex);
+                graph.AddStructure(vertex);
             }
 
             for (int i = 0; i < 10; i++)
@@ -839,7 +839,7 @@ namespace Graph_Model_Tests
                         edge.AddLink(extPole, edge.Poles[j]);
                     }
                 }
-                graph.AddHyperEdge(edge);
+                graph.AddStructure(edge);
             }
 
             return graph;

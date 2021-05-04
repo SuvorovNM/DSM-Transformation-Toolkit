@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching.IsomorphicEdgeFinder" Collapsed="true">
+    <Position X="21.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAACgAAIAAEAAAABABAAAABAIAAAAgAEAAQAEgA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\IsomorphicSubgraphMatching\IsomorphicEdgeFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching.IsomorphicPoleFinder" Collapsed="true">
+    <Position X="23.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAACgAAACAEAAAAAABGAAABAIAAAAgAAABIgAgA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\IsomorphicSubgraphMatching\IsomorphicPoleFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching.IsomorphicVertexFinder" Collapsed="true">
+    <Position X="21.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAACkAAAAAAAAAABQACCAAAAIAAAAgAAABQAEgA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\IsomorphicSubgraphMatching\IsomorphicVertexFinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.ElementWithId">
+    <Position X="12.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\ElementWithId.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.HPGraph">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAgAAAAAQAAACAAAAIQAQBAAAAFCAAEBAIIghAAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\HPGraph.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.Hyperedge">
+    <Position X="9.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAACAAAAAAAEAAAAAAAAQACAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\Hyperedge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.Link">
+    <Position X="16.5" Y="2.25" Width="1.5" />
+    <InheritanceLine Type="DSM_Graph_Layer.HPGraphModel.GraphClasses.ElementWithId" ManuallyRouted="true">
+      <Path>
+        <Point X="13.25" Y="1.603" />
+        <Point X="13.25" Y="1.979" />
+        <Point X="17.25" Y="1.979" />
+        <Point X="17.25" Y="2.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAEgAAAAQAAAAAAAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\Link.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.Pole">
+    <Position X="18.5" Y="1.75" Width="1.5" />
+    <InheritanceLine Type="DSM_Graph_Layer.HPGraphModel.GraphClasses.ElementWithId" ManuallyRouted="true">
+      <Path>
+        <Point X="13.25" Y="1.603" />
+        <Point X="13.25" Y="1.958" />
+        <Point X="14.2" Y="1.958" />
+        <Point X="14.2" Y="1.45" />
+        <Point X="19.25" Y="1.45" />
+        <Point X="19.25" Y="1.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>ABAAAACAgAAAAAAAAAAAAAAAGAAAAAAAAQAIAAAAABA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\Pole.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.Structure">
+    <Position X="12" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAACAABAAAgAAIAAAAAAQAIAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\Structure.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.Vertex">
+    <Position X="14.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\Vertex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DSM_Graph_Layer.HPGraphModel.GraphClasses.VertexForTransformation">
+    <Position X="16.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HPGraphModel\GraphClasses\Vertex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

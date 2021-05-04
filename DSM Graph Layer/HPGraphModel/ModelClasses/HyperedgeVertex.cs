@@ -129,7 +129,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
             var relationPortsLinks = CorrespondingHyperedge ?? new RelationsPortsHyperedge();
             relationPortsLinks.AddConnection(rel, p);
             // Добавление гиперребра происходит только в том случае, если оно еще не было добавлено
-            OwnerGraph.AddHyperEdge(relationPortsLinks);
+            OwnerGraph.AddStructure(relationPortsLinks);
         }
 
         /// <summary>

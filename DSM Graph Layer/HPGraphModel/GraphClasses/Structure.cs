@@ -47,14 +47,7 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
         /// Удалить полюс из структуры
         /// </summary>
         /// <param name="p">Удаляемый полюс</param>
-        public virtual void RemovePole(Pole p)
-        {
-            if (Poles.Any(x => x.Id == p.Id))
-                Poles.Remove(p);
-
-            if (!Poles.Any())
-                OwnerGraph.RemoveStructure(this);
-        }
+        public abstract void RemovePole(Pole p);
 
         /// <summary>
         /// Добавить декомпозицию для структуры
