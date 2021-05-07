@@ -236,15 +236,19 @@ namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
             {
                 foreach (var (vertices, edges, poles) in results)
                 {
-                    var hpGraph = new HPGraph();
-                    hpGraph.Vertices.AddRange(vertices.Values);
-                    hpGraph.ExternalPoles.AddRange(poles.Values.Where(x => x.VertexOwner == null));
-                    hpGraph.Edges.AddRange(edges.Values);
+                    if (vertices.Values.All(x => x.OwnerGraph == this) && edges.Values.All(x => x.OwnerGraph == this)
+                        && poles.Values.All(x => x.VertexOwner != null && x.VertexOwner.OwnerGraph == this))
+                    {
+                        var hpGraph = new HPGraph();
+                        hpGraph.Vertices.AddRange(vertices.Values);
+                        hpGraph.ExternalPoles.AddRange(poles.Values.Where(x => x.VertexOwner == null));
+                        hpGraph.Edges.AddRange(edges.Values);
 
-                    DeleteSubgraph(hpGraph, vertices);
-                    var insertedGraph = InitializeSubgraph(rightPart);
-                    var dict = poles.ToDictionary(x => x.Key.Id, x => x.Value);
-                    AddSubgraph(insertedGraph, dict);
+                        DeleteSubgraph(hpGraph, vertices);
+                        var insertedGraph = InitializeSubgraph(rightPart);
+                        var dict = poles.ToDictionary(x => x.Key.Id, x => x.Value);
+                        AddSubgraph(insertedGraph, dict);
+                    }
                 }
             }
             finally 

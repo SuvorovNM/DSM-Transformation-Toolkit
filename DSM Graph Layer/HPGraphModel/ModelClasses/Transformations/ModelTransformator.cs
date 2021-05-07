@@ -102,12 +102,12 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations
                 else
                 {
                     // Если не совпало, необходимо учесть неполные вершины
-                    var verticies = hyperedgeConn.Ports.Select(y => y.EntityOwner).Distinct();
+                    var vertices = hyperedgeConn.Ports.Select(y => y.EntityOwner).Distinct();
                     foreach (var v in connectedVertices)
                     {
                         if (CorrespondingVerticies.TryGetValue(v, out var targetVerticies))
                         {
-                            addedEntities.AddRange(targetVerticies.Where(x => verticies.Contains(x.BaseElement)));
+                            addedEntities.AddRange(targetVerticies.Where(x => vertices.Contains(x.BaseElement)));
                         }
                     }
 

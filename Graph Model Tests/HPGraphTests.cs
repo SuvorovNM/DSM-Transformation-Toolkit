@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using DSM_Graph_Layer.HPGraphModel.GraphClasses;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses;
 
 namespace Graph_Model_Tests
 {
@@ -26,14 +27,6 @@ namespace Graph_Model_Tests
 
             var newHPGraph = CreateRandomGraph();
             vertex.AddDecomposition(newHPGraph);
-        }
-
-        [Test]
-        public void CreateNewRoleTest()
-        {
-            var testRole = new Role("Ассоциация");
-
-            Assert.IsTrue(testRole.OppositeRole != null && testRole.OppositeRole.Label == testRole.Label && testRole.OppositeRole.OppositeRole == testRole);
         }
 
         #region Manipulations with verticies
@@ -385,7 +378,7 @@ namespace Graph_Model_Tests
         }
 
         [Test]
-        public void SingleIncompleteVertexSubgraphSearch() // TODO: Корректный ли тест??
+        public void SinglePoleVertexSubgraphSearch() // TODO: Корректный ли тест??
         {
             var newHPGraph = new HPGraph();
             var vertex = new Vertex();

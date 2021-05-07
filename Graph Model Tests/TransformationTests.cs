@@ -32,7 +32,7 @@ namespace Graph_Model_Tests
         {
             var sourceModel = erDiagram.Metamodel;
             var targetModel = classDiagram.Metamodel;
-            var pattern = erDiagram.GetSourceAttributeSubmodel();
+            var pattern = erDiagram.GetEntitySubmodel();
             var rightPart = classDiagram.GetClassAssociationSubmodel();
 
             var transformationRule = new TransformationRule(pattern, rightPart, "TestRule");
@@ -48,7 +48,7 @@ namespace Graph_Model_Tests
         {
             var sourceModel = erDiagram.Metamodel;
             var targetModel = classDiagram.Metamodel;
-            var pattern = erDiagram.GetSourceAttributeSubmodel();
+            var pattern = erDiagram.GetEntitySubmodel();
             var rightPart = classDiagram.GetClassAssociationSubmodel();
 
             var transformationRule = new TransformationRule(pattern, rightPart, "TestRule");
@@ -73,7 +73,7 @@ namespace Graph_Model_Tests
         {
             var sourceModel = erDiagram.Metamodel;
             var targetModel = classDiagram.Metamodel;
-            var pattern = erDiagram.GetSourceAttributeSubmodel();
+            var pattern = erDiagram.GetEntitySubmodel();
             var rightPart = classDiagram.GetClassAssociationSubmodel();
 
             var transformationRule = new TransformationRule(pattern, rightPart, "TestRule");
@@ -105,7 +105,7 @@ namespace Graph_Model_Tests
             var sourceModel = erDiagram.Metamodel;
             var targetModel = classDiagram.Metamodel;
 
-            var pattern1 = erDiagram.GetSourceAttributeSubmodel();
+            var pattern1 = erDiagram.GetEntitySubmodel();
             var rightPart1 = classDiagram.GetClassSubmodel();
             var pattern2 = erDiagram.GetLinkSubmodel();
             var rightPart2 = classDiagram.GetAssociationSubmodel();            
@@ -149,7 +149,7 @@ namespace Graph_Model_Tests
             var sourceModel = erDiagram.Metamodel;
             var targetModel = classDiagram.Metamodel;
 
-            var pattern1 = erDiagram.GetSourceAttributeSubmodel();
+            var pattern1 = erDiagram.GetEntitySubmodel();
             var rightPart1 = classDiagram.GetClassSubmodel();
             var pattern2 = erDiagram.GetLinkSubmodel();
             var rightPart2 = classDiagram.GetAssociationSubmodel();
@@ -297,7 +297,7 @@ namespace Graph_Model_Tests
             var sourceModel = erDiagram.Metamodel;
             var targetModel = classDiagram.Metamodel;
 
-            var pattern1 = erDiagram.GetSourceAttributeSubmodel();
+            var pattern1 = erDiagram.GetEntitySubmodel();
             var rightPart1 = classDiagram.GetClassSubmodel();
             var pattern2 = erDiagram.GetLinkSubmodel();
             var rightPart2 = classDiagram.GetAssociationSubmodel();

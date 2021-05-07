@@ -22,9 +22,11 @@ namespace Graph_Model_Tests.Metamodels
             var inheritanceRole = new Role("Наследование-родитель");
             var inheritanceRole1 = new Role(inheritanceRole, "Наследование потомок");
             model.AddNewRolePairToGraph(inheritanceRole);
+            var aggregationRole = new Role("Агрегация");
+            model.AddNewRolePairToGraph(aggregationRole);
 
             var entity = new EntityVertex("Класс");
-            var entityLinksPort = new EntityPort("Связи", new[] { associationRole, inheritanceRole, inheritanceRole1 });
+            var entityLinksPort = new EntityPort("Связи", new[] { associationRole, inheritanceRole, inheritanceRole1, aggregationRole, aggregationRole.OppositeRole });
             entity.AddPortToEntity(entityLinksPort);
             entity.Attributes.Add(new ElementAttribute("string", "Имя"));
             entity.Attributes.Add(new ElementAttribute("string", "Описание"));
@@ -36,6 +38,8 @@ namespace Graph_Model_Tests.Metamodels
             entityLink.SetLabel("Ассоциация");
             var entityInh = model.AddHyperedgeWithRelation(entityLinksPort, entityLinksPort, inheritanceRole);
             entityInh.SetLabel("Наследование");
+            var entityAggr = model.AddHyperedgeWithRelation(entityLinksPort, entityLinksPort, aggregationRole);
+            entityAggr.SetLabel("Агрегация");
 
             return model;
         }

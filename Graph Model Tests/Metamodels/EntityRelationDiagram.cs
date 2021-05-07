@@ -67,13 +67,14 @@ namespace Graph_Model_Tests.Metamodels
             return model;
         }
 
-        public ModelForTransformation GetSourceAttributeSubmodel()
+        public ModelForTransformation GetEntitySubmodel()
         {
             var sourceEntity = Metamodel.Entities.First(x => x.Label == "Сущность");
-            var sourceAttr = Metamodel.Entities.First(x => x.Label == "Атрибут");
-            var sourceHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Принадлежит" && x.Relations.Any(x => x.CorrespondingPort.EntityOwner == sourceEntity));
-            var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;
-            var pattern = new ModelForTransformation(new[] { sourceEntity, sourceAttr }, new[] { sourceHyperedge });
+            //var sourceAttr = Metamodel.Entities.First(x => x.Label == "Атрибут");
+            //var sourceHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Принадлежит" && x.Relations.Any(x => x.CorrespondingPort.EntityOwner == sourceEntity));
+            //var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;
+            //
+            var pattern = new ModelForTransformation(new[] { sourceEntity}, null);
             return pattern;
         }
         public ModelForTransformation GetLinkSubmodel()

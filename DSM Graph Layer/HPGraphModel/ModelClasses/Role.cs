@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DSM_Graph_Layer.HPGraphModel
+namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
     /// <summary>
     /// Роль - устанавливается для портов (список ролей, которые они могут принимать) и отношений (роль, соответствующая отношению)
