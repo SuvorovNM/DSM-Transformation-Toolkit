@@ -251,7 +251,7 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
                 // Если прообраз найден, то создать экземпляр первого добавленного в метамодель гиперребра
                 if (appropriateHyperedges.Any())
                 {
-                    hyperedge = appropriateHyperedges.First().Instantiate("");
+                    hyperedge = appropriateHyperedges.First().Instantiate(appropriateHyperedges.First()?.Label ?? "");
                     AddNewHyperedgeVertex(hyperedge);
 
                     rel1 = hyperedge.Relations.Where(x => x.RelationRole == role && x.CorrespondingPort == null).First();

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Graph_Model_Tests.Metamodels
 {
-    class ClassDiagram : AbstractDiagram
+    public class ClassDiagram : AbstractDiagram
     {
         public ClassDiagram() : base()
         {

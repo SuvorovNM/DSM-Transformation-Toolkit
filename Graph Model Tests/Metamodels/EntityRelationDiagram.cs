@@ -67,13 +67,57 @@ namespace Graph_Model_Tests.Metamodels
             return model;
         }
 
+        public Model GetSampleModel()
+        {
+            var model = Metamodel.Instantiate("ER Diagram Instance");
+            var person = Metamodel.Entities.First(x => x.Label == "Сущность").Instantiate("Человек");
+            var fio = Metamodel.Entities.First(x => x.Label == "Атрибут").Instantiate("ФИО");
+            model.AddNewEntityVertex(person);
+            model.AddNewEntityVertex(fio);
+            model.AddHyperedgeWithRelation(person, fio, Metamodel.Roles.First(x => x.Label == "Владелец атрибута"));
+
+            var teacher = Metamodel.Entities.First(x => x.Label == "Сущность").Instantiate("Учитель");
+            var post = Metamodel.Entities.First(x => x.Label == "Атрибут").Instantiate("Должность");
+            model.AddNewEntityVertex(teacher);
+            model.AddNewEntityVertex(post);
+            model.AddHyperedgeWithRelation(teacher, post, Metamodel.Roles.First(x => x.Label == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(teacher, person, Metamodel.Roles.First(x => x.Label == "Источник связи"));
+
+            var student = Metamodel.Entities.First(x => x.Label == "Сущность").Instantiate("Ученик");
+            var stage = Metamodel.Entities.First(x => x.Label == "Атрибут").Instantiate("Направление");
+            model.AddNewEntityVertex(student);
+            model.AddNewEntityVertex(stage);
+            model.AddHyperedgeWithRelation(student, stage, Metamodel.Roles.First(x => x.Label == "Владелец атрибута"));
+            model.AddHyperedgeWithRelation(student, person, Metamodel.Roles.First(x => x.Label == "Источник связи"));
+
+            var examCard = Metamodel.Entities.First(x => x.Label == "Сущность").Instantiate("Билет");
+            var question = Metamodel.Entities.First(x => x.Label == "Атрибут").Instantiate("Вопрос");
+            model.AddNewEntityVertex(examCard);
+            model.AddNewEntityVertex(question);
+            model.AddHyperedgeWithRelation(examCard, question, Metamodel.Roles.First(x => x.Label == "Владелец атрибута"));
+
+            var educating = Metamodel.Entities.First(x => x.Label == "Связь").Instantiate("Сдавать экзамен");
+            model.AddNewEntityVertex(educating);
+            model.AddHyperedgeWithRelation(teacher, educating, Metamodel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(student, educating, Metamodel.Roles.First(x => x.Label == "Приемник связи"));
+
+            var gettingCard = Metamodel.Entities.First(x => x.Label == "Связь").Instantiate("Тянет");
+            model.AddNewEntityVertex(gettingCard);
+            model.AddHyperedgeWithRelation(student, gettingCard, Metamodel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(examCard, gettingCard, Metamodel.Roles.First(x => x.Label == "Приемник связи"));
+
+            var creatingCard = Metamodel.Entities.First(x => x.Label == "Связь").Instantiate("Составляет");
+            model.AddNewEntityVertex(creatingCard);
+            model.AddHyperedgeWithRelation(teacher, creatingCard, Metamodel.Roles.First(x => x.Label == "Приемник связи"));
+            model.AddHyperedgeWithRelation(examCard, creatingCard, Metamodel.Roles.First(x => x.Label == "Приемник связи"));
+
+            return model;
+        }
+
         public ModelForTransformation GetEntitySubmodel()
         {
             var sourceEntity = Metamodel.Entities.First(x => x.Label == "Сущность");
-            //var sourceAttr = Metamodel.Entities.First(x => x.Label == "Атрибут");
-            //var sourceHyperedge = Metamodel.Hyperedges.First(x => x.Label == "Принадлежит" && x.Relations.Any(x => x.CorrespondingPort.EntityOwner == sourceEntity));
-            //var sourceHyperedgeConnector = sourceHyperedge.CorrespondingHyperedge;
-            //
+
             var pattern = new ModelForTransformation(new[] { sourceEntity}, null);
             return pattern;
         }
