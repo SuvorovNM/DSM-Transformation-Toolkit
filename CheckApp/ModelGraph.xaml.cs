@@ -53,14 +53,13 @@ namespace CheckApp
 
         private void GenerateGraph()
         {
-            Random rnd = new Random();
             var graph = new GraphExample();
             foreach (var ent in Model.Entities)
             {
                 var vertex = new DataVertex { Name = ent.Label, ID = ent.Id, Text = ent.Label };
                 graph.AddVertex(vertex);
             }
-            foreach(var hyp in Model.Hyperedges)
+            foreach (var hyp in Model.Hyperedges)
             {
                 var vertex = new DataVertex { Name = hyp.Label, ID = hyp.Id, Text = hyp.Label };
                 graph.AddVertex(vertex);
@@ -68,37 +67,49 @@ namespace CheckApp
             var logicCore = new LogicCoreExample
             {
                 Graph = graph
-
             };
 
-            var vList = logicCore.Graph.Vertices.ToList();
-
-            //add edges
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[0], vList[1], 3, 2);
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[0], vList[2], 4, 2);
-
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[1], vList[3], 3, 1);
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[3], vList[5], 2, 3);
-
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[2], vList[4], 4, 2);
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[4], vList[5], 1, 4);
-
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[5], vList[1], 1, 4);
-            ShowcaseHelper.AddEdge(logicCore.Graph, vList[5], vList[2], 2, 3);
+            var vList = logicCore.Graph.Vertices.ToDictionary(x=>x.ID);
 
             graphArea.LogicCore = logicCore;
 
-            graphArea.LogicCore.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.EfficientSugiyama;
-            graphArea.SetVerticesMathShape(VertexShape.Circle);            
+            graphArea.LogicCore.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.LinLog;//ISOM KK CompoundFDP FR! LinLog
+            graphArea.SetVerticesMathShape(VertexShape.Circle);
             graphArea.GenerateGraph(true);
 
-            foreach (var item in graphArea.VertexList.Values)
+            foreach (var item in graphArea.VertexList.Keys)
             {
-                item.VertexConnectionPointsList.Clear();
+                var poleCount = Model.Vertices.First(x => x.Id == item.ID).Poles.Count;
+                graphArea.VertexList[item].SetConnectionPointsVisibility(false);
+                graphArea.VertexList[item].VertexConnectionPointsList.Clear();
+                graphArea.VertexList[item].VCPRoot.Children.Clear();
+
+                foreach (var pole in Model.Vertices.First(x => x.Id == item.ID).Poles)
+                {
+                    var vcp = new GraphX.Controls.StaticVertexConnectionPoint { Id = (int)pole.Id, Tag = pole };
+                    var ctrl = new Border { Margin = new Thickness(2, 2, 0, 2), Padding = new Thickness(0), Child = vcp };
+                    graphArea.VertexList[item].VCPRoot.Children.Add(ctrl);
+                    graphArea.VertexList[item].VertexConnectionPointsList.Add(vcp);
+                }
             }
-            //settings
+            foreach (var hedge in Model.HyperedgeConnectors)
+            {
+                foreach (var link in hedge.Links)
+                {
+                    ShowcaseHelper.AddEdge(logicCore.Graph, vList[(int)link.SourcePole.VertexOwner.Id], vList[(int)link.TargetPole.VertexOwner.Id], (int)link.SourcePole.Id, (int)link.TargetPole.Id);
+                }
+            }
+            graphArea.RelayoutGraph(true);
+            foreach (var edge in graphArea.EdgesList.Values)
+            {
+                edge.ShowArrows = false;
+                edge.UpdateLayout();
+                edge.DetachLabels();
+            }
+
             graphArea.SetVerticesDrag(true, true);
             graphArea.SetEdgesDrag(true);
+            graphArea.SetEdgesDashStyle(GraphX.Controls.EdgeDashStyle.Solid);
             graphArea.UpdateLayout();
             zoomControl.ZoomToFill();
         }

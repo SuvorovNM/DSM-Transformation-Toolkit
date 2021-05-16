@@ -44,7 +44,6 @@ namespace CheckApp
             var edge = new DataEdge(source, target, weight)
             {
                 ID = Rand.Next(),
-                Text = "Sample",
                 SourceConnectionPointId = sourcePoint,
                 TargetConnectionPointId = targetPoint,
                 ToolTipText = "Label " + source.ID
