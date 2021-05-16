@@ -1,0 +1,55 @@
+﻿<Window x:Class="CheckApp.TestTransform"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="http://schemas.panthernet.ru/graphx/"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:CheckApp"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:wpf="clr-namespace:CheckApp"
+             d:DesignHeight="300"
+             d:DesignWidth="600"
+             mc:Ignorable="d"
+        Title="TestTransform" Height="450" Width="800" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="MiniFeatures.xaml" />
+                    <ResourceDictionary Source="LayoutTemplate.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </Grid.Resources>
+        <Border Margin="0,0,449,0"
+                BorderBrush="Black"
+                BorderThickness="1">
+            <controls:ZoomControl x:Name="zoomControl"
+                                  VerticalAlignment="Center"
+                                  HorizontalContentAlignment="Center"
+                                  Background="{DynamicResource ButtonBackground}"
+                                  Foreground="{DynamicResource ButtonText}">
+                <wpf:GraphAreaExample x:Name="graphArea" />
+            </controls:ZoomControl>
+        </Border>
+        <Border Margin="442,0,0,0"
+                BorderBrush="Black"
+                BorderThickness="1">
+            <controls:ZoomControl x:Name="zoomControl1"
+                                  VerticalAlignment="Center"
+                                  HorizontalContentAlignment="Center"
+                                  Background="{DynamicResource ButtonBackground}"
+                                  Foreground="{DynamicResource ButtonText}">
+                <wpf:GraphAreaExample x:Name="graphArea1"/>
+            </controls:ZoomControl>
+        </Border>
+        <Border BorderThickness="1" Margin="251,44,252,5">
+            <Label x:Name="NumberLabel" Content="0" VerticalAlignment="Top" Margin="0,96,0,0"/>
+        </Border>
+        <Border BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Center" Height="69" Margin="0,62,0,0" VerticalAlignment="Top" Width="72">
+            <Button x:Name="UpButton" FontFamily="Marlett" FontSize="20" Content="5" Click="UpButton_Click" Margin="15,13,14,14"/>
+        </Border>
+        <Border BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Center" Height="66" Margin="0,191,0,0" VerticalAlignment="Top" Width="72">
+            <Button x:Name="DownButton" FontFamily="Marlett" FontSize="20" Content="6" Click="DownButton_Click" Margin="16,12,14,12"/>
+        </Border>
+    </Grid>
+</Window>

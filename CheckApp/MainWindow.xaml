@@ -27,7 +27,7 @@
                 <MenuItem x:Name="DeleteMenuItem" Header="Удалить" Click="DeleteMenuItem_Click"/>
             </MenuItem>
             <MenuItem Header="Трансформации">
-                <MenuItem Header="Посмотреть правила"/>
+                <MenuItem x:Name="ViewRulesMenuItem" Header="Посмотреть правила" Click="ViewRulesMenuItem_Click"/>
                 <MenuItem Header="Выполнить преобразование в..."/>
             </MenuItem>
         </Menu>

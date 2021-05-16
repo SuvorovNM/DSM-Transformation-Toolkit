@@ -14,6 +14,10 @@ namespace Graph_Model_Tests.Metamodels
         {
 
         }
+        public ClassDiagram(Model metamodel)
+        {
+            Metamodel = metamodel;
+        }
         protected override Model CreateDiagram()
         {
             var model = new Model("Connected Entities Diagram");

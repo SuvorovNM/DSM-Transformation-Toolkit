@@ -13,6 +13,11 @@ namespace Graph_Model_Tests.Metamodels
         public EntityRelationDiagram() : base()
         {
         }
+
+        public EntityRelationDiagram(Model metamodel)
+        {
+            Metamodel = metamodel;
+        }
         protected override Model CreateDiagram()
         {
             var model = new Model("Entity-Relation Diagram");
@@ -134,6 +139,26 @@ namespace Graph_Model_Tests.Metamodels
 
             var pattern = new ModelForTransformation(null, new[] { inhLink });
             return pattern;
+        }
+
+        public void AddTransformationsToTargetMetamodel(Model cDiagram)
+        {
+            var classDiagram = new ClassDiagram(cDiagram);
+            var targetModel = classDiagram.Metamodel;
+
+            var pattern1 = GetEntitySubmodel();
+            var rightPart1 = classDiagram.GetClassSubmodel();
+            var pattern2 = GetLinkSubmodel();
+            var rightPart2 = classDiagram.GetAssociationSubmodel();
+            var pattern3 = GetSuperentitySubentitySubmodel();
+            var rightPart3 = classDiagram.GetInheritanceSubmodel();
+
+            var transformationRule1 = new TransformationRule(pattern1, rightPart1, "TestRule 1");
+            var transformationRule2 = new TransformationRule(pattern2, rightPart2, "TestRule 2");
+            var transformationRule3 = new TransformationRule(pattern3, rightPart3, "TestRule 3");
+            Metamodel.AddTransformationRule(targetModel, transformationRule1);
+            Metamodel.AddTransformationRule(targetModel, transformationRule2);
+            Metamodel.AddTransformationRule(targetModel, transformationRule3);
         }
     }
 }

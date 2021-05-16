@@ -32,8 +32,9 @@ namespace CheckApp
         public MainWindow()
         {
             InitializeComponent();
-            var erDiagram = new EntityRelationDiagram();
+            var erDiagram = new EntityRelationDiagram();            
             var classDiagram = new ClassDiagram();
+            erDiagram.AddTransformationsToTargetMetamodel(classDiagram.Metamodel);
 
             models = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, erDiagram.GetSampleModel()};
 
@@ -95,7 +96,7 @@ namespace CheckApp
             {
                 Window window = new Window
                 {
-                    Title = "My User Control Dialog",
+                    Title = "Model View",
                     Content = new ModelGraph(chosenModel)
                 };
 
@@ -180,6 +181,21 @@ namespace CheckApp
                         chosenModel.Label = changeNameWindow.ModelName;
                         (MetamodelListBox.SelectedItem as ListBoxItem).Content = chosenModel.Label;
                     }
+                }
+            }
+        }
+
+        private void ViewRulesMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (MetamodelListBox.SelectedItem as ListBoxItem != null && ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Any())
+            {
+                var availableMetamodels = ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.ToList();
+                ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
+                if (chooseMetamodelWindow.ShowDialog() == true)
+                {
+                    var chosenMetamodel = chooseMetamodelWindow.ChosenModel;
+                    var wind = new TestTransform(((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations[chosenMetamodel]);
+                    wind.ShowDialog();
                 }
             }
         }
