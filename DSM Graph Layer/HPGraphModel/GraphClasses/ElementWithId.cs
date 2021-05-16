@@ -4,6 +4,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
+    [Serializable]
     public abstract class ElementWithId
     {
         /// <summary>

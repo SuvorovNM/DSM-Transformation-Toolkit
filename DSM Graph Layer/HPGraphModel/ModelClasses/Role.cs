@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    [Serializable]
     /// <summary>
     /// Роль - устанавливается для портов (список ролей, которые они могут принимать) и отношений (роль, соответствующая отношению)
     /// </summary>

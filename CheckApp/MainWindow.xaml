@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <ListBox x:Name="MetamodelListBox" HorizontalAlignment="Left" Height="327" Margin="37,62,0,0" VerticalAlignment="Top" Width="225" SelectionChanged="MetamodelListBox_SelectionChanged"/>
+        <ListBox x:Name="MetamodelListBox" HorizontalAlignment="Left" Height="327" Margin="37,62,0,0" VerticalAlignment="Top" Width="225" SelectionChanged="MetamodelListBox_SelectionChanged" MouseUp="MetamodelListBox_MouseUp"/>
         <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="327" Margin="284,62,0,0" VerticalAlignment="Top" Width="225" SelectionChanged="ModelListBox_SelectionChanged"/>
         <ListBox x:Name="EntityListBox" HorizontalAlignment="Left" Height="150" Margin="530,62,0,0" VerticalAlignment="Top" Width="225"/>
         <ListBox x:Name="HyperedgeListBox" HorizontalAlignment="Left" Height="150" Margin="530,239,0,0" VerticalAlignment="Top" Width="225"/>
@@ -20,10 +20,11 @@
                 <MenuItem.Header>
                     <TextBlock Text="Модель" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="21,0,-21,0"/>
                 </MenuItem.Header>
-                <MenuItem Header="Открыть из файла..."/>
+                <MenuItem x:Name="OpenMenuItem" Header="Открыть из файла..." Click="OpenMenuItem_Click"/>
                 <MenuItem x:Name="ShowMenuItem" Header="Показать" Click="ShowMenuItem_Click"/>
-                <MenuItem Header="Изменить название"/>
-                <MenuItem Header="Сохранить"/>
+                <MenuItem x:Name="ChangeNameMenuItem" Header="Изменить название" Click="ChangeNameMenuItem_Click"/>
+                <MenuItem x:Name="SaveMenuItem" Header="Сохранить" Click="SaveMenuItem_Click"/>
+                <MenuItem x:Name="DeleteMenuItem" Header="Удалить" Click="DeleteMenuItem_Click"/>
             </MenuItem>
             <MenuItem Header="Трансформации">
                 <MenuItem Header="Посмотреть правила"/>

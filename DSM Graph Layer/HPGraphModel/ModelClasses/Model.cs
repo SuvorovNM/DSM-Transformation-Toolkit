@@ -10,6 +10,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    [Serializable]
     /// <summary>
     /// Непосредственно модель, с которой пользователь производит взаимодействие
     /// </summary>

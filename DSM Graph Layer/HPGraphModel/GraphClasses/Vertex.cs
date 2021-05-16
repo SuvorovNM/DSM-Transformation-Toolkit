@@ -6,6 +6,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
+    [Serializable]
     /// <summary>
     /// Вершина HP-графа
     /// </summary>

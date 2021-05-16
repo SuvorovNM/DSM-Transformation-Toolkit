@@ -5,6 +5,7 @@ using DSM_Graph_Layer.HPGraphModel.GraphClasses.IsomorphicSubgraphMatching;
 
 namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
+    [Serializable]
     public class HPGraph : ElementWithId
     {
         /// <summary>

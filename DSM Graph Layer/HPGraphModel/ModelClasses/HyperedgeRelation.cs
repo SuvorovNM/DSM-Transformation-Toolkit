@@ -6,6 +6,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    [Serializable]
     /// <summary>
     /// Отношение - является полюсом вершины-гиперребра
     /// </summary>

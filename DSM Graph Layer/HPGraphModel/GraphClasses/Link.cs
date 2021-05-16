@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
+    [Serializable]
     public class Link : ElementWithId
     {
         /// <summary>

@@ -7,6 +7,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
 {
+    [Serializable]
     /// <summary>
     /// Порт сущности
     /// </summary>

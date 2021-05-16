@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
+    [Serializable]
     /// <summary>
     /// Структура HP-графа: вершина или гиперребро
     /// </summary>

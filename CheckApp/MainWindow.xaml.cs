@@ -14,6 +14,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using Microsoft.Win32;
 
 namespace CheckApp
 {
@@ -39,13 +45,17 @@ namespace CheckApp
 
         private void MetamodelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var chosenItem = (MetamodelListBox.SelectedItem as ListBoxItem).Tag as Model;
-            FillVerticesInfo(chosenItem);
-
             ModelListBox.Items.Clear();
-            foreach (var model in chosenItem.Instances)
+            if (e.AddedItems.Count != 0)
             {
-                ModelListBox.Items.Add(new ListBoxItem { Tag = model, Content = model.Label });
+                var chosenItem = (MetamodelListBox.SelectedItem as ListBoxItem).Tag as Model;
+                FillVerticesInfo(chosenItem);
+
+                ModelListBox.Items.Clear();
+                foreach (var model in chosenItem.Instances)
+                {
+                    ModelListBox.Items.Add(new ListBoxItem { Tag = model, Content = model.Label });
+                }
             }
         }
 
@@ -79,13 +89,99 @@ namespace CheckApp
 
         private void ShowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Window window = new Window
-            {
-                Title = "My User Control Dialog",
-                Content = new ModelGraph((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model ?? (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model)
-            };
+            var chosenModel = (ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model ?? (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
 
-            window.ShowDialog();
+            if (chosenModel != null)
+            {
+                Window window = new Window
+                {
+                    Title = "My User Control Dialog",
+                    Content = new ModelGraph(chosenModel)
+                };
+
+                window.ShowDialog();
+            }
+        }
+
+        private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var chosenMetamodel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
+            if (chosenMetamodel != null)
+            {
+                var sfd = new SaveFileDialog();
+                sfd.Filter = "Model files (*.hpmodel) | *.hpmodel";
+                if (sfd.ShowDialog() == true)
+                {
+                    IFormatter formatter = new BinaryFormatter();
+                    Stream stream = sfd.OpenFile();
+                    formatter.Serialize(stream, chosenMetamodel);
+                    stream.Close();
+                }
+            }
+        }
+
+        private void OpenMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "Model files (*.hpmodel) | *.hpmodel";
+            if (ofd.ShowDialog() == true)
+            {
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = ofd.OpenFile();
+                var resultMetamodel = (Model)formatter.Deserialize(stream);
+                stream.Close();
+
+                MetamodelListBox.Items.Add(new ListBoxItem { Tag = resultMetamodel, Content = resultMetamodel.Label });
+            }            
+        }
+
+        private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Model chosenModel = null;
+
+            if (ModelListBox.SelectedItem as ListBoxItem != null)
+            {
+                chosenModel = (ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
+                ModelListBox.Items.RemoveAt(MetamodelListBox.SelectedIndex);                
+            }
+            else if (MetamodelListBox.SelectedItem as ListBoxItem != null)
+            {
+                chosenModel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
+                MetamodelListBox.Items.RemoveAt(MetamodelListBox.SelectedIndex);
+            }
+            if (chosenModel?.BaseElement != null)
+            {
+                chosenModel.BaseElement.Instances.Remove(chosenModel);
+            }
+        }
+
+        private void MetamodelListBox_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            ModelListBox.SelectedIndex = -1;
+        }
+
+        private void ChangeNameMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (ModelListBox.SelectedItem as ListBoxItem != null || MetamodelListBox.SelectedItem as ListBoxItem != null)
+            {
+                Model chosenModel = null;
+                ChangeName changeNameWindow = new ChangeName();
+                if (changeNameWindow.ShowDialog() == true)
+                {
+                    if (ModelListBox.SelectedItem as ListBoxItem != null)
+                    {
+                        chosenModel = (ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
+                        chosenModel.Label = changeNameWindow.ModelName;
+                        (ModelListBox.SelectedItem as ListBoxItem).Content = chosenModel.Label;
+                    }
+                    else if (MetamodelListBox.SelectedItem as ListBoxItem != null)
+                    {
+                        chosenModel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
+                        chosenModel.Label = changeNameWindow.ModelName;
+                        (MetamodelListBox.SelectedItem as ListBoxItem).Content = chosenModel.Label;
+                    }
+                }
+            }
         }
     }
 }

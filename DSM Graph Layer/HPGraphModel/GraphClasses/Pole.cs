@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DSM_Graph_Layer.HPGraphModel.GraphClasses
 {
+    [Serializable]
     /// <summary>
     /// Полюс HP-графа
     /// </summary>
