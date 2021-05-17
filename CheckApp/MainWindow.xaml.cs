@@ -32,11 +32,19 @@ namespace CheckApp
         public MainWindow()
         {
             InitializeComponent();
-            var erDiagram = new EntityRelationDiagram();            
+            var erDiagram = new EntityRelationDiagram();
             var classDiagram = new ClassDiagram();
-            erDiagram.AddTransformationsToTargetMetamodel(classDiagram.Metamodel);
+            var ebbDiagram = new EntityBasedBusDiagram();
+            var hbbDiagram = new HyperedgeBasedBusDiagram();
 
-            models = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, erDiagram.GetSampleModel()};
+            erDiagram.GetSampleModel();            
+            erDiagram.AddTransformationsToTargetMetamodel(classDiagram.Metamodel);
+            ebbDiagram.GetSampleModel();
+            ebbDiagram.AddTransformationsToTargetModel(hbbDiagram.Metamodel);
+            hbbDiagram.GetSampleModel();
+            hbbDiagram.AddTransformationsToTargetModel(ebbDiagram.Metamodel);            
+
+            models = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, ebbDiagram.Metamodel, hbbDiagram.Metamodel};
 
             foreach(var model in models.Where(x => x.BaseElement == null))
             {
@@ -58,6 +66,11 @@ namespace CheckApp
                     ModelListBox.Items.Add(new ListBoxItem { Tag = model, Content = model.Label });
                 }
             }
+            else
+            {
+                EntityListBox.Items.Clear();
+                HyperedgeListBox.Items.Clear();
+            }
         }
 
         private void ModelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -65,6 +78,11 @@ namespace CheckApp
             if (e.AddedItems.Count != 0)
             {
                 var chosenItem = (ModelListBox.SelectedItem as ListBoxItem).Tag as Model;
+                FillVerticesInfo(chosenItem);
+            }
+            else
+            {
+                var chosenItem = (MetamodelListBox.SelectedItem as ListBoxItem).Tag as Model;
                 FillVerticesInfo(chosenItem);
             }
         }
@@ -143,12 +161,14 @@ namespace CheckApp
             if (ModelListBox.SelectedItem as ListBoxItem != null)
             {
                 chosenModel = (ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
-                ModelListBox.Items.RemoveAt(MetamodelListBox.SelectedIndex);                
+                ModelListBox.Items.RemoveAt(ModelListBox.SelectedIndex);
+                ModelListBox.SelectedIndex = -1;
             }
             else if (MetamodelListBox.SelectedItem as ListBoxItem != null)
             {
                 chosenModel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
                 MetamodelListBox.Items.RemoveAt(MetamodelListBox.SelectedIndex);
+                MetamodelListBox.SelectedIndex = -1;
             }
             if (chosenModel?.BaseElement != null)
             {
@@ -196,6 +216,31 @@ namespace CheckApp
                     var chosenMetamodel = chooseMetamodelWindow.ChosenModel;
                     var wind = new TestTransform(((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations[chosenMetamodel]);
                     wind.ShowDialog();
+                }
+            }
+        }
+
+        private void ExecuteTransformationTo_Click(object sender, RoutedEventArgs e)
+        {
+            if (ModelListBox.SelectedItem as ListBoxItem != null && ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Any())
+            {
+                var availableMetamodels = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.ToList();
+                ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
+                if (chooseMetamodelWindow.ShowDialog() == true)
+                {
+                    var chosenMetamodel = chooseMetamodelWindow.ChosenModel;
+                    var result = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).ExecuteTransformations(chosenMetamodel);
+
+                    if (result != null)
+                    {
+                        Window window = new Window
+                        {
+                            Title = "Model View",
+                            Content = new ModelGraph(result)
+                        };
+
+                        window.ShowDialog();
+                    }
                 }
             }
         }

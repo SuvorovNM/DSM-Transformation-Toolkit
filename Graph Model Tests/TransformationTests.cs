@@ -206,35 +206,8 @@ namespace Graph_Model_Tests
             var sourceModel = hbBusDiagram.Metamodel;
             var targetModel = ebBusDiagram.Metamodel;
 
-            var pattern1 = hbBusDiagram.GetCpuSubmodel();
-            var rightPart1 = ebBusDiagram.GetCpuSubmodel();
-            var pattern2 = hbBusDiagram.GetRamSubmodel();
-            var rightPart2 = ebBusDiagram.GetRamSubmodel();
-            var pattern3 = hbBusDiagram.GetPeripherySubmodel();
-            var rightPart3 = ebBusDiagram.GetPeripherySubmodel();
-            var pattern4 = hbBusDiagram.GetBusHyperedgeSubmodel();
-            var rightPart4 = ebBusDiagram.GetBusHyperedgeSubmodel();
-
-            var transformationRule1 = new TransformationRule(pattern1, rightPart1, "TestRule 1");
-            var transformationRule2 = new TransformationRule(pattern2, rightPart2, "TestRule 2");
-            var transformationRule3 = new TransformationRule(pattern3, rightPart3, "TestRule 3");
-            var transformationRule4 = new TransformationRule(pattern4, rightPart4, "TestRule 4");
-            sourceModel.AddTransformationRule(targetModel, transformationRule1);
-            sourceModel.AddTransformationRule(targetModel, transformationRule2);
-            sourceModel.AddTransformationRule(targetModel, transformationRule3);
-            sourceModel.AddTransformationRule(targetModel, transformationRule4);
-
-            var busDiagram = sourceModel.Instantiate("Test Bus Diagram");
-            var proc = sourceModel.Entities.First(x => x.Label == "CPU").Instantiate("Intel Core i5-2400");
-            busDiagram.AddNewEntityVertex(proc);
-            var ram = sourceModel.Entities.First(x => x.Label == "RAM").Instantiate("DDR4 PC4-28800U");
-            busDiagram.AddNewEntityVertex(ram);
-            var periphery = sourceModel.Entities.First(x => x.Label == "Periphery").Instantiate("Монитор HP 25x");
-            busDiagram.AddNewEntityVertex(periphery);
-
-            var busLink = busDiagram.AddHyperedgeWithRelation(proc, ram, sourceModel.Roles.First());
-            busLink.AddRelationToHyperedge(ram, periphery, sourceModel.Roles.First());
-            busLink.AddRelationToHyperedge(periphery, proc, sourceModel.Roles.First());
+            hbBusDiagram.AddTransformationsToTargetModel(targetModel);
+            var busDiagram = hbBusDiagram.GetSampleModel();
 
             var resultModel = busDiagram.ExecuteTransformations(targetModel);
 
@@ -250,39 +223,10 @@ namespace Graph_Model_Tests
         public void VertexToComplexHyperedgeTransformationTest()
         {
             var sourceModel = ebBusDiagram.Metamodel;
-            var targetModel = hbBusDiagram.Metamodel; 
+            var targetModel = hbBusDiagram.Metamodel;
 
-            var pattern1 = ebBusDiagram.GetCpuSubmodel();
-            var rightPart1 = hbBusDiagram.GetCpuSubmodel();
-            var pattern2 = ebBusDiagram.GetRamSubmodel();
-            var rightPart2 = hbBusDiagram.GetRamSubmodel();
-            var pattern3 = ebBusDiagram.GetPeripherySubmodel();
-            var rightPart3 = hbBusDiagram.GetPeripherySubmodel();
-            var pattern4 = ebBusDiagram.GetBusEntitySubmodel();
-            var rightPart4 = hbBusDiagram.GetBusHyperedgeSubmodel();
-
-            var transformationRule1 = new TransformationRule(pattern1, rightPart1, "TestRule 1");
-            var transformationRule2 = new TransformationRule(pattern2, rightPart2, "TestRule 2");
-            var transformationRule3 = new TransformationRule(pattern3, rightPart3, "TestRule 3");
-            var transformationRule4 = new TransformationRule(pattern4, rightPart4, "TestRule 4");
-            sourceModel.AddTransformationRule(targetModel, transformationRule1);
-            sourceModel.AddTransformationRule(targetModel, transformationRule2);
-            sourceModel.AddTransformationRule(targetModel, transformationRule3);
-            sourceModel.AddTransformationRule(targetModel, transformationRule4);
-
-            var busDiagram = sourceModel.Instantiate("Test Bus Diagram");
-            var proc = sourceModel.Entities.First(x => x.Label == "CPU").Instantiate("Intel Core i5-2400");
-            busDiagram.AddNewEntityVertex(proc);
-            var ram = sourceModel.Entities.First(x => x.Label == "RAM").Instantiate("DDR4 PC4-28800U");
-            busDiagram.AddNewEntityVertex(ram);
-            var periphery = sourceModel.Entities.First(x => x.Label == "Periphery").Instantiate("Монитор HP 25x");
-            busDiagram.AddNewEntityVertex(periphery);
-            var bus = sourceModel.Entities.First(x => x.Label == "Bus").Instantiate("Шина компьютера");
-            busDiagram.AddNewEntityVertex(bus);
-
-            busDiagram.AddHyperedgeWithRelation(proc, bus, sourceModel.Roles.First(x=>x.Label== "Processor connection"));
-            busDiagram.AddHyperedgeWithRelation(ram, bus, sourceModel.Roles.First(x=>x.Label== "RAM Connection"));
-            busDiagram.AddHyperedgeWithRelation(periphery, bus, sourceModel.Roles.First(x=>x.Label== "Periphery connection"));
+            ebBusDiagram.AddTransformationsToTargetModel(targetModel);
+            var busDiagram = ebBusDiagram.GetSampleModel();
 
             var resultModel = busDiagram.ExecuteTransformations(targetModel);
 

@@ -31,7 +31,7 @@ namespace CheckApp
             Rules = rules;
             currentIndex = 0;
             DataContext = this;
-            NumberLabel.Content = currentIndex;
+            NumberLabel.Content = currentIndex + 1;
         }
 
         void FillRules()
@@ -100,7 +100,7 @@ namespace CheckApp
                 FillRules();
             }
             ValidateButtons();
-            NumberLabel.Content = currentIndex;
+            NumberLabel.Content = currentIndex + 1;
         }
 
         private void DownButton_Click(object sender, RoutedEventArgs e)
@@ -111,7 +111,7 @@ namespace CheckApp
                 FillRules();
             }
             ValidateButtons();
-            NumberLabel.Content = currentIndex;
+            NumberLabel.Content = currentIndex + 1;
         }
 
         private void ValidateButtons()

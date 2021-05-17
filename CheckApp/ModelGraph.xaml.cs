@@ -83,6 +83,7 @@ namespace CheckApp
                 graphArea.VertexList[item].SetConnectionPointsVisibility(false);
                 graphArea.VertexList[item].VertexConnectionPointsList.Clear();
                 graphArea.VertexList[item].VCPRoot.Children.Clear();
+                graphArea.VertexList[item].FontSize = 8;
 
                 foreach (var pole in Model.Vertices.First(x => x.Id == item.ID).Poles)
                 {

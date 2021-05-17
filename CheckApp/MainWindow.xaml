@@ -28,7 +28,7 @@
             </MenuItem>
             <MenuItem Header="Трансформации">
                 <MenuItem x:Name="ViewRulesMenuItem" Header="Посмотреть правила" Click="ViewRulesMenuItem_Click"/>
-                <MenuItem Header="Выполнить преобразование в..."/>
+                <MenuItem x:Name="ExecuteTransformationTo" Header="Выполнить преобразование в..." Click="ExecuteTransformationTo_Click"/>
             </MenuItem>
         </Menu>
 
