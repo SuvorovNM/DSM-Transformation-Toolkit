@@ -15,8 +15,8 @@
         <Grid.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="MiniFeatures.xaml" />
-                    <ResourceDictionary Source="LayoutTemplate.xaml" />
+                    <ResourceDictionary Source="ResourceDirectories/MiniFeatures.xaml" />
+                    <ResourceDictionary Source="ResourceDirectories/LayoutTemplate.xaml" />
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
         </Grid.Resources>

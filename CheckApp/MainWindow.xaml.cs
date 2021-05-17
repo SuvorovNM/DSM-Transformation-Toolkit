@@ -20,6 +20,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using Microsoft.Win32;
+using DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations;
 
 namespace CheckApp
 {
@@ -28,7 +29,7 @@ namespace CheckApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<Model> models;
+        List<Model> metamodels;
         public MainWindow()
         {
             InitializeComponent();
@@ -37,18 +38,18 @@ namespace CheckApp
             var ebbDiagram = new EntityBasedBusDiagram();
             var hbbDiagram = new HyperedgeBasedBusDiagram();
 
-            erDiagram.GetSampleModel();            
+            erDiagram.GetSampleModel();
             erDiagram.AddTransformationsToTargetMetamodel(classDiagram.Metamodel);
             ebbDiagram.GetSampleModel();
             ebbDiagram.AddTransformationsToTargetModel(hbbDiagram.Metamodel);
             hbbDiagram.GetSampleModel();
-            hbbDiagram.AddTransformationsToTargetModel(ebbDiagram.Metamodel);            
+            hbbDiagram.AddTransformationsToTargetModel(ebbDiagram.Metamodel);
 
-            models = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, ebbDiagram.Metamodel, hbbDiagram.Metamodel};
+            metamodels = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, ebbDiagram.Metamodel, hbbDiagram.Metamodel };
 
-            foreach(var model in models.Where(x => x.BaseElement == null))
+            foreach (var model in metamodels.Where(x => x.BaseElement == null))
             {
-                MetamodelListBox.Items.Add(new ListBoxItem {Tag = model, Content = model.Label });
+                MetamodelListBox.Items.Add(new ListBoxItem { Tag = model, Content = model.Label });
             }
         }
 
@@ -151,7 +152,13 @@ namespace CheckApp
                 stream.Close();
 
                 MetamodelListBox.Items.Add(new ListBoxItem { Tag = resultMetamodel, Content = resultMetamodel.Label });
-            }            
+                metamodels.Add(resultMetamodel);
+
+                foreach (var metamodel in metamodels.Where(x => x.Transformations.Any(y => y.Key.Id == resultMetamodel.Id)))
+                {
+                    metamodel.RedefineTransformation(resultMetamodel);
+                }
+            }
         }
 
         private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
@@ -167,6 +174,7 @@ namespace CheckApp
             else if (MetamodelListBox.SelectedItem as ListBoxItem != null)
             {
                 chosenModel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
+                metamodels.Remove(chosenModel);
                 MetamodelListBox.Items.RemoveAt(MetamodelListBox.SelectedIndex);
                 MetamodelListBox.SelectedIndex = -1;
             }
@@ -185,10 +193,10 @@ namespace CheckApp
         {
             if (ModelListBox.SelectedItem as ListBoxItem != null || MetamodelListBox.SelectedItem as ListBoxItem != null)
             {
-                Model chosenModel = null;
                 ChangeName changeNameWindow = new ChangeName();
                 if (changeNameWindow.ShowDialog() == true)
                 {
+                    Model chosenModel;
                     if (ModelListBox.SelectedItem as ListBoxItem != null)
                     {
                         chosenModel = (ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
@@ -207,24 +215,27 @@ namespace CheckApp
 
         private void ViewRulesMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (MetamodelListBox.SelectedItem as ListBoxItem != null && ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Any())
+            if (MetamodelListBox.SelectedItem as ListBoxItem != null && ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(metamodels).Any())
             {
-                var availableMetamodels = ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.ToList();
+                var availableMetamodels = ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(metamodels).ToList();
                 ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
                 if (chooseMetamodelWindow.ShowDialog() == true)
                 {
                     var chosenMetamodel = chooseMetamodelWindow.ChosenModel;
-                    var wind = new TestTransform(((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations[chosenMetamodel]);
-                    wind.ShowDialog();
+                    if (chosenMetamodel != null)
+                    {
+                        var wind = new TestTransform(((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations[chosenMetamodel]);
+                        wind.ShowDialog();
+                    }
                 }
             }
         }
 
         private void ExecuteTransformationTo_Click(object sender, RoutedEventArgs e)
         {
-            if (ModelListBox.SelectedItem as ListBoxItem != null && ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Any())
+            if (ModelListBox.SelectedItem as ListBoxItem != null && ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(metamodels).Any())
             {
-                var availableMetamodels = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.ToList();
+                var availableMetamodels = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(metamodels).ToList();
                 ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
                 if (chooseMetamodelWindow.ShowDialog() == true)
                 {
@@ -243,6 +254,6 @@ namespace CheckApp
                     }
                 }
             }
-        }
+        }        
     }
 }

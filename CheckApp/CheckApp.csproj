@@ -16,17 +16,4 @@
     <ProjectReference Include="..\Graph Model Tests\Graph Model Tests.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="TransformModel.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="TransformModel.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-
 </Project>

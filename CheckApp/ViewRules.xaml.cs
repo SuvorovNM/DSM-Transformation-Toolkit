@@ -25,71 +25,36 @@ namespace CheckApp
     {
         private List<TransformationRule> Rules { get; set; }
         private int currentIndex;
+        private int VisibleRuleNumber
+        {
+            get
+            {
+                return currentIndex + 1;
+            }
+        }
         public TestTransform(List<TransformationRule> rules)
         {
             InitializeComponent();
             Rules = rules;
             currentIndex = 0;
             DataContext = this;
-            NumberLabel.Content = currentIndex + 1;
+            NumberLabel.Content = VisibleRuleNumber;
         }
 
         void FillRules()
         {
-            GenerateGraph(graphArea, Rules[currentIndex].LeftPart);
-            zoomControl.ZoomToFill();
-            if (zoomControl.ViewFinder != null)
-                zoomControl.ViewFinder.Visibility = Visibility.Collapsed;
+            graphArea.GenerateGraph(Rules[currentIndex].LeftPart, false);
+            SetupZoom(zoomControl);
 
-            GenerateGraph(graphArea1, Rules[currentIndex].RightPart);
-            zoomControl1.ZoomToFill();
-            if (zoomControl1.ViewFinder != null)
-                zoomControl1.ViewFinder.Visibility = Visibility.Collapsed;
+            graphArea1.GenerateGraph(Rules[currentIndex].RightPart, false);
+            SetupZoom(zoomControl1);
         }
 
-        private void GenerateGraph(GraphAreaExample graphArea, Model model)
+        private void SetupZoom(GraphX.Controls.ZoomControl zoomcontrol)
         {
-            var graph = new GraphExample();
-            foreach (var ent in model.Entities)
-            {
-                var vertex = new DataVertex { Name = ent.Label, ID = ent.Id, Text = ent.Label };
-                graph.AddVertex(vertex);
-            }
-            foreach (var hyp in model.Hyperedges)
-            {
-                var vertex = new DataVertex { Name = hyp.Label, ID = hyp.Id, Text = hyp.Label };
-                graph.AddVertex(vertex);
-            }
-            var logicCore = new LogicCoreExample
-            {
-                Graph = graph
-            };
-
-            var vList = logicCore.Graph.Vertices.ToDictionary(x => x.ID);
-
-            graphArea.LogicCore = logicCore;
-
-            graphArea.LogicCore.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.LinLog;//ISOM KK CompoundFDP FR! LinLog
-            graphArea.SetVerticesMathShape(VertexShape.Circle);
-            graphArea.GenerateGraph(true);
-
-            foreach (var item in graphArea.VertexList.Keys)
-            {
-                var poleCount = model.Vertices.First(x => x.Id == item.ID).Poles.Count;
-                graphArea.VertexList[item].SetConnectionPointsVisibility(false);
-                graphArea.VertexList[item].VertexConnectionPointsList.Clear();
-                graphArea.VertexList[item].VCPRoot.Children.Clear();
-
-                foreach (var pole in model.Vertices.First(x => x.Id == item.ID).Poles)
-                {
-                    var vcp = new GraphX.Controls.StaticVertexConnectionPoint { Id = (int)pole.Id, Tag = pole };
-                    var ctrl = new Border { Margin = new Thickness(2, 2, 0, 2), Padding = new Thickness(0), Child = vcp };
-                    graphArea.VertexList[item].VCPRoot.Children.Add(ctrl);
-                    graphArea.VertexList[item].VertexConnectionPointsList.Add(vcp);
-                }
-            }
-            graphArea.SetVerticesDrag(false, false);
-            graphArea.UpdateLayout();
+            zoomcontrol.ZoomToFill();
+            if (zoomcontrol.ViewFinder != null)
+                zoomcontrol.ViewFinder.Visibility = Visibility.Collapsed;
         }
 
         private void UpButton_Click(object sender, RoutedEventArgs e)
@@ -100,7 +65,7 @@ namespace CheckApp
                 FillRules();
             }
             ValidateButtons();
-            NumberLabel.Content = currentIndex + 1;
+            NumberLabel.Content = VisibleRuleNumber;
         }
 
         private void DownButton_Click(object sender, RoutedEventArgs e)
@@ -111,7 +76,7 @@ namespace CheckApp
                 FillRules();
             }
             ValidateButtons();
-            NumberLabel.Content = currentIndex + 1;
+            NumberLabel.Content = VisibleRuleNumber;
         }
 
         private void ValidateButtons()
@@ -125,7 +90,6 @@ namespace CheckApp
                 DownButton.IsEnabled = false;
             else
                 DownButton.IsEnabled = true;
-
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

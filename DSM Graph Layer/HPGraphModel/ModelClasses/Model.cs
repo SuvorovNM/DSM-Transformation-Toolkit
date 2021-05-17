@@ -399,6 +399,30 @@ namespace DSM_Graph_Layer.HPGraphModel.ModelClasses
         }
 
         /// <summary>
+        /// Переопределить правила трансформации для целевой метамодель (если она была перезагружена)
+        /// </summary>
+        /// <param name="newTarget">Новая целевая метамодель</param>
+        public void RedefineTransformation(Model newTarget)
+        {
+            if (Transformations.Where(x => x.Key.Id == newTarget.Id).Any())
+            {
+                var transformation = Transformations.FirstOrDefault(x => x.Key.Id == newTarget.Id);
+                foreach (var rule in transformation.Value)
+                {
+                    var vertexIds = rule.RightPart.Entities.Select(x => x.Id);
+                    var hyperedgeIds = rule.RightPart.Hyperedges.Select(x => x.Id);
+                    var poleIds = rule.RightPart.ExternalPoles.Select(x => x.Id);
+
+                    var newRightPart = new ModelForTransformation(newTarget.Entities.Where(x => vertexIds.Contains(x.Id)), newTarget.Hyperedges.Where(x => hyperedgeIds.Contains(x.Id)), newTarget.ExternalPoles.Where(x => poleIds.Contains(x.Id)));
+                    rule.RightPart = newRightPart;
+
+                    AddTransformationRule(newTarget, rule);
+                }
+                Transformations.Remove(transformation.Key);
+            }
+        }
+
+        /// <summary>
         /// Выполнить трансформации для преобразования в модель, основанную на целевой метамодели
         /// </summary>
         /// <param name="targetMetamodel"></param>
