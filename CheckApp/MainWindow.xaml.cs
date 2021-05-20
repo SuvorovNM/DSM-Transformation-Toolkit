@@ -1,35 +1,30 @@
 ﻿using DSM_Graph_Layer.HPGraphModel.ModelClasses;
 using Graph_Model_Tests.Metamodels;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using Microsoft.Win32;
-using DSM_Graph_Layer.HPGraphModel.ModelClasses.Transformations;
 
 namespace CheckApp
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<Model> metamodels;
+        /// <summary>
+        /// Открытые метамодели
+        /// </summary>
+        List<Model> Metamodels { get; set; }
+
+        /// <summary>
+        /// Инициализация демонстрационных моделей, метамоделей и правил трансформации
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -45,14 +40,17 @@ namespace CheckApp
             hbbDiagram.GetSampleModel();
             hbbDiagram.AddTransformationsToTargetModel(ebbDiagram.Metamodel);
 
-            metamodels = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, ebbDiagram.Metamodel, hbbDiagram.Metamodel };
+            Metamodels = new List<Model>() { erDiagram.Metamodel, classDiagram.Metamodel, ebbDiagram.Metamodel, hbbDiagram.Metamodel };
 
-            foreach (var model in metamodels.Where(x => x.BaseElement == null))
+            foreach (var model in Metamodels.Where(x => x.BaseElement == null))
             {
                 MetamodelListBox.Items.Add(new ListBoxItem { Tag = model, Content = model.Label });
             }
         }
 
+        /// <summary>
+        /// Изменение выбора элемента в списке метамоделей - также осуществляется обновление списка моделей и списков сущностей и гиперребер
+        /// </summary>
         private void MetamodelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ModelListBox.Items.Clear();
@@ -74,6 +72,9 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Изменение элемента в списке моделей - также осуществляется обновление списка моделей и списков сущностей и гиперребер
+        /// </summary>
         private void ModelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count != 0)
@@ -88,6 +89,10 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Заполнить списки сущностей и гиперребер по выбранной модели
+        /// </summary>
+        /// <param name="chosenItem">Выбранная модель</param>
         private void FillVerticesInfo(Model chosenItem)
         {
             EntityListBox.Items.Clear();
@@ -102,11 +107,9 @@ namespace CheckApp
             }
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
+        /// <summary>
+        /// Открыть окно просмотра модели/метамодели
+        /// </summary>
         private void ShowMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var chosenModel = (ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model ?? (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
@@ -123,6 +126,9 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Сохранить выбранную метамодель в качестве бинарного файла
+        /// </summary>
         private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var chosenMetamodel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
@@ -140,6 +146,9 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Открыть бинарный файл метамодели и добавить полученную метамодель в список метамоделей
+        /// </summary>
         private void OpenMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new OpenFileDialog();
@@ -152,15 +161,18 @@ namespace CheckApp
                 stream.Close();
 
                 MetamodelListBox.Items.Add(new ListBoxItem { Tag = resultMetamodel, Content = resultMetamodel.Label });
-                metamodels.Add(resultMetamodel);
+                Metamodels.Add(resultMetamodel);
 
-                foreach (var metamodel in metamodels.Where(x => x.Transformations.Any(y => y.Key.Id == resultMetamodel.Id)))
+                foreach (var metamodel in Metamodels.Where(x => x.Transformations.Any(y => y.Key.Id == resultMetamodel.Id)))
                 {
                     metamodel.RedefineTransformation(resultMetamodel);
                 }
             }
         }
 
+        /// <summary>
+        /// Удалить модель/метамодель из списка
+        /// </summary>
         private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Model chosenModel = null;
@@ -174,7 +186,7 @@ namespace CheckApp
             else if (MetamodelListBox.SelectedItem as ListBoxItem != null)
             {
                 chosenModel = (MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model;
-                metamodels.Remove(chosenModel);
+                Metamodels.Remove(chosenModel);
                 MetamodelListBox.Items.RemoveAt(MetamodelListBox.SelectedIndex);
                 MetamodelListBox.SelectedIndex = -1;
             }
@@ -184,11 +196,17 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Сброс выбора модели при щелчке по списку метамоделей
+        /// </summary>
         private void MetamodelListBox_MouseUp(object sender, MouseButtonEventArgs e)
         {
             ModelListBox.SelectedIndex = -1;
         }
 
+        /// <summary>
+        /// Изменение наименования модели/метамодели - для выбора имени открывается диалоговое окно
+        /// </summary>
         private void ChangeNameMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (ModelListBox.SelectedItem as ListBoxItem != null || MetamodelListBox.SelectedItem as ListBoxItem != null)
@@ -213,11 +231,15 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Посмотреть правила трансформации для выбранной метамодели:
+        /// Для этого сначала открывается диалоговое окно для выбора целевой метамодели, а затем открывается окно с правилами преобразования
+        /// </summary>
         private void ViewRulesMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (MetamodelListBox.SelectedItem as ListBoxItem != null && ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(metamodels).Any())
+            if (MetamodelListBox.SelectedItem as ListBoxItem != null && ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(Metamodels).Any())
             {
-                var availableMetamodels = ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(metamodels).ToList();
+                var availableMetamodels = ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(Metamodels).ToList();
                 ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
                 if (chooseMetamodelWindow.ShowDialog() == true)
                 {
@@ -231,11 +253,15 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Выполнить горизонтальную трансформацию выбранной модели в экземпляр целевой метамодели:
+        /// Для этого сначала открывается диалоговое окно для выбора возможной целевой метамодели, а затем открывается окно с созданной моделью
+        /// </summary>
         private void ExecuteTransformationTo_Click(object sender, RoutedEventArgs e)
         {
-            if (ModelListBox.SelectedItem as ListBoxItem != null && ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(metamodels).Any())
+            if (ModelListBox.SelectedItem as ListBoxItem != null && ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(Metamodels).Any())
             {
-                var availableMetamodels = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(metamodels).ToList();
+                var availableMetamodels = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(Metamodels).ToList();
                 ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
                 if (chooseMetamodelWindow.ShowDialog() == true)
                 {

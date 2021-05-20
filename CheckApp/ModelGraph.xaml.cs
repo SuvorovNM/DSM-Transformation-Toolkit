@@ -1,19 +1,6 @@
 ﻿using DSM_Graph_Layer.HPGraphModel.ModelClasses;
-using GraphX.Common.Enums;
-using GraphX.Logic.Models;
-using QuickGraph;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CheckApp
 {
@@ -22,7 +9,15 @@ namespace CheckApp
     /// </summary>
     public partial class ModelGraph : UserControl
     {
+        /// <summary>
+        /// Демонстрируемая модель
+        /// </summary>
         private Model Model { get; set; }
+
+        /// <summary>
+        /// Инициализация и загрузка визуального отображения графа модели
+        /// </summary>
+        /// <param name="model">Демонстрируемая модель</param>
         public ModelGraph(Model model)
         {
             InitializeComponent();
@@ -31,6 +26,9 @@ namespace CheckApp
             Loaded += ControlLoaded;
         }
 
+        /// <summary>
+        /// Загрузка визуального отображения графа модели и установка zoomControl
+        /// </summary>
         void ControlLoaded(object sender, RoutedEventArgs e)
         {
             graphArea.GenerateGraph(Model);

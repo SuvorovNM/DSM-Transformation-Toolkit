@@ -16,7 +16,7 @@
         <Label x:Name="EntitiesLabel" Content="Сущности" HorizontalAlignment="Left" Margin="608,36,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="HyperedgesLabel" Content="Гиперребра" HorizontalAlignment="Left" Margin="602,213,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Menu HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="792">
-            <MenuItem Height="26" Width="100" RenderTransformOrigin="0.495,0.558" Click="MenuItem_Click">
+            <MenuItem Height="26" Width="100" RenderTransformOrigin="0.495,0.558">
                 <MenuItem.Header>
                     <TextBlock Text="Модель" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="21,0,-21,0"/>
                 </MenuItem.Header>

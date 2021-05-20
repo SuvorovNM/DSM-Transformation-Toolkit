@@ -18,6 +18,10 @@ namespace CheckApp
     /// </summary>
     public partial class ChooseMetamodel : Window
     {
+        /// <summary>
+        /// Инициализация - заполнение списка возможных метамоделей
+        /// </summary>
+        /// <param name="targetMetamodels">Список потенциальных целевых метамоделей</param>
         public ChooseMetamodel(List<Model> targetMetamodels)
         {
             InitializeComponent();
@@ -27,11 +31,17 @@ namespace CheckApp
             }
         }
 
+        /// <summary>
+        /// Нажатие кнопки "ОК" - диалоговое окно закрывается с результатом True
+        /// </summary>
         private void Accept_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
         }
 
+        /// <summary>
+        /// Выбранная целевая метамодель
+        /// </summary>
         public Model ChosenModel
         {
             get

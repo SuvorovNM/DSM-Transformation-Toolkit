@@ -20,42 +20,59 @@ using System.Windows.Shapes;
 
 namespace CheckApp
 {
+    /// <summary>
+    /// Элемент управления для отображения графа модели
+    /// </summary>
     public class GraphAreaExample : GraphArea<DataVertex, DataEdge, BidirectionalGraph<DataVertex, DataEdge>> 
     {
+        /// <summary>
+        /// Генерация графа мо модели
+        /// </summary>
+        /// <param name="model">Выбранная модель</param>
+        /// <param name="EdgesToAdd">Необходимо ли добавлять ребра: True, если необходимо</param>
         public void GenerateGraph(Model model, bool EdgesToAdd = true)
         {
-            var graph = new GraphExample();
+            var graph = new BidirectionalGraph<DataVertex, DataEdge>();
+
+            // Добавление вершин в граф
             foreach (var ent in model.Entities)
             {
-                var vertex = new DataVertex { Name = ent.Label, ID = ent.Id, Text = ent.Label };
+                var vertex = new DataVertex { ID = ent.Id, Text = ent.Label };
                 graph.AddVertex(vertex);
             }
             foreach (var hyp in model.Hyperedges)
             {
-                var vertex = new DataVertex { Name = hyp.Label, ID = hyp.Id, Text = hyp.Label };
+                var vertex = new DataVertex { ID = hyp.Id, Text = hyp.Label };
                 graph.AddVertex(vertex);
             }
-            var logicCore = new LogicCoreExample
+            var logicCore = new GXLogicCore<DataVertex, DataEdge, BidirectionalGraph<DataVertex, DataEdge>>
             {
                 Graph = graph
             };
 
             var vList = logicCore.Graph.Vertices.ToDictionary(x => x.ID);
 
+            // Установка базовых параметров для отображения графа модели, включая алогоритм укладки
             LogicCore = logicCore;
-
             LogicCore.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.LinLog;
             SetVerticesMathShape(VertexShape.Circle);
+            SetVerticesDrag(true, true);
             GenerateGraph(true);
 
+            // Добавление полюсов (Vertex Connection Points) к графу модели
             AddPoles(model);
+
+            // Добавление ребер, если это необходимо
             if (EdgesToAdd)
                 AddEdges(model, graph, vList);
 
-            SetVerticesDrag(true, true);
             UpdateLayout();
         }
 
+        /// <summary>
+        /// Добавление полюсов (Vertex Connection Points) к графу модели по полюсам вершин выбранной модели
+        /// </summary>
+        /// <param name="model">Выбранная модель</param>
         private void AddPoles(Model model)
         {
             foreach (var item in VertexList.Keys)
@@ -76,13 +93,25 @@ namespace CheckApp
             }
         }
 
-        private void AddEdges(Model model, GraphExample graph, Dictionary<long, DataVertex> vList)
+        /// <summary>
+        /// Добавление ребер к графу модели на основе связей выбранной модели
+        /// </summary>
+        /// <param name="model">Выбранная модель</param>
+        /// <param name="graph">Граф модели</param>
+        /// <param name="vList">Список вершин</param>
+        private void AddEdges(Model model, BidirectionalGraph<DataVertex, DataEdge> graph, Dictionary<long, DataVertex> vList)
         {
             foreach (var hedge in model.HyperedgeConnectors)
             {
                 foreach (var link in hedge.Links)
                 {
-                    graph.AddEdge(vList[(int)link.SourcePole.VertexOwner.Id], vList[(int)link.TargetPole.VertexOwner.Id], (int)link.SourcePole.Id, (int)link.TargetPole.Id);
+                    var edge = new DataEdge(vList[(int)link.SourcePole.VertexOwner.Id], vList[(int)link.TargetPole.VertexOwner.Id])
+                    {
+                        ID = link.Id,
+                        SourceConnectionPointId = (int)link.SourcePole.Id,
+                        TargetConnectionPointId = (int)link.TargetPole.Id,
+                    };
+                    graph.AddEdge(edge);
                 }
             }
             RelayoutGraph(true);
@@ -96,57 +125,46 @@ namespace CheckApp
             SetEdgesDashStyle(GraphX.Controls.EdgeDashStyle.Solid);
         }
     }
-    public class LogicCoreExample : GXLogicCore<DataVertex, DataEdge, BidirectionalGraph<DataVertex, DataEdge>>
-    {
-    }
 
+    /// <summary>
+    /// Вершина отображаемого графа модели
+    /// </summary>
     public class DataVertex : VertexBase
     {
+        /// <summary>
+        /// Текст вершины
+        /// </summary>
         public string Text { get; set; }
-        public string Name { get; set; }
 
         public override string ToString()
         {
             return Text;
         }
 
-        public DataVertex() : this(string.Empty)
-        {
-        }
-
+        /// <summary>
+        /// Инициализация вершины
+        /// </summary>
+        /// <param name="text">Отображаемый текст вершины</param>
         public DataVertex(string text = "")
         {
             Text = string.IsNullOrEmpty(text) ? "New Vertex" : text;
         }
     }
 
-    public class DataEdge : EdgeBase<DataVertex>, INotifyPropertyChanged
+    /// <summary>
+    /// Ребро отображаемого графа модели
+    /// </summary>
+    public class DataEdge : EdgeBase<DataVertex>
     {
+        /// <summary>
+        /// Инициализация ребра
+        /// </summary>
+        /// <param name="source">Исходная вершина</param>
+        /// <param name="target">Целевая вершина</param>
+        /// <param name="weight">Вес ребра</param>
         public DataEdge(DataVertex source, DataVertex target, double weight = 1)
             : base(source, target, weight)
         {
-            Angle = 90;
-        }
-
-        public double Angle { get; set; }
-
-        /// <summary>
-        /// Node main description (header)
-        /// </summary>
-        private string _text;
-        public string Text { get { return _text; } set { _text = value; OnPropertyChanged("Text"); } }
-
-        public override string ToString()
-        {
-            return Text;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
