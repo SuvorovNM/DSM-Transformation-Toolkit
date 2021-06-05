@@ -4,19 +4,11 @@ using GraphX.Common.Models;
 using GraphX.Controls;
 using GraphX.Logic.Models;
 using QuickGraph;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CheckApp
 {
@@ -33,6 +25,7 @@ namespace CheckApp
         public void GenerateGraph(Model model, bool EdgesToAdd = true)
         {
             var graph = new BidirectionalGraph<DataVertex, DataEdge>();
+            var hyperedges = new List<DataVertex>();
 
             // Добавление вершин в граф
             foreach (var ent in model.Entities)
@@ -44,20 +37,27 @@ namespace CheckApp
             {
                 var vertex = new DataVertex { ID = hyp.Id, Text = hyp.Label };
                 graph.AddVertex(vertex);
+                hyperedges.Add(vertex);
             }
             var logicCore = new GXLogicCore<DataVertex, DataEdge, BidirectionalGraph<DataVertex, DataEdge>>
             {
                 Graph = graph
             };
 
-            var vList = logicCore.Graph.Vertices.ToDictionary(x => x.ID);
+            var vList = logicCore.Graph.Vertices.ToDictionary(x => x.ID);            
 
-            // Установка базовых параметров для отображения графа модели, включая алогоритм укладки
+            // Установка базовых параметров для отображения графа модели, включая алгоритм укладки
             LogicCore = logicCore;
             LogicCore.DefaultLayoutAlgorithm = LayoutAlgorithmTypeEnum.LinLog;
             SetVerticesMathShape(VertexShape.Circle);
             SetVerticesDrag(true, true);
             GenerateGraph(true);
+
+            // Покраска гиперребер
+            foreach (var item in hyperedges)
+            {
+                VertexList[item].Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 128));
+            }
 
             // Добавление полюсов (Vertex Connection Points) к графу модели
             AddPoles(model);

@@ -3,9 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CheckApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Система визуализации" Height="450" Width="800">
     <Grid>
         <ListBox x:Name="MetamodelListBox" HorizontalAlignment="Left" Height="327" Margin="37,62,0,0" VerticalAlignment="Top" Width="225" SelectionChanged="MetamodelListBox_SelectionChanged" MouseUp="MetamodelListBox_MouseUp"/>
         <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="327" Margin="284,62,0,0" VerticalAlignment="Top" Width="225" SelectionChanged="ModelListBox_SelectionChanged"/>

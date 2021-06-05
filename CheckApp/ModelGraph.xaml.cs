@@ -23,7 +23,7 @@ namespace CheckApp
             InitializeComponent();
             Model = model;
             DataContext = this;
-            Loaded += ControlLoaded;
+            Loaded += ControlLoaded;            
         }
 
         /// <summary>

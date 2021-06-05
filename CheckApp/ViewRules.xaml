@@ -10,7 +10,7 @@
              d:DesignHeight="300"
              d:DesignWidth="600"
              mc:Ignorable="d"
-        Title="TestTransform" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="Просмотр правил трансформации" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
         <Grid.Resources>
             <ResourceDictionary>
