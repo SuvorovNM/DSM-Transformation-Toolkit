@@ -122,6 +122,8 @@ namespace CheckApp
                     Content = new ModelGraph(chosenModel)
                 };
 
+                window.Owner = this;
+                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 window.ShowDialog();
             }
         }
@@ -241,12 +243,14 @@ namespace CheckApp
             {
                 var availableMetamodels = ((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations.Keys.Intersect(Metamodels).ToList();
                 ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
+                chooseMetamodelWindow.Owner = this;
                 if (chooseMetamodelWindow.ShowDialog() == true)
                 {
                     var chosenMetamodel = chooseMetamodelWindow.ChosenModel;
                     if (chosenMetamodel != null)
                     {
                         var wind = new TestTransform(((MetamodelListBox.SelectedItem as ListBoxItem)?.Tag as Model).Transformations[chosenMetamodel]);
+                        wind.Owner = this;
                         wind.ShowDialog();
                     }
                 }
@@ -263,6 +267,7 @@ namespace CheckApp
             {
                 var availableMetamodels = ((ModelListBox.SelectedItem as ListBoxItem)?.Tag as Model).BaseElement.Transformations.Keys.Intersect(Metamodels).ToList();
                 ChooseMetamodel chooseMetamodelWindow = new ChooseMetamodel(availableMetamodels);
+                chooseMetamodelWindow.Owner = this;
                 if (chooseMetamodelWindow.ShowDialog() == true)
                 {
                     var chosenMetamodel = chooseMetamodelWindow.ChosenModel;
@@ -275,6 +280,8 @@ namespace CheckApp
                             Title = "Model View",
                             Content = new ModelGraph(result)
                         };
+                        window.Owner = this;
+                        window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
                         window.ShowDialog();
                     }
