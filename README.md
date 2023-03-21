@@ -1,4 +1,4 @@
-# DSM-Graph-Layer
+# DSM Transformation toolkit
 
 Toolkit that implements a transformation DSM module using HP-graph as a formalism. Allows to perform vertical and horizontal transformations.
 
